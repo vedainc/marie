@@ -32,6 +32,7 @@
    #:split-string
    #:join-strings
    #:normalize-strings
+   #:trim-whitespace
 
    ;; symbols.lisp
    #:defalias
@@ -49,12 +50,15 @@
    #:read-integer
    #:read-integer-line
    #:display-file
-   #:make
+   #:collect-characters
+
+   ;; collect.lisp
+   #:collect
 
    ;; matrix.lisp
    #:index-string
    #:map-string
-   #:build-words
+   #:build-lines
    #:build-matrix
    #:coordinates
    #:element
@@ -63,6 +67,7 @@
    #:dimensions
    #:coordinate-equal-p
    #:valid-coordinate-p
+   #:adjacent-coordinates
    #:ensure-coordinate
    #:peek-up
    #:peek-right

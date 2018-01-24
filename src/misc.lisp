@@ -79,6 +79,7 @@ characters being typed. Returns the input"
        :do (format t "~A~%" line))
     (close in))))
 
-(defun make (&rest args)
-  "Shorthand for ASDF:MAKE"
-  (apply #'asdf:make args))
+(defun collect-characters (start end)
+  "Collect ASCII characters from START to END"
+  (loop :for index :from start :below (+ start end) :collect (code-char index)))
+

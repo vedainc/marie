@@ -23,6 +23,7 @@
                              (:file "strings")
                              (:file "symbols")
                              (:file "misc")
+                             (:file "collect")
                              (:file "matrix")))))
 
 ;;; 2007-10-02

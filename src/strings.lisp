@@ -50,3 +50,6 @@
        :else
        :collect (cat item (make-string (- max length) :initial-element character)))))
 
+(defun trim-whitespace (string)
+  "Trim whitespace characters from STRING"
+  (string-trim '(#\space #\tab #\newline #\linefeed) string))

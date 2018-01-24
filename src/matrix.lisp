@@ -19,9 +19,9 @@ separated by SEPARATOR"
      :for count = 0 :then (1+ count)
      :nconc (index-string count word)))
 
-(defun build-words (line separator)
+(defun build-lines (string separator)
   "Build a list of list of characters from words in LINE."
-  (mapcar #'string-list (split-string line separator)))
+  (mapcar #'string-list (split-string string separator)))
 
 (defun build-matrix (strings separator)
   "Build a matrix from STRING"
@@ -72,6 +72,19 @@ separated by SEPARATOR"
       (gethash coordinate matrix)
     (declare (ignore var))
     exists))
+
+(defun adjacent-coordinates (coordinate)
+  "Return a list of coordinates surrounding COORDINATE"
+  (let* ((steps '(-1 0 1))
+         (coordinates (remove
+                       coordinate
+                       (destructuring-bind (a b) coordinate
+                         (collect list
+                             ((list (+ a x) (+ b y)))
+                           (in x steps)
+                           (in y steps)))
+                       :test #'equal)))
+    coordinates))
 
 (defun ensure-coordinate (coordinate matrix)
   "Return COORDINATE if it is part of MATRIX. Otherwise, return NIL"
