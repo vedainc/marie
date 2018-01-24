@@ -44,15 +44,14 @@ separated by SEPARATOR"
   "Return the elements of MATRIX"
   (loop :for v :being the hash-values :in matrix :collect v))
 
-(defun print-matrix (table)
+(defun print-matrix (matrix)
   "View hash table processed by BUILD-MATRIX"
-  (maphash #'(lambda (k v)
-               (format t "~S: ~S~%" k v))
-           table))
+  (maphash #'(lambda (key value) (format t "~S: ~S~%" key value))
+           matrix))
 
 (defun dimensions (matrix)
   "Return the dimensions of MATRIX as two values"
-  (let ((last-coordinate (first (last (coordinates matrix)))))
+  (let ((last-coordinate (last* (coordinates matrix))))
     (destructuring-bind (rows cols)
         last-coordinate
       (values (1+ rows)

@@ -6,6 +6,7 @@
 
 (defpackage :mof
   (:use #:cl)
+  (:nicknames #:m)
   (:export
    ;; lists.lisp
    #:last*
@@ -48,6 +49,7 @@
    #:read-integer
    #:read-integer-line
    #:display-file
+   #:make
 
    ;; matrix.lisp
    #:index-string

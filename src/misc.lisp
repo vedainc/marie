@@ -79,3 +79,6 @@ characters being typed. Returns the input"
        :do (format t "~A~%" line))
     (close in))))
 
+(defun make (&rest args)
+  "Shorthand for ASDF:MAKE"
+  (apply #'asdf:make args))
