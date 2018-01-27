@@ -74,7 +74,8 @@ characters being typed. Returns the input"
   "Display the contents of FILE"
   (let ((in (open file :if-does-not-exist nil)))
   (when in
-    (loop :for line = (read-line in nil)
+    (loop
+       :for line = (read-line in nil)
        :while line
        :do (format t "~A~%" line))
     (close in))))
@@ -83,3 +84,14 @@ characters being typed. Returns the input"
   "Collect ASCII characters from START to END"
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
+(defun copy-hash-table (hash-table)
+  "Create a new hash table from HASH-TABLE"
+  (let ((table (make-hash-table :test (hash-table-test hash-table)
+                                :rehash-size (hash-table-rehash-size hash-table)
+                                :rehash-threshold (hash-table-rehash-threshold hash-table)
+                                :size (hash-table-size hash-table))))
+    (loop
+       :for key :being each hash-key :of hash-table
+       :using (hash-value value)
+       :do (setf (gethash key table) value)
+       :finally (return table))))

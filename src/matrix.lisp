@@ -73,18 +73,24 @@ separated by SEPARATOR"
     (declare (ignore var))
     exists))
 
-(defun adjacent-coordinates (coordinate)
+(defun adjacent-coordinates (coordinate &key (include nil))
   "Return a list of coordinates surrounding COORDINATE"
   (let* ((steps '(-1 0 1))
-         (coordinates (remove
-                       coordinate
-                       (destructuring-bind (a b) coordinate
-                         (collect list
-                             ((list (+ a x) (+ b y)))
-                           (in x steps)
-                           (in y steps)))
-                       :test #'equal)))
-    coordinates))
+         (coordinates (destructuring-bind (a b) coordinate
+                        (collect list
+                            ((list (+ a x) (+ b y)))
+                          (in x steps)
+                          (in y steps)))))
+    (if include
+        coordinates
+        (remove coordinate coordinates :test #'equal))))
+
+(defun cross-adjacent-coordinates (coordinate)
+  "Return the adjacent coordinates of COORDINATE horizontally and vertically, only"
+  (list (peek-left coordinate)
+        (peek-up coordinate)
+        (peek-right coordinate)
+        (peek-down coordinate)))
 
 (defun ensure-coordinate (coordinate matrix)
   "Return COORDINATE if it is part of MATRIX. Otherwise, return NIL"
@@ -132,6 +138,32 @@ separated by SEPARATOR"
   "Return LINE from MATRIX as string"
   (list-string (line-values line matrix)))
 
+(defun last-coordinate (matrix)
+  "Return the last coordinate of MATRIX"
+  (last* (coordinates matrix)))
+
+(defun matrix-rows (matrix)
+  "Return the number of rows from MATRIX"
+  (destructuring-bind (row column)
+      (last-coordinate matrix)
+    (declare (ignore column))
+    (1+ row)))
+
+(defun matrix-columns (matrix)
+  "Return the number of rows from MATRIX"
+  (destructuring-bind (row column)
+      (last-coordinate matrix)
+    (declare (ignore row))
+    (1+ column)))
+
+(defun group-coordinates (matrix)
+  "Create groups of coordinates according to the dimensions of MATRIX"
+  (group (coordinates matrix) (matrix-columns matrix)))
+
+(defun group-elements (matrix)
+  "Create groups of elements according to the dimensions of MATRIX"
+  (group (elements matrix) (matrix-columns matrix)))
+
 
 ;;; ?
 (defun range (start end)
@@ -171,3 +203,4 @@ separated by SEPARATOR"
     (remove-duplicate-coordinates
      (sort-coordinates
       (append top left right bottom)))))
+

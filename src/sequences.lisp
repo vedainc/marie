@@ -1,4 +1,4 @@
-;;;; lists.lisp
+;;;; sequences.lisp
 
 ;;; Utilities for working with lists and trees
 
@@ -106,4 +106,21 @@ doesn't, and another list that starts where FN returns true,as values"
          (values (nreverse accumulator) source))
       (push (car source) accumulator))))
 
+(defun append* (list data)
+  "Destructively update list with data"
+  (setf list (nconc list data)))
 
+(defun vector-list (list)
+  "Return list as vector"
+  (map 'vector #'identity list))
+
+(defun list-vector (vector)
+  "Return list as vector"
+  (map 'list #'identity vector))
+
+(defun remove-items (list items)
+  "Remove ITEMS from LIST"
+  (cond ((null items) list)
+        (t (remove-items
+            (remove (first items) list :test #'equal)
+            (rest items)))))

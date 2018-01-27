@@ -8,7 +8,7 @@
   (:use #:cl)
   (:nicknames #:m)
   (:export
-   ;; lists.lisp
+   ;; sequences.lisp
    #:last*
    #:solop
    #:longerp
@@ -23,6 +23,10 @@
    #:afterp
    #:duplicatep
    #:split-if
+   #:append*
+   #:vector-list
+   #:list-vector
+   #:remove-items
 
    ;; strings.lisp
    #:digest-string
@@ -51,6 +55,7 @@
    #:read-integer-line
    #:display-file
    #:collect-characters
+   #:copy-hash-table
 
    ;; collect.lisp
    #:collect
@@ -68,6 +73,7 @@
    #:coordinate-equal-p
    #:valid-coordinate-p
    #:adjacent-coordinates
+   #:cross-adjacent-coordinates
    #:ensure-coordinate
    #:peek-up
    #:peek-right
@@ -77,4 +83,11 @@
    #:filter-lines
    #:line-values
    #:list-string
-   #:line-string))
+   #:line-string
+   #:last-coordinate
+   #:matrix-rows
+   #:matrix-columns
+   #:group-coordinates
+   #:group-elements
+   #:range
+   #:sort-coordinates))

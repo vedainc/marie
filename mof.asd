@@ -9,7 +9,7 @@
   :name "mof"
   :version "0.5"
   :author "Rommel Martinez <ebzzry@ebzzry.io>"
-  :license "BSD License"
+  :license "MIT"
   :description "Miscellaneous utilities"
   :depends-on (#:cl-who
                #:ironclad
@@ -19,7 +19,7 @@
                 "src"
                 :serial t
                 :components ((:file "packages")
-                             (:file "lists")
+                             (:file "sequences")
                              (:file "strings")
                              (:file "symbols")
                              (:file "misc")
