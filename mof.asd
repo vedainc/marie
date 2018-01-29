@@ -15,15 +15,13 @@
                #:ironclad
                #+SBCL
                #:sb-posix)
-  :components ((:module
-                "src"
-                :serial t
-                :components ((:file "packages")
-                             (:file "sequences")
-                             (:file "strings")
-                             (:file "symbols")
-                             (:file "misc")
-                             (:file "collect")
-                             (:file "matrix")))))
+  :serial t
+  :components ((:file "packages")
+               (:file "sequences")
+               (:file "strings")
+               (:file "symbols")
+               (:file "misc")
+               (:file "collect")
+               (:file "matrix")))
 
 ;;; 2007-10-02
