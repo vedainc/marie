@@ -29,6 +29,7 @@
    #:remove-items
    #:join-stream-string
    #:group-alike
+   #:build-length-index
 
    ;; strings.lisp
    #:digest-string

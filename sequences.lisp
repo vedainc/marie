@@ -137,3 +137,13 @@ doesn't, and another list that starts where FN returns true,as values"
                           (cons (make-list (count (first list) list) :initial-element (first list))
                                 accumulator))))))
     (fn list nil)))
+
+(defun build-length-index (groups)
+  "Return a hash table from a list of lists, with the first member of each list as the key
+and the length of each list as the value"
+  (let ((table (make-hash-table :test #'equal)))
+    (loop
+       :for group :in groups
+       :do (setf (gethash (first group) table) (length group)))
+    table))
+
