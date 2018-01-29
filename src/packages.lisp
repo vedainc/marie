@@ -27,6 +27,7 @@
    #:vector-list
    #:list-vector
    #:remove-items
+   #:join-stream-string
 
    ;; strings.lisp
    #:digest-string

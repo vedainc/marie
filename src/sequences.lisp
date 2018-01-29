@@ -124,3 +124,7 @@ doesn't, and another list that starts where FN returns true,as values"
         (t (remove-items
             (remove (first items) list :test #'equal)
             (rest items)))))
+
+(defun join-stream-string (stream lines)
+  "Read lines from 1 to END from STREAM"
+  (join-strings (loop :for i :from 1 :to lines :collect (read-line stream nil nil))))
