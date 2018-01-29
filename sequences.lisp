@@ -128,3 +128,12 @@ doesn't, and another list that starts where FN returns true,as values"
 (defun join-stream-string (stream lines)
   "Read lines from 1 to END from STREAM"
   (join-strings (loop :for i :from 1 :to lines :collect (read-line stream nil nil))))
+
+(defun group-alike (list)
+  "Group similar elements together"
+  (labels ((fn (list accumulator)
+             (cond ((null list) (nreverse accumulator))
+                   (t (fn (remove (first list) list)
+                          (cons (make-list (count (first list) list) :initial-element (first list))
+                                accumulator))))))
+    (fn list nil)))

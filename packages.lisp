@@ -28,6 +28,7 @@
    #:list-vector
    #:remove-items
    #:join-stream-string
+   #:group-alike
 
    ;; strings.lisp
    #:digest-string
