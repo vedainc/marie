@@ -40,7 +40,7 @@
   (format nil "~{~A~^ ~}" list))
 
 (defun normalize-strings (list &key (character #\_))
-  "Return list of characters with equal lengthn using CHARACTER as end padding"
+  "Return list of characters with equal length using CHARACTER as end padding"
   (assert (>= (length list) 1))
   (let ((max (apply #'max (mapcar #'length list))))
     (loop
