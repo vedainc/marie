@@ -63,6 +63,9 @@
    ;; collect.lisp
    #:collect
 
+   ;; files.lisp
+   #:files
+
    ;; matrix.lisp
    #:index-string
    #:map-string

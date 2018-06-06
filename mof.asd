@@ -7,7 +7,7 @@
 
 (defsystem :mof
   :name "mof"
-  :version "0.5"
+  :version "0.6"
   :author "Rommel Martinez <ebzzry@ebzzry.io>"
   :license "MIT"
   :description "Miscellaneous utilities"
@@ -22,6 +22,7 @@
                (:file "symbols")
                (:file "misc")
                (:file "collect")
+               (:file "files")
                (:file "matrix")))
 
 ;;; 2007-10-02
