@@ -2,11 +2,11 @@
 
 ;;; Miscellaneous utilities
 
-(in-package :mof)
+(in-package #:mof)
 
 ;;; From http://thread.gmane.org/gmane.lisp.steel-bank.general/1598/focus=1604
 (defmacro with-echo-off (&body body)
-  "Disable terminal input echo within BODY"
+  "Disable terminal input echo within BODY."
   (with-gensyms (res)
     `(let ((,res nil))
        #+SBCL
@@ -24,7 +24,7 @@
 
 (defun read-passwd ()
   "Read a password string from standard input but do not echo the
-characters being typed. Returns the input"
+characters being typed. Returns the input."
   (with-echo-off (read-line)))
 
 (defun aps (symbol &optional (package *package*))
@@ -63,15 +63,15 @@ characters being typed. Returns the input"
        ,@body)))
 
 (defun read-integer (string)
-  "Return integer from STRING"
+  "Return integer from STRING."
   (parse-integer string :junk-allowed t))
 
 (defun read-integer-line (file)
-  "Return integer from a line in FILE"
+  "Return integer from a line in FILE."
   (read-integer (read-line file nil)))
 
 (defun display-file (file)
-  "Display the contents of FILE"
+  "Display the contents of FILE."
   (let ((in (open file :if-does-not-exist nil)))
   (when in
     (loop
@@ -81,11 +81,11 @@ characters being typed. Returns the input"
     (close in))))
 
 (defun collect-characters (start end)
-  "Collect ASCII characters from START to END"
+  "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
 (defun copy-hash-table (hash-table)
-  "Create a new hash table from HASH-TABLE"
+  "Create a new hash table from HASH-TABLE."
   (let ((table (make-hash-table :test (hash-table-test hash-table)
                                 :rehash-size (hash-table-rehash-size hash-table)
                                 :rehash-threshold (hash-table-rehash-threshold hash-table)

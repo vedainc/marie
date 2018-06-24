@@ -2,10 +2,10 @@
 
 ;;; Utilities for working with finite two-dimensional matrices
 
-(in-package :mof)
+(in-package #:mof)
 
 (defun index-string (count string)
-  "Create data index from STRING prefixed with COUNT"
+  "Create data index from STRING prefixed with COUNT."
   (loop
      :for char :across string
      :for index = 0 :then (1+ index)
@@ -13,7 +13,7 @@
 
 (defun map-string (string separator)
   "Build a list of character index from STRING prefixed with their coordinates
-separated by SEPARATOR"
+separated by SEPARATOR."
   (loop
      :for word :in (split-string string separator)
      :for count = 0 :then (1+ count)
@@ -24,7 +24,7 @@ separated by SEPARATOR"
   (mapcar #'string-list (split-string string separator)))
 
 (defun build-matrix (strings separator)
-  "Build a matrix from STRING"
+  "Build a matrix from STRING."
   (let ((hash (make-hash-table :test #'equal)))
     (loop
        :for (key val)
@@ -33,24 +33,24 @@ separated by SEPARATOR"
     hash))
 
 (defun coordinates (matrix)
-  "Return the list of coordinates of MATRIX"
+  "Return the list of coordinates of MATRIX."
   (loop :for k :being the hash-keys :in matrix :collect k))
 
 (defun element (coordinate matrix)
-  "Return the element under COORDINATE from MATRIX"
+  "Return the element under COORDINATE from MATRIX."
   (gethash coordinate matrix))
 
 (defun elements (matrix)
-  "Return the elements of MATRIX"
+  "Return the elements of MATRIX."
   (loop :for v :being the hash-values :in matrix :collect v))
 
 (defun print-matrix (matrix)
-  "View hash table processed by BUILD-MATRIX"
+  "View hash table processed by BUILD-MATRIX."
   (maphash #'(lambda (key value) (format t "~S: ~S~%" key value))
            matrix))
 
 (defun dimensions (matrix)
-  "Return the dimensions of MATRIX as two values"
+  "Return the dimensions of MATRIX as two values."
   (let ((last-coordinate (last* (coordinates matrix))))
     (destructuring-bind (rows cols)
         last-coordinate
@@ -58,7 +58,7 @@ separated by SEPARATOR"
               (1+ cols)))))
 
 (defun coordinate-equal-p (a b)
-  "Return true if coordinates A and B match"
+  "Return true if coordinates A and B match."
   (if (or (null a) (null b))
       nil
       (destructuring-bind ((a-x a-y) (b-x b-y))
@@ -67,14 +67,14 @@ separated by SEPARATOR"
             t))))
 
 (defun valid-coordinate-p (coordinate matrix)
-  "Return true if COORDINATE is part of MATRIX"
+  "Return true if COORDINATE is part of MATRIX."
   (multiple-value-bind (var exists)
       (gethash coordinate matrix)
     (declare (ignore var))
     exists))
 
 (defun adjacent-coordinates (coordinate &key (include nil))
-  "Return a list of coordinates surrounding COORDINATE"
+  "Return a list of coordinates surrounding COORDINATE."
   (let* ((steps '(-1 0 1))
          (coordinates (destructuring-bind (a b) coordinate
                         (collect list
@@ -86,88 +86,88 @@ separated by SEPARATOR"
         (remove coordinate coordinates :test #'equal))))
 
 (defun cross-adjacent-coordinates (coordinate)
-  "Return the adjacent coordinates of COORDINATE horizontally and vertically, only"
+  "Return the adjacent coordinates of COORDINATE horizontally and vertically, only."
   (list (peek-left coordinate)
         (peek-up coordinate)
         (peek-right coordinate)
         (peek-down coordinate)))
 
 (defun ensure-coordinate (coordinate matrix)
-  "Return COORDINATE if it is part of MATRIX. Otherwise, return NIL"
+  "Return COORDINATE if it is part of MATRIX. Otherwise, return NIL."
   (and coordinate
        (if (valid-coordinate-p coordinate matrix)
            coordinate
            nil)))
 
 (defun peek-up (coordinate)
-  "Return the coordinate up, if it exists. Otherwise, return NIL"
+  "Return the coordinate up, if it exists. Otherwise, return NIL."
   (destructuring-bind (x y) coordinate `(,(1- x) ,y)))
 
 (defun peek-right (coordinate)
-  "Return the coordinate to the right, if it exists. Otherwise, return NIL"
+  "Return the coordinate to the right, if it exists. Otherwise, return NIL."
   (destructuring-bind (x y) coordinate `(,x ,(1+ y))))
 
 (defun peek-down (coordinate)
-  "Return the coordinate down, if it exists. Otherwise, return NIL"
+  "Return the coordinate down, if it exists. Otherwise, return NIL."
   (destructuring-bind (x y) coordinate `(,(1+ x) ,y)))
 
 (defun peek-left (coordinate)
-  "Return the coordinate to the left, if it exists. Otherwise, return NIL"
+  "Return the coordinate to the left, if it exists. Otherwise, return NIL."
   (destructuring-bind (x y) coordinate `(,x ,(1- y))))
 
 (defun find-element-coordinates (element matrix)
-  "Find all coordinates containing ELEMENT from MATRIX"
+  "Find all coordinates containing ELEMENT from MATRIX."
   (loop
      :for key :being the hash-keys :in matrix
      :for val :being the hash-values :in matrix
      :if (equal val element) :collect key))
 
 (defun filter-lines (lines length)
-  "Return LINES with length LENGTH"
+  "Return LINES with length LENGTH."
   (loop :for line :in lines :when (= (length line) length) :collect line))
 
 (defun line-values (line matrix)
-  "Return LINE as characters"
+  "Return LINE as characters."
   (loop :for char :in line :collect (element char matrix)))
 
 (defun list-string (list)
-  "Return LIST of characters as string"
+  "Return LIST of characters as string."
   (format nil "~{~A~}" list))
 
 (defun line-string (line matrix)
-  "Return LINE from MATRIX as string"
+  "Return LINE from MATRIX as string."
   (list-string (line-values line matrix)))
 
 (defun last-coordinate (matrix)
-  "Return the last coordinate of MATRIX"
+  "Return the last coordinate of MATRIX."
   (last* (coordinates matrix)))
 
 (defun matrix-rows (matrix)
-  "Return the number of rows from MATRIX"
+  "Return the number of rows from MATRIX."
   (destructuring-bind (row column)
       (last-coordinate matrix)
     (declare (ignore column))
     (1+ row)))
 
 (defun matrix-columns (matrix)
-  "Return the number of rows from MATRIX"
+  "Return the number of rows from MATRIX."
   (destructuring-bind (row column)
       (last-coordinate matrix)
     (declare (ignore row))
     (1+ column)))
 
 (defun group-coordinates (matrix)
-  "Create groups of coordinates according to the dimensions of MATRIX"
+  "Create groups of coordinates according to the dimensions of MATRIX."
   (group (coordinates matrix) (matrix-columns matrix)))
 
 (defun group-elements (matrix)
-  "Create groups of elements according to the dimensions of MATRIX"
+  "Create groups of elements according to the dimensions of MATRIX."
   (group (elements matrix) (matrix-columns matrix)))
 
 
 ;;; ?
 (defun range (start end)
-  "Return a list of coordinates from START to END, inclusive"
+  "Return a list of coordinates from START to END, inclusive."
   (destructuring-bind ((x1 y1) (x2 y2))
       (list start end)
     (cond ((= x1 x2) (loop :for i :from y1 :to y2 :collect (list x1 i)))
@@ -175,7 +175,7 @@ separated by SEPARATOR"
           (t nil))))
 
 (defun sort-coordinates (coordinates)
-  "Sort COORDINATES in increasing order"
+  "Sort COORDINATES in increasing order."
   (sort coordinates
         #'(lambda (a-coordinate b-coordinate)
             (destructuring-bind ((x1 y1) (x2 y2))
@@ -183,7 +183,7 @@ separated by SEPARATOR"
               (and (<= x1 x2) (<= y1 y2))))))
 
 (defun remove-duplicate-coordinates (coordinates)
-  "Remove duplicates coordinates in COORDINATES"
+  "Remove duplicates coordinates in COORDINATES."
   (labels ((fn (coords acc)
              (cond ((or (null (cdr coords)))
                     (reverse acc))
@@ -193,7 +193,7 @@ separated by SEPARATOR"
     (fn coordinates nil)))
 
 (defun boundaries (start end)
-  "Return the list of boundary coordinates from START to END"
+  "Return the list of boundary coordinates from START to END."
   (let* ((top (range start (list (first start) (second end))))
          (left (range start (list (first end) (second start))))
          (end1 (first (last top)))

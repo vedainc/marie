@@ -2,12 +2,29 @@
 
 ;;; Utilities for woking with symbols, macros, and definitions
 
-(in-package :mof)
+(in-package #:mof)
+
+(defmacro defcon (name value &optional doc)
+  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains
+about constants being redefined, hence, this macro."
+  (if (boundp name)
+      (format t
+              "~&already defined ~A~%old value ~s~%attempted value ~s~%"
+              name (symbol-value name) value))
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+     ,@(when doc (list doc))))
+
 
 (defmacro defalias (alias name)
   "Create alias `alias' for function `name'."
   `(defun ,alias (&rest args)
      (apply #',name args)))
+
+(defmacro defun* (name alias args &rest body)
+  "Define a function with an alias."
+  `(progn
+     (defun ,name ,args ,@body)
+     (defalias ,name ,alias)))
 
 ;;; From Practical Common Lisp—Peter Seibel
 (defmacro with-gensyms ((&rest names) &body body)

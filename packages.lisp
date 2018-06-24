@@ -2,7 +2,7 @@
 
 ;;; Top-level package definition
 
-(in-package :cl-user)
+(in-package #:cl-user)
 
 (defpackage :mof
   (:use #:cl)
@@ -40,9 +40,12 @@
    #:join-strings
    #:normalize-strings
    #:trim-whitespace
+   #:fmt
 
    ;; symbols.lisp
+   #:defcon
    #:defalias
+   #:defun*
    #:with-gensyms
    #:ppmx
 
