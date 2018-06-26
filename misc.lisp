@@ -95,3 +95,7 @@ characters being typed. Returns the input."
        :using (hash-value value)
        :do (setf (gethash key table) value)
        :finally (return table))))
+
+(defun home (path)
+  "Return a path relative to the home directory."
+  (uiop:subpathname (user-homedir-pathname) path))

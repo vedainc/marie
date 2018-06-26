@@ -63,6 +63,7 @@
    #:display-file
    #:collect-characters
    #:copy-hash-table
+   #:home
 
    ;; collect.lisp
    #:collect
