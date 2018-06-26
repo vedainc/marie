@@ -12,7 +12,7 @@
    #:last*
    #:solop
    #:longerp
-   #:group
+   #:partition
    #:flatten-list
    #:filter-if
    #:filter-if-not
@@ -32,6 +32,7 @@
    #:build-length-index
 
    ;; strings.lisp
+   #:empty-string-p
    #:digest-string
    #:string-if
    #:cat

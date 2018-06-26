@@ -158,11 +158,11 @@ separated by SEPARATOR."
 
 (defun group-coordinates (matrix)
   "Create groups of coordinates according to the dimensions of MATRIX."
-  (group (coordinates matrix) (matrix-columns matrix)))
+  (partition (coordinates matrix) (matrix-columns matrix)))
 
 (defun group-elements (matrix)
   "Create groups of elements according to the dimensions of MATRIX."
-  (group (elements matrix) (matrix-columns matrix)))
+  (partition (elements matrix) (matrix-columns matrix)))
 
 
 ;;; ?

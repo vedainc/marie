@@ -4,6 +4,10 @@
 
 (in-package #:mof)
 
+(defun empty-string-p (string)
+  "Return true if STRING is of length zero."
+  (zerop (length string)))
+
 (defun digest-string (string &optional (type :sha256))
   "Return a string of a digest of a string."
   (ironclad:byte-array-to-hex-string
