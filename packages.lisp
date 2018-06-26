@@ -51,7 +51,7 @@
    #:ppmx
 
    ;; misc.lisp
-   #:with-echo-off
+   #+sbcl #:with-echo-off
    #:read-passwd
    #:print-symbols
    #:aps

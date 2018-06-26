@@ -5,6 +5,7 @@
 (in-package #:mof)
 
 ;;; From http://thread.gmane.org/gmane.lisp.steel-bank.general/1598/focus=1604
+#+sbcl
 (defmacro with-echo-off (&body body)
   "Disable terminal input echo within BODY."
   (with-gensyms (res)
@@ -53,14 +54,6 @@ characters being typed. Returns the input."
               :for line = (read-line in nil nil)
               :while line
               :do (write-line line out)))))))
-
-(defmacro with-html (filename &body body)
-  "Trivial wrapper for CL-WHO:WITH-HTML-OUTPUT."
-  `(with-open-file (out ,filename
-                        :direction :output
-                        :if-exists :supersede)
-     (cl-who:with-html-output (out nil :prologue t)
-       ,@body)))
 
 (defun read-integer (string)
   "Return integer from STRING."
