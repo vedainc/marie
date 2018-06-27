@@ -1,4 +1,4 @@
-;;;; mof.asd
+#-asdf3.1 (error "ASDF 3.1 or bust!")
 
 (defpackage :mof-system
   (:use #:cl #:asdf))
@@ -8,9 +8,9 @@
 (defsystem :mof
   :name "mof"
   :version "0.0.7"
-  :author "Rommel Martinez <ebzzry@ebzzry.io>"
-  :license "MIT"
   :description "Miscellaneous utilities"
+  :license "CC0"
+  :author "Rommel Martinez <ebzzry@ebzzry.io>"
   :depends-on (#:ironclad
                #+SBCL
                #:sb-posix)
