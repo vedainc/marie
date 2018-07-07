@@ -6,18 +6,16 @@
 
 (defun index-string (count string)
   "Create data index from STRING prefixed with COUNT."
-  (loop
-     :for char :across string
-     :for index = 0 :then (1+ index)
-     :collect (list (list count index) char)))
+  (loop :for char :across string
+        :for index = 0 :then (1+ index)
+        :collect (list (list count index) char)))
 
 (defun map-string (string separator)
   "Build a list of character index from STRING prefixed with their coordinates
 separated by SEPARATOR."
-  (loop
-     :for word :in (split-string string separator)
-     :for count = 0 :then (1+ count)
-     :nconc (index-string count word)))
+  (loop :for word :in (split-string string separator)
+        :for count = 0 :then (1+ count)
+        :nconc (index-string count word)))
 
 (defun build-lines (string separator)
   "Build a list of list of characters from words in LINE."
@@ -26,10 +24,9 @@ separated by SEPARATOR."
 (defun build-matrix (strings separator)
   "Build a matrix from STRING."
   (let ((hash (make-hash-table :test #'equal)))
-    (loop
-       :for (key val)
-       :in (map-string strings separator)
-       :do (setf (gethash key hash) val))
+    (loop :for (key val)
+          :in (map-string strings separator)
+          :do (setf (gethash key hash) val))
     hash))
 
 (defun coordinates (matrix)
@@ -117,10 +114,9 @@ separated by SEPARATOR."
 
 (defun find-element-coordinates (element matrix)
   "Find all coordinates containing ELEMENT from MATRIX."
-  (loop
-     :for key :being the hash-keys :in matrix
-     :for val :being the hash-values :in matrix
-     :if (equal val element) :collect key))
+  (loop :for key :being the hash-keys :in matrix
+        :for val :being the hash-values :in matrix
+        :if (equal val element) :collect key))
 
 (defun filter-lines (lines length)
   "Return LINES with length LENGTH."

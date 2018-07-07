@@ -10,19 +10,20 @@
   "Disable terminal input echo within BODY."
   (with-gensyms (res)
     `(let ((,res nil))
-       #+SBCL
+       #+sbcl
        (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
          (setf (sb-posix:termios-lflag tm)
                (logandc2 (sb-posix:termios-lflag tm) sb-posix:echo))
          (sb-posix:tcsetattr sb-sys:*tty* sb-posix:tcsanow tm))
        (setf ,res ,@body)
-       #+SBCL
+       #+sbcl
        (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
          (setf (sb-posix:termios-lflag tm)
                (logior (sb-posix:termios-lflag tm) sb-posix:echo))
          (sb-posix:tcsetattr sb-sys:*tty* sb-posix:tcsanow tm))
        ,res)))
 
+#+sbcl
 (defun read-passwd ()
   "Read a password string from standard input but do not echo the
 characters being typed. Returns the input."
@@ -30,9 +31,8 @@ characters being typed. Returns the input."
 
 (defun aps (symbol &optional (package *package*))
   "Shortcut for APROPOS."
-  (loop
-     :for i :in (sort (apropos-list symbol package) #'string<)
-     :do (format t "~(~S~)~%" i)))
+  (loop :for i :in (sort (apropos-list symbol package) #'string<)
+        :do (format t "~(~S~)~%" i)))
 
 (defun doc (&rest args)
   "Shortcut for DOCUMENTATION."
@@ -42,18 +42,17 @@ characters being typed. Returns the input."
   "Run command CMD and returns output as string."
   (with-gensyms (s)
     `(with-output-to-string (,s)
-       #+SBCL
+       #+sbcl
        (sb-ext:run-program ,cmd ',args :search t :output ,s)
-       #+CCL
+       #+ccl
        (ccl:run-program ,cmd ',args :output ,s)
-       (with-open-stream (in (#+(or CLISP CMUCL)
-                                ext:run-program
-                                ,cmd :arguments ,args :output :stream))
+       (with-open-stream (in (#+(or clisp cmucl)
+                              ext:run-program
+                              ,cmd :arguments ,args :output :stream))
          (with-output-to-string (out)
-           (loop
-              :for line = (read-line in nil nil)
-              :while line
-              :do (write-line line out)))))))
+           (loop :for line = (read-line in nil nil)
+                 :while line
+                 :do (write-line line out)))))))
 
 (defun read-integer (string)
   "Return integer from STRING."
@@ -66,12 +65,11 @@ characters being typed. Returns the input."
 (defun display-file (file)
   "Display the contents of FILE."
   (let ((in (open file :if-does-not-exist nil)))
-  (when in
-    (loop
-       :for line = (read-line in nil)
-       :while line
-       :do (format t "~A~%" line))
-    (close in))))
+    (when in
+      (loop :for line = (read-line in nil)
+            :while line
+            :do (format t "~A~%" line))
+      (close in))))
 
 (defun collect-characters (start end)
   "Collect ASCII characters from START to END."
@@ -83,11 +81,10 @@ characters being typed. Returns the input."
                                 :rehash-size (hash-table-rehash-size hash-table)
                                 :rehash-threshold (hash-table-rehash-threshold hash-table)
                                 :size (hash-table-size hash-table))))
-    (loop
-       :for key :being each hash-key :of hash-table
-       :using (hash-value value)
-       :do (setf (gethash key table) value)
-       :finally (return table))))
+    (loop :for key :being each hash-key :of hash-table
+          :using (hash-value value)
+          :do (setf (gethash key table) value)
+          :finally (return table))))
 
 (defun home (path)
   "Return a path relative to the home directory."

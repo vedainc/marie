@@ -7,12 +7,12 @@
 
 (defsystem :mof
   :name "mof"
-  :version "0.0.7"
+  :version "0.0.8"
   :description "Miscellaneous utilities"
   :license "CC0"
-  :author "Rommel Martinez <ebzzry@ebzzry.io>"
+  :author "Rommel MARTINEZ <ebzzry@ebzzry.io>"
   :depends-on (#:ironclad
-               #+SBCL
+               #+sbcl
                #:sb-posix)
   :serial t
   :components ((:file "packages")

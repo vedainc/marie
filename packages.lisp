@@ -6,7 +6,6 @@
 
 (defpackage :mof
   (:use #:cl)
-  (:nicknames #:m)
   (:export
    ;; sequences.lisp
    #:last*
@@ -52,7 +51,7 @@
 
    ;; misc.lisp
    #+sbcl #:with-echo-off
-   #:read-passwd
+   #+sbcl #:read-passwd
    #:print-symbols
    #:aps
    #:doc

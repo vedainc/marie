@@ -34,9 +34,8 @@ about constants being redefined, hence, this macro."
 (defmacro print-symbols (package &key (location :external-symbols))
   "Print symbols in a package. Prints external symbols by default."
   (let ((pkg (find-package package)))
-    `(loop
-        :for symbol :being :the ,location :in ,pkg
-        :do (format t "~S~%" symbol))))
+    `(loop :for symbol :being :the ,location :in ,pkg
+           :do (format t "~S~%" symbol))))
 
 ;;; From A Gentle Introduction to Symbolic Computation—David Touretzky
 (defmacro ppmx (form)
