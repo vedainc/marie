@@ -89,3 +89,11 @@ characters being typed. Returns the input."
 (defun home (path)
   "Return a path relative to the home directory."
   (uiop:subpathname (user-homedir-pathname) path))
+
+(defun make (system &key (force nil))
+  "Use ASDF to load systems."
+  (asdf:make system :force force))
+
+(defun make! (system)
+  "Use ASDF to force build "
+  (make system :force t))

@@ -4,7 +4,7 @@
 
 (in-package #:cl-user)
 
-(defpackage :mof
+(defpackage #:mof
   (:use #:cl)
   (:export
    ;; sequences.lisp
@@ -52,7 +52,7 @@
    ;; misc.lisp
    #+sbcl #:with-echo-off
    #+sbcl #:read-passwd
-   #:print-symbols
+   #:symbols
    #:aps
    #:doc
    #:run
@@ -63,6 +63,8 @@
    #:collect-characters
    #:copy-hash-table
    #:home
+   #:make
+   #:make!
 
    ;; collect.lisp
    #:collect
