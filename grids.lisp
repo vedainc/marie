@@ -1,6 +1,6 @@
-;;;; matrix.lisp
+;;;; grids.lisp
 
-;;; Utilities for working with finite two-dimensional matrices
+;;; Utilities for working with finite two-dimensional grids
 
 (in-package #:mof)
 
@@ -21,34 +21,34 @@ separated by SEPARATOR."
   "Build a list of list of characters from words in LINE."
   (mapcar #'string-list (split-string string separator)))
 
-(defun build-matrix (strings separator)
-  "Build a matrix from STRING."
+(defun build-grid (strings separator)
+  "Build a grid from STRING."
   (let ((hash (make-hash-table :test #'equal)))
     (loop :for (key val)
           :in (map-string strings separator)
           :do (setf (gethash key hash) val))
     hash))
 
-(defun coordinates (matrix)
-  "Return the list of coordinates of MATRIX."
-  (loop :for k :being the hash-keys :in matrix :collect k))
+(defun coordinates (grid)
+  "Return the list of coordinates of GRID."
+  (loop :for k :being the hash-keys :in grid :collect k))
 
-(defun element (coordinate matrix)
-  "Return the element under COORDINATE from MATRIX."
-  (gethash coordinate matrix))
+(defun element (coordinate grid)
+  "Return the element under COORDINATE from GRID."
+  (gethash coordinate grid))
 
-(defun elements (matrix)
-  "Return the elements of MATRIX."
-  (loop :for v :being the hash-values :in matrix :collect v))
+(defun elements (grid)
+  "Return the elements of GRID."
+  (loop :for v :being the hash-values :in grid :collect v))
 
-(defun print-matrix (matrix)
-  "View hash table processed by BUILD-MATRIX."
+(defun print-grid (grid)
+  "View hash table processed by BUILD-GRID."
   (maphash #'(lambda (key value) (format t "~S: ~S~%" key value))
-           matrix))
+           grid))
 
-(defun dimensions (matrix)
-  "Return the dimensions of MATRIX as two values."
-  (let ((last-coordinate (last* (coordinates matrix))))
+(defun dimensions (grid)
+  "Return the dimensions of GRID as two values."
+  (let ((last-coordinate (last* (coordinates grid))))
     (destructuring-bind (rows cols)
         last-coordinate
       (values (1+ rows)
@@ -63,10 +63,10 @@ separated by SEPARATOR."
         (when (and (= a-x b-x) (= a-y b-y))
             t))))
 
-(defun valid-coordinate-p (coordinate matrix)
-  "Return true if COORDINATE is part of MATRIX."
+(defun valid-coordinate-p (coordinate grid)
+  "Return true if COORDINATE is part of GRID."
   (multiple-value-bind (var exists)
-      (gethash coordinate matrix)
+      (gethash coordinate grid)
     (declare (ignore var))
     exists))
 
@@ -89,10 +89,10 @@ separated by SEPARATOR."
         (peek-right coordinate)
         (peek-down coordinate)))
 
-(defun ensure-coordinate (coordinate matrix)
-  "Return COORDINATE if it is part of MATRIX. Otherwise, return NIL."
+(defun ensure-coordinate (coordinate grid)
+  "Return COORDINATE if it is part of GRID. Otherwise, return NIL."
   (and coordinate
-       (if (valid-coordinate-p coordinate matrix)
+       (if (valid-coordinate-p coordinate grid)
            coordinate
            nil)))
 
@@ -112,53 +112,53 @@ separated by SEPARATOR."
   "Return the coordinate to the left, if it exists. Otherwise, return NIL."
   (destructuring-bind (x y) coordinate `(,x ,(1- y))))
 
-(defun find-element-coordinates (element matrix)
-  "Find all coordinates containing ELEMENT from MATRIX."
-  (loop :for key :being the hash-keys :in matrix
-        :for val :being the hash-values :in matrix
+(defun find-element-coordinates (element grid)
+  "Find all coordinates containing ELEMENT from GRID."
+  (loop :for key :being the hash-keys :in grid
+        :for val :being the hash-values :in grid
         :if (equal val element) :collect key))
 
 (defun filter-lines (lines length)
   "Return LINES with length LENGTH."
   (loop :for line :in lines :when (= (length line) length) :collect line))
 
-(defun line-values (line matrix)
+(defun line-values (line grid)
   "Return LINE as characters."
-  (loop :for char :in line :collect (element char matrix)))
+  (loop :for char :in line :collect (element char grid)))
 
 (defun list-string (list)
   "Return LIST of characters as string."
   (format nil "~{~A~}" list))
 
-(defun line-string (line matrix)
-  "Return LINE from MATRIX as string."
-  (list-string (line-values line matrix)))
+(defun line-string (line grid)
+  "Return LINE from GRID as string."
+  (list-string (line-values line grid)))
 
-(defun last-coordinate (matrix)
-  "Return the last coordinate of MATRIX."
-  (last* (coordinates matrix)))
+(defun last-coordinate (grid)
+  "Return the last coordinate of GRID."
+  (last* (coordinates grid)))
 
-(defun matrix-rows (matrix)
-  "Return the number of rows from MATRIX."
+(defun grid-rows (grid)
+  "Return the number of rows from GRID."
   (destructuring-bind (row column)
-      (last-coordinate matrix)
+      (last-coordinate grid)
     (declare (ignore column))
     (1+ row)))
 
-(defun matrix-columns (matrix)
-  "Return the number of rows from MATRIX."
+(defun grid-columns (grid)
+  "Return the number of rows from GRID."
   (destructuring-bind (row column)
-      (last-coordinate matrix)
+      (last-coordinate grid)
     (declare (ignore row))
     (1+ column)))
 
-(defun group-coordinates (matrix)
-  "Create groups of coordinates according to the dimensions of MATRIX."
-  (partition (coordinates matrix) (matrix-columns matrix)))
+(defun group-coordinates (grid)
+  "Create groups of coordinates according to the dimensions of GRID."
+  (partition (coordinates grid) (grid-columns grid)))
 
-(defun group-elements (matrix)
-  "Create groups of elements according to the dimensions of MATRIX."
-  (partition (elements matrix) (matrix-columns matrix)))
+(defun group-elements (grid)
+  "Create groups of elements according to the dimensions of GRID."
+  (partition (elements grid) (grid-columns grid)))
 
 
 ;;; ?

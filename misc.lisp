@@ -90,6 +90,18 @@ characters being typed. Returns the input."
   "Return a path relative to the home directory."
   (uiop:subpathname (user-homedir-pathname) path))
 
+(defun expand-pathname (path)
+  "Return a path while performing tilde expansion."
+  (let ((home (uiop:pathname-parent-directory-pathname (user-homedir-pathname)))
+        (pathstring (uiop:native-namestring path)))
+    (cond ((and (char-equal (elt pathstring 0) #\~)
+                (char-equal (elt pathstring 1) #\/))
+           (home (subseq pathstring 2)))
+          ((and (char-equal (elt pathstring 0) #\~)
+                (not (char-equal (elt pathstring 1) #\/)))
+           (uiop:subpathname home (subseq pathstring 1)))
+          (t (uiop:ensure-absolute-pathname pathstring)))))
+
 (defun make (system &key (force nil))
   "Use ASDF to load systems."
   (asdf:make system :force force))

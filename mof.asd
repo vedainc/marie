@@ -7,7 +7,7 @@
 
 (defsystem :mof
   :name "mof"
-  :version "0.0.8"
+  :version "0.0.9"
   :description "Miscellaneous utilities"
   :license "CC0"
   :author "Rommel MARTINEZ <ebzzry@ebzzry.io>"
@@ -22,4 +22,4 @@
                (:file "misc")
                (:file "collect")
                (:file "files")
-               (:file "matrix")))
+               (:file "grids")))

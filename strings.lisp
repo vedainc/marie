@@ -55,7 +55,7 @@
 
 (defun trim-whitespace (string)
   "Trim whitespace characters from STRING."
-  (string-trim '(#\space #\tab #\newline #\linefeed) string))
+  (string-trim '(#\Space #\Tab #\Newline #\Linefeed) string))
 
 (defun fmt (&rest args)
   "Simply return a string with FORMAT."

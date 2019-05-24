@@ -145,4 +145,3 @@ and the length of each list as the value."
     (loop :for group :in groups
           :do (setf (gethash (first group) table) (length group)))
     table))
-

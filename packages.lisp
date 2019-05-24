@@ -6,6 +6,7 @@
 
 (defpackage #:mof
   (:use #:cl)
+  (:nicknames #:m)
   (:export
    ;; sequences.lisp
    #:last*
@@ -63,6 +64,7 @@
    #:collect-characters
    #:copy-hash-table
    #:home
+   #:expand-pathname
    #:make
    #:make!
 
@@ -72,15 +74,15 @@
    ;; files.lisp
    #:files
 
-   ;; matrix.lisp
+   ;; grid.lisp
    #:index-string
    #:map-string
    #:build-lines
-   #:build-matrix
+   #:build-grid
    #:coordinates
    #:element
    #:elements
-   #:print-matrix
+   #:print-grid
    #:dimensions
    #:coordinate-equal-p
    #:valid-coordinate-p
@@ -97,8 +99,8 @@
    #:list-string
    #:line-string
    #:last-coordinate
-   #:matrix-rows
-   #:matrix-columns
+   #:grid-rows
+   #:grid-columns
    #:group-coordinates
    #:group-elements
    #:range
