@@ -145,3 +145,11 @@ and the length of each list as the value."
     (loop :for group :in groups
           :do (setf (gethash (first group) table) (length group)))
     table))
+
+(defun map-append (fn sequence1 sequence2)
+  "Apply APPEND to the result of applying FN to sequence1 and sequence2."
+  (append (mapcar fn sequence1) (mapcar fn sequence2)))
+
+(defun map-nappend (fn sequence1 sequence2)
+  "Apply NCONC to the result of applying FN to sequence1 and sequence2."
+  (nconc (mapcar fn sequence1) (mapcar fn sequence2)))

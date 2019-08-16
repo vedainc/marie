@@ -12,8 +12,8 @@
   :license "CC0"
   :author "Rommel MARTINEZ <ebzzry@ebzzry.io>"
   :depends-on (#:ironclad
-               #+sbcl
-               #:sb-posix)
+               #+sbcl #:sb-posix
+               #+sbcl #:sb-sprof)
   :serial t
   :components ((:file "packages")
                (:file "sequences")

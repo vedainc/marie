@@ -8,7 +8,7 @@
   (:use #:cl)
   (:nicknames #:m)
   (:export
-   ;; sequences.lisp
+   ;; sequences
    #:last*
    #:solop
    #:longerp
@@ -30,8 +30,10 @@
    #:join-stream-string
    #:group-alike
    #:build-length-index
+   #:map-append
+   #:map-nappend
 
-   ;; strings.lisp
+   ;; strings
    #:empty-string-p
    #:digest-string
    #:string-if
@@ -43,14 +45,14 @@
    #:trim-whitespace
    #:fmt
 
-   ;; symbols.lisp
+   ;; symbols
    #:defcon
    #:defalias
    #:defun*
    #:with-gensyms
    #:ppmx
 
-   ;; misc.lisp
+   ;; misc
    #+sbcl #:with-echo-off
    #+sbcl #:read-passwd
    #:symbols
@@ -67,14 +69,18 @@
    #:expand-pathname
    #:make
    #:make!
+   #:with-time
+   #:with-profiling
+   #:true
+   #:false
 
-   ;; collect.lisp
+   ;; collect
    #:collect
 
-   ;; files.lisp
+   ;; files
    #:files
 
-   ;; grid.lisp
+   ;; grids
    #:index-string
    #:map-string
    #:build-lines

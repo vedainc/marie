@@ -109,3 +109,22 @@ characters being typed. Returns the input."
 (defun make! (system)
   "Use ASDF to force build "
   (make system :force t))
+
+(defmacro with-time (&body body)
+  "Execute BODY then return timing information."
+  `(time (progn ,@body (values))))
+
+(defmacro with-profiling (&body body)
+  "Run the profiler with BODY."
+  #+sbcl
+  `(sb-sprof:with-profiling (:report :graph :show-progress t) ,@body))
+
+(defun true (arg)
+  "Return true for anything."
+  (declare (ignore arg))
+  t)
+
+(defun false (arg)
+  "Return false for anything."
+  (declare (ignore arg))
+  nil)
