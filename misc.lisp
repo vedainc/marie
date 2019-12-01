@@ -5,18 +5,16 @@
 (in-package #:mof)
 
 ;;; From http://thread.gmane.org/gmane.lisp.steel-bank.general/1598/focus=1604
-#+sbcl
+#+(and sbcl unix)
 (defmacro with-echo-off (&body body)
   "Disable terminal input echo within BODY."
   (with-gensyms (res)
     `(let ((,res nil))
-       #+sbcl
        (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
          (setf (sb-posix:termios-lflag tm)
                (logandc2 (sb-posix:termios-lflag tm) sb-posix:echo))
          (sb-posix:tcsetattr sb-sys:*tty* sb-posix:tcsanow tm))
        (setf ,res ,@body)
-       #+sbcl
        (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
          (setf (sb-posix:termios-lflag tm)
                (logior (sb-posix:termios-lflag tm) sb-posix:echo))

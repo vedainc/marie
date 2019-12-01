@@ -79,6 +79,9 @@
 
    ;; files
    #:files
+   #:slurp-file
+   #:file-string
+   #:resolve-system-file
 
    ;; grids
    #:index-string
