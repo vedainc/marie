@@ -22,4 +22,5 @@
                (:file "misc")
                (:file "collect")
                (:file "files")
-               (:file "grids")))
+               (:file "grids")
+               (:file "reader")))
