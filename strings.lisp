@@ -39,10 +39,6 @@
         :collecting (subseq string start finish)
         :until (null finish)))
 
-(defun join-strings (list)
-  "Merge strings in LIST by the space character."
-  (format nil "~{~A~^ ~}" list))
-
 (defun normalize-strings (list &key (character #\_))
   "Return list of characters with equal length using CHARACTER as end padding."
   (assert (>= (length list) 1))
@@ -60,3 +56,7 @@
 (defun fmt (&rest args)
   "Simply return a string with FORMAT."
   (apply #'format nil args))
+
+(defun fmt* (&rest args)
+  "Print ARGS to stdout with FORMAT."
+  (apply #'format t args))

@@ -126,3 +126,16 @@ characters being typed. Returns the input."
   "Return false for anything."
   (declare (ignore arg))
   nil)
+
+(defmacro dbg (&rest args)
+  "Print information about ARGS."
+  `(progn
+     ,@(loop :for arg :in args
+             :collect (if (stringp arg)
+                          `(format t "~&~A~%" ,arg)
+                          `(format t "~&~S: ~S~%" ',arg ,arg)))))
+
+(defmacro dbg* ((&rest args) &body body)
+  "Print information about ARGS, then evaluate BODY."
+  `(progn (dbg ,@args)
+          ,@body))

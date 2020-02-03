@@ -10,8 +10,8 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
      (declare (ignorable ,(intern "__")))
      ,(read-delimited-list #\] stream t)))
 
-(set-macro-character #\[ #'bracket-reader)
-(set-macro-character #\] (get-macro-character #\) nil))
+;; (set-macro-character #\[ #'bracket-reader)
+;; (set-macro-character #\] (get-macro-character #\) nil))
 
 (defun brace-reader (stream char)
   "Use {foo 5} as a shorthand for (funcall foo 5)
@@ -19,8 +19,8 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (declare (ignore char))
   `(funcall ,@(read-delimited-list #\} stream t)))
 
-(set-macro-character #\{ #'brace-reader)
-(set-macro-character #\} (get-macro-character #\) nil))
+;; (set-macro-character #\{ #'brace-reader)
+;; (set-macro-character #\} (get-macro-character #\) nil))
 
 ;;; Return first expression from the last expression evaluated.
 (set-dispatch-macro-character

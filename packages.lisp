@@ -32,6 +32,7 @@
    #:build-length-index
    #:map-append
    #:map-nappend
+   #:join
 
    ;; strings
    #:empty-string-p
@@ -40,10 +41,10 @@
    #:cat
    #:string-list
    #:split-string
-   #:join-strings
    #:normalize-strings
    #:trim-whitespace
    #:fmt
+   #:fmt*
 
    ;; symbols
    #:defcon
@@ -73,6 +74,8 @@
    #:with-profiling
    #:true
    #:false
+   #:dbg
+   #:dbg*
 
    ;; collect
    #:collect

@@ -127,7 +127,7 @@ doesn't, and another list that starts where FN returns true,as values."
 
 (defun join-stream-string (stream lines)
   "Read lines from 1 to END from STREAM."
-  (join-strings (loop :for i :from 1 :to lines :collect (read-line stream nil nil))))
+  (join (loop :for i :from 1 :to lines :collect (read-line stream nil nil))))
 
 (defun group-alike (list)
   "Group similar elements together."
@@ -153,3 +153,8 @@ and the length of each list as the value."
 (defun map-nappend (fn sequence1 sequence2)
   "Apply NCONC to the result of applying FN to sequence1 and sequence2."
   (nconc (mapcar fn sequence1) (mapcar fn sequence2)))
+
+(defun join (list &optional (char #\Space))
+  "Merge items in LIST by the space character."
+  (let ((fmt (cat "~{~A~^" (string char) "~}")))
+    (format nil fmt list)))
