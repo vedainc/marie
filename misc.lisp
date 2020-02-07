@@ -139,3 +139,12 @@ characters being typed. Returns the input."
   "Print information about ARGS, then evaluate BODY."
   `(progn (dbg ,@args)
           ,@body))
+
+(defmacro f-and (v &rest fs)
+  "Return the conjunction of FS on V."
+  `(and ,@(loop :for f :in fs :collect `(funcall ,f ,v))))
+
+(defmacro f-or (v &rest fs)
+  "Return the disjunction of FS on V."
+  `(or ,@(loop :for f :in fs :collect `(funcall ,f ,v))))
+

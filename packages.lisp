@@ -76,6 +76,8 @@
    #:false
    #:dbg
    #:dbg*
+   #:f-and
+   #:f-or
 
    ;; collect
    #:collect
