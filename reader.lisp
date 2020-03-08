@@ -1,6 +1,6 @@
 ;;;; reader.lisp
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defun bracket-reader (stream char)
   "Use [+ _ 1] as a shorthand for #'(lambda (_) (+ _ 1))

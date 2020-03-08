@@ -2,7 +2,7 @@
 
 ;;; Utilities for working with finite two-dimensional grids
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defun index-string (count string)
   "Create data index from STRING prefixed with COUNT."

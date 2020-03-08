@@ -1,6 +1,6 @@
 ;;;; files.lisp
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defun directory-entries (directory)
   "Return top-level files and directories under DIRECTORY."

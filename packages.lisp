@@ -4,7 +4,7 @@
 
 (in-package #:cl-user)
 
-(defpackage #:mof
+(defpackage #:marie
   (:use #:cl)
   (:nicknames #:m)
   (:export

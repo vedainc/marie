@@ -2,7 +2,7 @@
 
 ;;; Utilities for working with strings
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defun empty-string-p (string)
   "Return true if STRING is of length zero."

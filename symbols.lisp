@@ -2,7 +2,7 @@
 
 ;;; Utilities for woking with symbols, macros, and definitions
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defmacro define-constant (name value &optional doc)
   "Create a constant only if it hasn’t been bound or created, yet. SBCL complains

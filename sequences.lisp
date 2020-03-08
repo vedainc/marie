@@ -2,7 +2,7 @@
 
 ;;; Utilities for working with lists and trees
 
-(in-package #:mof)
+(in-package #:marie)
 
 (defun last* (list)
   "Return the first of the last element of LIST."

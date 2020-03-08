@@ -2,7 +2,7 @@
 
 ;;; Miscellaneous utilities
 
-(in-package #:mof)
+(in-package #:marie)
 
 ;;; From http://thread.gmane.org/gmane.lisp.steel-bank.general/1598/focus=1604
 #+(and sbcl unix)
