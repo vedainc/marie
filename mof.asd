@@ -7,8 +7,8 @@
 
 (defsystem :mof
   :name "mof"
-  :version "0.0.9"
-  :description "Miscellaneous utilities"
+  :version "0.0.10"
+  :description "My personal miscellaneous utilities"
   :license "CC0"
   :author "Rommel MARTINEZ <ebzzry@ebzzry.io>"
   :depends-on (#:ironclad

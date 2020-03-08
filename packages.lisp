@@ -33,6 +33,7 @@
    #:map-append
    #:map-nappend
    #:join
+   #:join-no-space
 
    ;; strings
    #:empty-string-p
@@ -45,13 +46,16 @@
    #:trim-whitespace
    #:fmt
    #:fmt*
+   #:string-convert
 
    ;; symbols
-   #:defcon
+   #:define-constant
+   #:define-dynamic-constant
    #:defalias
    #:defun*
    #:with-gensyms
    #:ppmx
+   #:symbol-convert
 
    ;; misc
    #+sbcl #:with-echo-off
@@ -78,6 +82,9 @@
    #:dbg*
    #:f-and
    #:f-or
+   #:when-let
+   #:hyphenate
+   #:hyphenate-intern
 
    ;; collect
    #:collect

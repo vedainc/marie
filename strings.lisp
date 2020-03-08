@@ -60,3 +60,10 @@
 (defun fmt* (&rest args)
   "Print ARGS to stdout with FORMAT."
   (apply #'format t args))
+
+(defun string-convert (value)
+  "Convert VALUE to a string."
+  (etypecase value
+    (number (format nil "~A" value))
+    (string value)
+    (t (string value))))

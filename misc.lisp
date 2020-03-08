@@ -148,3 +148,22 @@ characters being typed. Returns the input."
   "Return the disjunction of FS on V."
   `(or ,@(loop :for f :in fs :collect `(funcall ,f ,v))))
 
+(defmacro when-let (bindings &body forms)
+  "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a true value. This is ALEXANDRIA:WHEN-LET."
+  (let* ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
+                           (list bindings)
+                           bindings))
+         (variables (mapcar #'car binding-list)))
+    `(let ,binding-list
+       (when (and ,@variables)
+         ,@forms))))
+
+(defun hyphenate (&rest names)
+  "Return a new symbol from the hyphen concatenation of NAMES, then intern it in the current package."
+  (format nil "~{~A~^-~}" (mapcar #'(lambda (name) (string-upcase (string-convert name)))
+                                  names)))
+
+(defun hyphenate-intern (package &rest names)
+  "Intern names from NAMES in PACKAGE with HYPHENATE."
+  (let ((p (if (null package) *package* package)))
+    (intern (apply #'hyphenate names) (find-package p))))

@@ -4,7 +4,7 @@
 
 (in-package #:mof)
 
-(defmacro defcon (name value &optional doc)
+(defmacro define-constant (name value &optional doc)
   "Create a constant only if it hasn’t been bound or created, yet. SBCL complains
 about constants being redefined, hence, this macro."
   (if (boundp name)
@@ -14,6 +14,13 @@ about constants being redefined, hence, this macro."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
 
+(defmacro define-dynamic-constant (name value)
+  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
+  `(handler-bind ((sb-ext:defconstant-uneql #'(lambda (c)
+                                                (let ((r (find-restart 'continue c)))
+                                                  (when r
+                                                    (invoke-restart r))))))
+     (defconstant ,name ,value)))
 
 (defmacro defalias (alias name)
   "Create alias `alias' for function `name'."
@@ -52,3 +59,10 @@ about constants being redefined, hence, this macro."
               (pprint exp)))
      (format t "~%~%")
      (values)))
+
+(defun symbol-convert (value)
+  "Convert VALUE to a symbol."
+  (etypecase value
+    (number value)
+    (string (intern (string-upcase value)))
+    (t value)))
