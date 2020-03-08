@@ -1,6 +1,11 @@
-;;;; files.lisp
+;;;; files.lisp - file and path utilities
 
-(in-package #:marie)
+(uiop:define-package #:marie/files
+  (:use #:cl)
+  (:export #:files
+           #:slurp-file
+           #:file-string
+           #:resolve-system-file))
 
 (defun directory-entries (directory)
   "Return top-level files and directories under DIRECTORY."

@@ -1,31 +1,34 @@
-;;;; misc.lisp
+;;;; etc.lisp - miscellaneous utilities
 
-;;; Miscellaneous utilities
-
-(in-package #:marie)
-
-;;; From http://thread.gmane.org/gmane.lisp.steel-bank.general/1598/focus=1604
-#+(and sbcl unix)
-(defmacro with-echo-off (&body body)
-  "Disable terminal input echo within BODY."
-  (with-gensyms (res)
-    `(let ((,res nil))
-       (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
-         (setf (sb-posix:termios-lflag tm)
-               (logandc2 (sb-posix:termios-lflag tm) sb-posix:echo))
-         (sb-posix:tcsetattr sb-sys:*tty* sb-posix:tcsanow tm))
-       (setf ,res ,@body)
-       (let ((tm (sb-posix:tcgetattr sb-sys:*tty*)))
-         (setf (sb-posix:termios-lflag tm)
-               (logior (sb-posix:termios-lflag tm) sb-posix:echo))
-         (sb-posix:tcsetattr sb-sys:*tty* sb-posix:tcsanow tm))
-       ,res)))
-
-#+sbcl
-(defun read-passwd ()
-  "Read a password string from standard input but do not echo the
-characters being typed. Returns the input."
-  (with-echo-off (read-line)))
+(uiop:define-package #:marie/etc
+  (:use #:cl)
+  (:export #:symbols
+           #:aps
+           #:doc
+           #:run
+           #:with-html
+           #:read-integer
+           #:read-integer-line
+           #:display-file
+           #:collect-characters
+           #:copy-hash-table
+           #:home
+           #:expand-pathname
+           #:make
+           #:make!
+           #:with-time
+           #:true
+           #:false
+           #:dbg
+           #:dbg*
+           #:f-and
+           #:f-or
+           #:when-let
+           #:hyphenate
+           #:hyphenate-intern
+           #:dump-object
+           #:dump-table
+           #:hide-debugger-output))
 
 (defun aps (symbol &optional (package *package*))
   "Shortcut for APROPOS."
@@ -38,7 +41,7 @@ characters being typed. Returns the input."
 
 (defmacro run (cmd &rest args)
   "Run command CMD and returns output as string."
-  (with-gensyms (s)
+  (marie/symbols:with-gensyms (s)
     `(with-output-to-string (,s)
        #+sbcl
        (sb-ext:run-program ,cmd ',args :search t :output ,s)
@@ -112,11 +115,6 @@ characters being typed. Returns the input."
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
-(defmacro with-profiling (&body body)
-  "Run the profiler with BODY."
-  #+sbcl
-  `(sb-sprof:with-profiling (:report :graph :show-progress t) ,@body))
-
 (defun true (arg)
   "Return true for anything."
   (declare (ignore arg))
@@ -167,3 +165,21 @@ characters being typed. Returns the input."
   "Intern names from NAMES in PACKAGE with HYPHENATE."
   (let ((p (if (null package) *package* package)))
     (intern (apply #'hyphenate names) (find-package p))))
+
+(defun dump-object (object)
+  "Display the contents of OBJECT."
+  (loop :for slot :in (slots object)
+        :do (format t "~A -> ~S~%" slot (funcall slot object))))
+
+(defun dump-table (table)
+  "Print the contents of hash table TABLE."
+  (maphash #'(lambda (k v) (format t "~S => ~S~%" k v))
+           table))
+
+(defun hide-debugger-output ()
+  "Hide the debugger output."
+  (setf *debugger-hook*
+        (lambda (condition hook)
+          (declare (ignore hook))
+          (format *error-output* "Caught error: ~A" condition)
+          (finish-output *error-output*))))

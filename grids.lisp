@@ -1,8 +1,37 @@
-;;;; grids.lisp
+;;;; grids.lisp - utilities for working with finite two-dimensional grids
 
-;;; Utilities for working with finite two-dimensional grids
-
-(in-package #:marie)
+(uiop:define-package #:marie/grid
+  (:use #:cl)
+  (:export #:index-string
+           #:map-string
+           #:build-lines
+           #:build-grid
+           #:coordinates
+           #:element
+           #:elements
+           #:print-grid
+           #:dimensions
+           #:coordinate-equal-p
+           #:valid-coordinate-p
+           #:adjacent-coordinates
+           #:cross-adjacent-coordinates
+           #:ensure-coordinate
+           #:peek-up
+           #:peek-right
+           #:peek-down
+           #:peek-left
+           #:find-element-coordinates
+           #:filter-lines
+           #:line-values
+           #:list-string
+           #:line-string
+           #:last-coordinate
+           #:grid-rows
+           #:grid-columns
+           #:group-coordinates
+           #:group-elements
+           #:range
+           #:sort-coordinates))
 
 (defun index-string (count string)
   "Create data index from STRING prefixed with COUNT."

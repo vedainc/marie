@@ -1,8 +1,33 @@
-;;;; sequences.lisp
+;;;; sequences.lisp - utilities for working with lists and trees
 
-;;; Utilities for working with lists and trees
-
-(in-package #:marie)
+(uiop:define-package #:marie/sequences
+  (:use #:cl)
+  (:export #:last*
+           #:solop
+           #:longerp
+           #:partition
+           #:flatten-list
+           #:filter-if
+           #:filter-if-not
+           #:prune-if
+           #:prune-if-not
+           #:locate-if
+           #:beforep
+           #:afterp
+           #:duplicatep
+           #:split-if
+           #:append*
+           #:vector-list
+           #:list-vector
+           #:remove-items
+           #:join-stream-string
+           #:group-alike
+           #:build-length-index
+           #:map-append
+           #:map-nappend
+           #:join
+           #:assoc-key
+           #:assoc-value))
 
 (defun last* (list)
   "Return the first of the last element of LIST."
@@ -158,3 +183,15 @@ and the length of each list as the value."
   "Merge items in LIST by the space character."
   (let ((fmt (cat "~{~A~^" (string char) "~}")))
     (format nil fmt list)))
+
+(defun assoc-key (key items)
+  "Return the key found in ITEMS if KEY is found."
+  (let ((val (assoc key items)))
+    (when val
+      (car val))))
+
+(defun assoc-value (key items)
+  "Return the value found in ITEMS if KEY is found."
+  (let ((val (assoc key items)))
+    (when val
+      (cdr val))))

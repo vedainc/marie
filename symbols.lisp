@@ -1,8 +1,14 @@
-;;;; symbols.lisp
+;;;; symbols.lisp - utilities for woking with symbols, macros, and definitions
 
-;;; Utilities for woking with symbols, macros, and definitions
-
-(in-package #:marie)
+(uiop:define-package #:marie/symbols
+  (:use #:cl)
+  (:export #:define-constant
+           #:define-dynamic-constant
+           #:defalias
+           #:defun*
+           #:with-gensyms
+           #:ppmx
+           #:symbol-convert))
 
 (defmacro define-constant (name value &optional doc)
   "Create a constant only if it hasn’t been bound or created, yet. SBCL complains

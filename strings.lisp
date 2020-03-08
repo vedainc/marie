@@ -1,24 +1,23 @@
-;;;; strings.lisp
+;;;; strings.lisp - utilities for working with strings
 
-;;; Utilities for working with strings
-
-(in-package #:marie)
+(uiop:define-package #:marie/strings
+  (:use #:cl)
+  (:export #:empty-string-p
+           #:string-if
+           #:cat
+           #:string-list
+           #:split-string
+           #:normalize-strings
+           #:trim-whitespace
+           #:fmt
+           #:fmt*
+           #:string-convert
+           #:build-string
+           #:string-chars))
 
 (defun empty-string-p (string)
   "Return true if STRING is of length zero."
   (zerop (length string)))
-
-(defun digest-string (string &optional (type :sha256))
-  "Return a string of a digest of a string."
-  (ironclad:byte-array-to-hex-string
-   (ironclad:digest-sequence
-    type
-    (#+sbcl sb-ext:string-to-octets
-     #+ccl ccl:encode-string-to-octets
-     #+clisp ext:convert-string-to-bytes
-     #+cmucl stream:string-to-octets
-     #+clisp charset:utf-8
-     string))))
 
 (defun string-if (data)
   "Like IF but returns an empty string when X is false. Otherwise, return DATA."
@@ -67,3 +66,12 @@
     (number (format nil "~A" value))
     (string value)
     (t (string value))))
+
+(defun build-string (items)
+  "Return a string from the concatenation of items."
+  (let ((strings (loop :for item :in items :collect (string-convert item))))
+    (format nil "~{~A~^ ~}" strings)))
+
+(defun string-chars (string)
+  "Return STRING as individual characters."
+  (loop :for c :across string :collect c))

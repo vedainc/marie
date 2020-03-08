@@ -1,6 +1,11 @@
-;;;; reader.lisp
+;;;; reader.lisp - stuff for the lisp reader
 
-(in-package #:marie)
+(uiop:define-package #:marie/reader
+  (:use #:cl)
+  (:export #:bracket-reader
+           #:brace-reader
+           #:with-preserved-case
+           #:read-from-string*))
 
 (defun bracket-reader (stream char)
   "Use [+ _ 1] as a shorthand for #'(lambda (_) (+ _ 1))
@@ -41,3 +46,13 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
        (error "#~A does not take an integer infix parameter."
              sub-character))
      `(last* +)))
+
+(defmacro with-preserved-case (&body body)
+  "Evaluate BODY while preserving the read case."
+  `(let ((*readtable* (copy-readtable nil)))
+     (setf (readtable-case *readtable*) :preserve)
+     (progn ,@body)))
+
+(defun read-from-string* (string)
+  "Evaluate STRING with preserved case."
+  (with-preserved-case (read-from-string string)))
