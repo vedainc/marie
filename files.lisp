@@ -7,6 +7,8 @@
            #:file-string
            #:resolve-system-file))
 
+(in-package #:marie/files)
+
 (defun directory-entries (directory)
   "Return top-level files and directories under DIRECTORY."
   (append (uiop:subdirectories directory)

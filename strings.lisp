@@ -15,6 +15,8 @@
            #:build-string
            #:string-chars))
 
+(in-package #:marie/strings)
+
 (defun empty-string-p (string)
   "Return true if STRING is of length zero."
   (zerop (length string)))

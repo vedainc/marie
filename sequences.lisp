@@ -29,6 +29,8 @@
            #:assoc-key
            #:assoc-value))
 
+(in-package #:marie/sequences)
+
 (defun last* (list)
   "Return the first of the last element of LIST."
   (first (last list)))
@@ -181,7 +183,7 @@ and the length of each list as the value."
 
 (defun join (list &optional (char #\Space))
   "Merge items in LIST by the space character."
-  (let ((fmt (cat "~{~A~^" (string char) "~}")))
+  (let ((fmt (marie/strings:cat "~{~A~^" (string char) "~}")))
     (format nil fmt list)))
 
 (defun assoc-key (key items)

@@ -21,6 +21,8 @@
   (:use #:cl)
   (:export #:collect))
 
+(in-package #:marie/collect)
+
 (defmacro collect (kind exprs &body clauses)
   (translate-collect kind exprs clauses))
 

@@ -30,6 +30,8 @@
            #:dump-table
            #:hide-debugger-output))
 
+(in-package #:marie/etc)
+
 (defun aps (symbol &optional (package *package*))
   "Shortcut for APROPOS."
   (loop :for i :in (sort (apropos-list symbol package) #'string<)
@@ -158,7 +160,7 @@
 
 (defun hyphenate (&rest names)
   "Return a new symbol from the hyphen concatenation of NAMES, then intern it in the current package."
-  (format nil "~{~A~^-~}" (mapcar #'(lambda (name) (string-upcase (string-convert name)))
+  (format nil "~{~A~^-~}" (mapcar #'(lambda (name) (string-upcase (marie/strings:string-convert name)))
                                   names)))
 
 (defun hyphenate-intern (package &rest names)

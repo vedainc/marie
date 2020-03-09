@@ -7,6 +7,8 @@
            #:with-preserved-case
            #:read-from-string*))
 
+(in-package #:marie/reader)
+
 (defun bracket-reader (stream char)
   "Use [+ _ 1] as a shorthand for #'(lambda (_) (+ _ 1))
 See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"

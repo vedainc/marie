@@ -10,6 +10,8 @@
            #:ppmx
            #:symbol-convert))
 
+(in-package #:marie/symbols)
+
 (defmacro define-constant (name value &optional doc)
   "Create a constant only if it hasn’t been bound or created, yet. SBCL complains
 about constants being redefined, hence, this macro."

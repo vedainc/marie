@@ -1,6 +1,6 @@
 ;;;; grids.lisp - utilities for working with finite two-dimensional grids
 
-(uiop:define-package #:marie/grid
+(uiop:define-package #:marie/grids
   (:use #:cl)
   (:export #:index-string
            #:map-string
@@ -228,4 +228,3 @@ separated by SEPARATOR."
     (remove-duplicate-coordinates
      (sort-coordinates
       (append top left right bottom)))))
-
