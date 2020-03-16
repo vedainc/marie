@@ -26,9 +26,8 @@
            #:when-let
            #:hyphenate
            #:hyphenate-intern
-           #:dump-object
            #:dump-table
-           #:hide-debugger-output))
+           #:muffle-debugger))
 
 (in-package #:marie/etc)
 
@@ -160,25 +159,22 @@
 
 (defun hyphenate (&rest names)
   "Return a new symbol from the hyphen concatenation of NAMES, then intern it in the current package."
-  (format nil "~{~A~^-~}" (mapcar #'(lambda (name) (string-upcase (marie/strings:string-convert name)))
-                                  names)))
+  (format nil "~{~A~^-~}"
+          (mapcar #'(lambda (name)
+                      (string-upcase (marie/strings:string-convert name)))
+                  names)))
 
 (defun hyphenate-intern (package &rest names)
   "Intern names from NAMES in PACKAGE with HYPHENATE."
   (let ((p (if (null package) *package* package)))
     (intern (apply #'hyphenate names) (find-package p))))
 
-(defun dump-object (object)
-  "Display the contents of OBJECT."
-  (loop :for slot :in (slots object)
-        :do (format t "~A -> ~S~%" slot (funcall slot object))))
-
 (defun dump-table (table)
   "Print the contents of hash table TABLE."
   (maphash #'(lambda (k v) (format t "~S => ~S~%" k v))
            table))
 
-(defun hide-debugger-output ()
+(defun muffle-debugger ()
   "Hide the debugger output."
   (setf *debugger-hook*
         (lambda (condition hook)
