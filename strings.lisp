@@ -5,6 +5,7 @@
   (:export #:empty-string-p
            #:string-if
            #:cat
+           #:cat-intern
            #:string-list
            #:split-string
            #:normalize-strings
@@ -28,6 +29,11 @@
 (defun cat (&rest args)
   "Concatenate ARGS to a string."
   (apply #'concatenate 'string args))
+
+(defun cat-intern (package &rest args)
+  "Concatenate ARGS to a string then intern it to the current package."
+  (let ((p (if (null package) *package* package)))
+    (intern (apply #'cat args) (find-package p))))
 
 (defun string-list (string)
   "Create a list from STRiNG."

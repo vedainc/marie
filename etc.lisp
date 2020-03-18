@@ -27,7 +27,8 @@
            #:hyphenate
            #:hyphenate-intern
            #:dump-table
-           #:muffle-debugger))
+           #:muffle-debugger
+           #:with-muffled-debugger))
 
 (in-package #:marie/etc)
 
@@ -181,3 +182,9 @@
           (declare (ignore hook))
           (format *error-output* "Caught error: ~A" condition)
           (finish-output *error-output*))))
+
+(defmacro with-muffled-debugger (&body body)
+  "Evaluate body with the debugger warnings turned off."
+  `(let ((*debugger-hook* *debugger-hook*))
+     (muffle-debugger)
+     ,@body))

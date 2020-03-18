@@ -186,14 +186,14 @@ and the length of each list as the value."
   (let ((fmt (marie/strings:cat "~{~A~^" (string char) "~}")))
     (format nil fmt list)))
 
-(defun assoc-key (key items)
+(defun assoc-key (key items &key (test #'equal))
   "Return the key found in ITEMS if KEY is found."
-  (let ((val (assoc key items)))
+  (let ((val (assoc key items :test test)))
     (when val
       (car val))))
 
-(defun assoc-value (key items)
+(defun assoc-value (key items &key (test #'equal))
   "Return the value found in ITEMS if KEY is found."
-  (let ((val (assoc key items)))
+  (let ((val (assoc key items :test test)))
     (when val
       (cdr val))))
