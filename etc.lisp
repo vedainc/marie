@@ -28,6 +28,7 @@
            #:hyphenate
            #:hyphenate-intern
            #:dump-table
+           #:dump-table*
            #:muffle-debugger
            #:with-muffled-debugger))
 
@@ -186,8 +187,22 @@
 
 (defun dump-table (table)
   "Print the contents of hash table TABLE."
-  (maphash #'(lambda (k v) (format t "~S => ~S~%" k v))
+  (maphash #'(lambda (k v)
+               (format t "~S => ~S~%" k v))
            table))
+
+(defun dump-table* (table &optional (pad 0))
+  "Print the contents of hash table TABLE recursively."
+  (loop :for key :being :the :hash-keys :in table
+        :for value :being :the :hash-values :in table
+        :do (if (hash-table-p value)
+                (progn
+                  (format t "~A~S => ~S~%"
+                          (make-string pad :initial-element #\space)
+                          key
+                          value)
+                  (dump-table* value (+ pad 2)))
+                (format t "~S => ~S~%" key value))))
 
 (defun muffle-debugger ()
   "Hide the debugger output."
