@@ -24,6 +24,7 @@
            #:f-and
            #:f-or
            #:when-let
+           #:when-let*
            #:hyphenate
            #:hyphenate-intern
            #:dump-table
@@ -157,6 +158,19 @@
     `(let ,binding-list
        (when (and ,@variables)
          ,@forms))))
+
+(defmacro when-let* (bindings &body body)
+  "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to a true value. This is ALEXANDRIA:WHEN-LET*."
+  (let ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
+                          (list bindings)
+                          bindings)))
+    (labels ((bind (bindings body)
+               (if bindings
+                   `(let (,(car bindings))
+                      (when ,(caar bindings)
+                        ,(bind (cdr bindings) body)))
+                   `(progn ,@body))))
+      (bind binding-list body))))
 
 (defun hyphenate (&rest names)
   "Return a new symbol from the hyphen concatenation of NAMES, then intern it in the current package."
