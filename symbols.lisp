@@ -4,10 +4,10 @@
   (:use #:cl)
   (:export #:define-constant
            #:define-dynamic-constant
-           #:defalias
+           #:define-alias
            #:defun*
            #:with-gensyms
-           #:ppmx
+           #:macroexpand*
            #:symbol-convert))
 
 (in-package #:marie/symbols)
@@ -16,8 +16,7 @@
   "Create a constant only if it hasn’t been bound or created, yet. SBCL complains
 about constants being redefined, hence, this macro."
   (if (boundp name)
-      (format t
-              "~&already defined ~A~%old value ~s~%attempted value ~s~%"
+      (format t "~&already defined ~A~%old value ~s~%attempted value ~s~%"
               name (symbol-value name) value))
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
@@ -30,8 +29,8 @@ about constants being redefined, hence, this macro."
                                                     (invoke-restart r))))))
      (defconstant ,name ,value)))
 
-(defmacro defalias (alias name)
-  "Create alias `alias' for function `name'."
+(defmacro define-alias (alias name)
+  "Define ALIAS as an alternate name for NAME."
   `(defun ,alias (&rest args)
      (apply #',name args)))
 
@@ -39,7 +38,7 @@ about constants being redefined, hence, this macro."
   "Define a function with an alias."
   `(progn
      (defun ,name ,args ,@body)
-     (defalias ,name ,alias)))
+     (define-alias ,alias ,name)))
 
 (defmacro symbols (package &key (location :external-symbols))
   "Collect symbols in a package. Prints external symbols by default."
@@ -47,25 +46,20 @@ about constants being redefined, hence, this macro."
     `(loop :for symbol :being :the ,location :in ,pkg
            :collect symbol)))
 
-;;; From Practical Common Lisp - Peter Seibel
+;;; From Practical Common Lisp (2005)—Peter Seibel
 (defmacro with-gensyms ((&rest names) &body body)
-  `(let ,(loop :for n :in names :collect `(,n (gensym)))
+  `(let ,(loop :for name :in names :collect `(,name (gensym)))
      ,@body))
 
-;;; From A Gentle Introduction to Symbolic Computation — David Touretzky
-(defmacro ppmx (form)
-  "Pretty prints the macro expansion of FORM."
-  `(let* ((exp1 (macroexpand-1 ',form))
-          (exp (macroexpand exp1))
-          (*print-circle* nil))
-     (cond ((equal exp exp1)
-            (format t "~&Macro expansion:")
-            (pprint exp))
-           (t (format t "~&First step of expansion:")
-              (pprint exp1)
-              (format t "~%~%Final expansion:")
-              (pprint exp)))
-     (format t "~%~%")
+(defmacro macroexpand* (form)
+  "Pretty print the macro expansion of FORM."
+  `(let* ((text "MACROEXPAND")
+          (value-1 (macroexpand-1 ,form))
+          (value-2 (macroexpand ,form)))
+     (cond ((equal value-1 value-2)
+            (format t "~&~A:~%~A" text value-1))
+           (t (format t "~&~A-1:~%~A" text value-1)
+              (format t "~&~A:~%~A" text value-2)))
      (values)))
 
 (defun symbol-convert (value)

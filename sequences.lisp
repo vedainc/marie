@@ -4,6 +4,7 @@
   (:use #:cl)
   (:export #:last*
            #:solop
+           #:seq-solo-p
            #:longerp
            #:partition
            #:flatten-list
@@ -27,7 +28,9 @@
            #:map-nappend
            #:join
            #:assoc-key
-           #:assoc-value))
+           #:assoc-value
+           #:stemmedp
+           #:stem))
 
 (in-package #:marie/sequences)
 
@@ -37,7 +40,12 @@
 
 (defun solop (list)
   "Return true if there is only one element in LIST."
-  (and (consp list) (null (cdr list))))
+  (and (consp list)
+       (null (cdr list))))
+
+(defun seq-solo-p (sequence)
+  "Return true if there is only one element in SEQUENCE."
+  (= (length sequence) 1))
 
 (defun longerp (x y)
   "Return true if X is longer than Y."
@@ -197,3 +205,9 @@ and the length of each list as the value."
   (let ((val (assoc key items :test test)))
     (when val
       (cdr val))))
+
+(defun stem (sequence)
+  "Return the only item in SEQUENCE if SEQUENCE has only one element."
+  (if (null (= (length sequence) 1))
+      (error "Argument must exactly be of length 1.")
+      (elt sequence 0)))

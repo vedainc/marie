@@ -2,11 +2,8 @@
 
 (uiop:define-package #:marie/etc
   (:use #:cl)
-  (:export #:symbols
-           #:aps
-           #:doc
+  (:export #:apropos*
            #:run
-           #:with-html
            #:read-integer
            #:read-integer-line
            #:display-file
@@ -15,14 +12,11 @@
            #:home
            #:expand-pathname
            #:make
-           #:make!
            #:with-time
            #:true
            #:false
            #:dbg
            #:dbg*
-           #:f-and
-           #:f-or
            #:when-let
            #:when-let*
            #:hyphenate
@@ -30,18 +24,20 @@
            #:dump-table
            #:dump-table*
            #:muffle-debugger
-           #:with-muffled-debugger))
+           #:with-muffled-debugger
+           #:map-and
+           #:map-or
+           #:rmap-and
+           #:rmap-or
+           #:when*
+           #:unless*))
 
 (in-package #:marie/etc)
 
-(defun aps (symbol &optional (package *package*))
-  "Shortcut for APROPOS."
-  (loop :for i :in (sort (apropos-list symbol package) #'string<)
-        :do (format t "~(~S~)~%" i)))
-
-(defun doc (&rest args)
-  "Shortcut for DOCUMENTATION."
-  (apply #'documentation args))
+(defun apropos* (&rest args)
+  "Display sorted matching symbols from SYMBOL with CL:APROPOS."
+  (loop :for symbol :in (sort (apply #'apropos-list args) #'string<)
+        :do (format t "~S~%" symbol)))
 
 (defmacro run (cmd &rest args)
   "Run command CMD and returns output as string."
@@ -107,26 +103,22 @@
            (uiop:subpathname home (subseq pathstring 1)))
           (t (uiop:ensure-absolute-pathname pathstring)))))
 
-(defun make (system &key (force nil))
-  "Use ASDF to load systems."
-  (asdf:make system :force force))
-
-(defun make! (system)
-  "Use ASDF to force build "
-  (make system :force t))
+(defun make (system)
+  "Use ASDF to load system by force. "
+  (asdf:make system :force t))
 
 (defmacro with-time (&body body)
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
-(defun true (arg)
+(defun true (&rest args)
   "Return true for anything."
-  (declare (ignore arg))
+  (declare (ignore args))
   t)
 
-(defun false (arg)
+(defun false (&rest args)
   "Return false for anything."
-  (declare (ignore arg))
+  (declare (ignore args))
   nil)
 
 (defmacro dbg (&rest args)
@@ -142,16 +134,9 @@
   `(progn (dbg ,@args)
           ,@body))
 
-(defmacro f-and (v &rest fs)
-  "Return the conjunction of FS on V."
-  `(and ,@(loop :for f :in fs :collect `(funcall ,f ,v))))
-
-(defmacro f-or (v &rest fs)
-  "Return the disjunction of FS on V."
-  `(or ,@(loop :for f :in fs :collect `(funcall ,f ,v))))
-
 (defmacro when-let (bindings &body forms)
-  "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a true value. This is ALEXANDRIA:WHEN-LET."
+  "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
+true value. This is ALEXANDRIA:WHEN-LET."
   (let* ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
                            (list bindings)
                            bindings))
@@ -161,7 +146,8 @@
          ,@forms))))
 
 (defmacro when-let* (bindings &body body)
-  "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to a true value. This is ALEXANDRIA:WHEN-LET*."
+  "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
+a true value. This is ALEXANDRIA:WHEN-LET*."
   (let ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
                           (list bindings)
                           bindings)))
@@ -174,7 +160,8 @@
       (bind binding-list body))))
 
 (defun hyphenate (&rest names)
-  "Return a new symbol from the hyphen concatenation of NAMES, then intern it in the current package."
+  "Return a new symbol from the hyphen concatenation of NAMES, then intern it in
+the current package."
   (format nil "~{~A~^-~}"
           (mapcar #'(lambda (name)
                       (string-upcase (marie/strings:string-convert name)))
@@ -182,8 +169,8 @@
 
 (defun hyphenate-intern (package &rest names)
   "Intern names from NAMES in PACKAGE with HYPHENATE."
-  (let ((p (if (null package) *package* package)))
-    (intern (apply #'hyphenate names) (find-package p))))
+  (let ((pkg (if (null package) *package* package)))
+    (intern (apply #'hyphenate names) (find-package pkg))))
 
 (defun dump-table (table)
   "Print the contents of hash table TABLE."
@@ -202,7 +189,10 @@
                           key
                           value)
                   (dump-table* value (+ pad 2)))
-                (format t "~S => ~S~%" key value))))
+                (format t "~A~S => ~S~%"
+                        (make-string pad :initial-element #\space)
+                        key
+                        value))))
 
 (defun muffle-debugger ()
   "Hide the debugger output."
@@ -217,3 +207,33 @@
   `(let ((*debugger-hook* *debugger-hook*))
      (muffle-debugger)
      ,@body))
+
+(defmacro map-and (fn &rest args)
+  "Return true if FN returns true for all items in ARGS."
+  `(and ,@(loop :for arg :in args :collect `(funcall ,fn ,arg))
+        t))
+
+(defmacro map-or (fn &rest args)
+  "Return true if FN returns true for at least one item in ARGS."
+  `(or ,@(loop :for arg :in args :collect `(funcall ,fn ,arg))
+       nil))
+
+(defmacro rmap-and (value &rest fns)
+  "Return true if all functions in FNS return true for VALUE."
+  `(and ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
+        t))
+
+(defmacro rmap-or (value &rest fns)
+  "Return true if at least one function in FNS return true for VALUE."
+  `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
+       nil))
+
+(defmacro when* (&body body)
+  "Return true if all forms in BODY evaluates to true."
+  `(when (and ,@body)
+     t))
+
+(defmacro unless* (&body body)
+  "Return true if all forms in BODY evaluates to false."
+  `(unless (and ,@body)
+     t))
