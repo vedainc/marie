@@ -3,9 +3,10 @@
 (uiop:define-package #:marie/symbols
   (:use #:cl)
   (:export #:define-constant
-           #:define-dynamic-constant
+           #:define-constant*
            #:define-alias
            #:defun*
+           #:symbols
            #:with-gensyms
            #:macroexpand*
            #:symbol-convert))
@@ -21,13 +22,14 @@ about constants being redefined, hence, this macro."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
 
-(defmacro define-dynamic-constant (name value)
+(defmacro define-constant* (name value &optional doc)
   "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
   `(handler-bind ((sb-ext:defconstant-uneql #'(lambda (c)
                                                 (let ((r (find-restart 'continue c)))
                                                   (when r
                                                     (invoke-restart r))))))
-     (defconstant ,name ,value)))
+     (defconstant ,name ,value
+       ,@(when doc (list doc)))))
 
 (defmacro define-alias (alias name)
   "Define ALIAS as an alternate name for NAME."
