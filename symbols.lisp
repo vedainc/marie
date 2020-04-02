@@ -22,12 +22,16 @@ about constants being redefined, hence, this macro."
   `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
      ,@(when doc (list doc))))
 
+(defun call-continue-restart (condition)
+  "Call the continue restart on CONDITION."
+  (let ((restart (find-restart 'continue condition)))
+    (when restart
+      (invoke-restart restart))))
+
 (defmacro define-constant* (name value &optional doc)
   "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
-  `(handler-bind ((sb-ext:defconstant-uneql #'(lambda (c)
-                                                (let ((r (find-restart 'continue c)))
-                                                  (when r
-                                                    (invoke-restart r))))))
+  `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'call-continue-restart))
+                 #-sbcl ((simple-error #'call-continue-restart))
      (defconstant ,name ,value
        ,@(when doc (list doc)))))
 
