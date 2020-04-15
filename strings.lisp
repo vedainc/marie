@@ -3,7 +3,7 @@
 (uiop:define-package #:marie/strings
   (:use #:cl)
   (:export #:empty-string-p
-           #:string-if
+           #:string*
            #:cat
            #:cat-intern
            #:string-list
@@ -12,7 +12,6 @@
            #:trim-whitespace
            #:fmt
            #:fmt*
-           #:string-convert
            #:build-string
            #:string-chars))
 
@@ -20,15 +19,21 @@
 
 (defun empty-string-p (string)
   "Return true if STRING is of length zero."
+  (declare (type (simple-array character (*))  string))
   (zerop (length string)))
 
-(defun string-if (data)
-  "Like IF but returns an empty string when X is false. Otherwise, return DATA."
-  (if data data ""))
+(defun string* (value)
+  "Return VALUE to a string."
+  (etypecase value
+    (number (format nil "~A" value))
+    (cons (format nil "(~{~A~^ ~})" value))
+    (string value)
+    (t (string value))))
 
 (defun cat (&rest args)
   "Concatenate ARGS to a string."
-  (apply #'concatenate 'string args))
+  (let ((v (loop :for arg :in args :collect (string* arg))))
+    (apply #'concatenate 'string v)))
 
 (defun cat-intern (package &rest args)
   "Concatenate ARGS to a string then intern it to the current package."
@@ -37,6 +42,7 @@
 
 (defun string-list (string)
   "Create a list from STRiNG."
+  (declare (type (simple-array character (*))  string))
   (loop :for char :across string :collect char))
 
 (defun split-string (string char)
@@ -68,16 +74,9 @@
   "Print ARGS to stdout with FORMAT."
   (apply #'format t args))
 
-(defun string-convert (value)
-  "Convert VALUE to a string."
-  (etypecase value
-    (number (format nil "~A" value))
-    (string value)
-    (t (string value))))
-
 (defun build-string (items)
   "Return a string from the concatenation of items."
-  (let ((strings (loop :for item :in items :collect (string-convert item))))
+  (let ((strings (loop :for item :in items :collect (string* item))))
     (format nil "~{~A~^ ~}" strings)))
 
 (defun string-chars (string)

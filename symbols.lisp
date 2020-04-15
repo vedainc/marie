@@ -9,7 +9,7 @@
            #:symbols
            #:with-gensyms
            #:macroexpand*
-           #:symbol-convert))
+           #:symbol*))
 
 (in-package #:marie/symbols)
 
@@ -35,7 +35,7 @@ about constants being redefined, hence, this macro."
      (defconstant ,name ,value
        ,@(when doc (list doc)))))
 
-(defmacro define-alias (alias name)
+(defmacro define-alias (name alias)
   "Define ALIAS as an alternate name for NAME."
   `(defun ,alias (&rest args)
      (apply #',name args)))
@@ -68,7 +68,7 @@ about constants being redefined, hence, this macro."
               (format t "~&~A:~%~A" text value-2)))
      (values)))
 
-(defun symbol-convert (value)
+(defun symbol* (value)
   "Convert VALUE to a symbol."
   (etypecase value
     (number value)

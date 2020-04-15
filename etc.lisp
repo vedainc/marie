@@ -164,7 +164,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 the current package."
   (format nil "~{~A~^-~}"
           (mapcar #'(lambda (name)
-                      (string-upcase (marie/strings:string-convert name)))
+                      (string-upcase (marie/strings:string* name)))
                   names)))
 
 (defun hyphenate-intern (package &rest names)

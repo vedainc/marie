@@ -30,7 +30,8 @@
            #:assoc-key
            #:assoc-value
            #:stemmedp
-           #:stem))
+           #:stem
+           #:mem))
 
 (in-package #:marie/sequences)
 
@@ -211,3 +212,8 @@ and the length of each list as the value."
   (if (null (= (length sequence) 1))
       (error "Argument must exactly be of length 1.")
       (elt sequence 0)))
+
+(defun mem (elem list &key (test #'equal))
+  "Return true if ELEM is a member of LIST using TEST as the equality function."
+  (when (member elem list :test test)
+    t))
