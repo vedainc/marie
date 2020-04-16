@@ -6,7 +6,6 @@
            #:define-constant*
            #:define-alias
            #:defun*
-           #:defun+
            #:symbols
            #:with-gensyms
            #:macroexpand*
@@ -30,7 +29,8 @@ about constants being redefined, hence, this macro."
       (invoke-restart restart))))
 
 (defmacro define-constant* (name value &optional doc)
-  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
+  "Bind NAME to VALUE and only change the binding after subsequent calls to the
+macro."
   `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'call-continue-restart))
                  #-sbcl ((simple-error #'call-continue-restart))
      (defconstant ,name ,value
@@ -41,17 +41,24 @@ about constants being redefined, hence, this macro."
   `(defun ,alias (&rest args)
      (apply #',name args)))
 
-(defmacro defun* (name alias args &rest body)
-  "Define a function with an alias."
-  `(progn
-     (defun ,name ,args ,@body)
-     (define-alias ,alias ,name)))
-
-(defmacro defun+ (name args &rest body)
-  "Define a function then export it."
-  `(progn
-     (defun ,name ,args ,@body)
-     (export ',name)))
+(defmacro defun* (spec args &rest body)
+  "Define a function with aliases and optionally export the symbols. SPEC is a
+list where the first element is the name of the function and the rest are
+aliases. If the last element of SPEC is T, the function names, including the
+aliases, are exported."
+  (let ((fid (if (consp spec) spec (list spec))))
+    (destructuring-bind (name &rest handles)
+        fid
+      (let* ((exportp (equal (car (reverse handles)) t))
+             (aliases (if exportp (butlast handles) handles)))
+        `(progn
+           (defun ,name ,args ,@body)
+           ,(when exportp `(export ',name))
+           ,@(loop :for alias :in aliases
+                   :when alias
+                   :collect `(progn (defun ,alias (&rest args)
+                                      (apply #',name args))
+                                    ,(when exportp `(export ',alias)))))))))
 
 (defmacro symbols (package &key (location :external-symbols))
   "Collect symbols in a package. Prints external symbols by default."
