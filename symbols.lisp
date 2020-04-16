@@ -6,6 +6,7 @@
            #:define-constant*
            #:define-alias
            #:defun*
+           #:defun+
            #:symbols
            #:with-gensyms
            #:macroexpand*
@@ -45,6 +46,12 @@ about constants being redefined, hence, this macro."
   `(progn
      (defun ,name ,args ,@body)
      (define-alias ,alias ,name)))
+
+(defmacro defun+ (name args &rest body)
+  "Define a function then export it."
+  `(progn
+     (defun ,name ,args ,@body)
+     (export ',name)))
 
 (defmacro symbols (package &key (location :external-symbols))
   "Collect symbols in a package. Prints external symbols by default."
