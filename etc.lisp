@@ -3,7 +3,6 @@
 (uiop:define-package #:marie/etc
   (:use #:cl)
   (:export #:apropos*
-           #:run
            #:read-integer
            #:read-integer-line
            #:display-file
@@ -30,7 +29,8 @@
            #:rmap-and
            #:rmap-or
            #:when*
-           #:unless*))
+           #:unless*
+           #:getuid))
 
 (in-package #:marie/etc)
 
@@ -38,22 +38,6 @@
   "Display sorted matching symbols from SYMBOL with CL:APROPOS."
   (loop :for symbol :in (sort (apply #'apropos-list args) #'string<)
         :do (format t "~S~%" symbol)))
-
-(defmacro run (cmd &rest args)
-  "Run command CMD and returns output as string."
-  (marie/symbols:with-gensyms (s)
-    `(with-output-to-string (,s)
-       #+sbcl
-       (sb-ext:run-program ,cmd ',args :search t :output ,s)
-       #+ccl
-       (ccl:run-program ,cmd ',args :output ,s)
-       (with-open-stream (in (#+(or clisp cmucl)
-                              ext:run-program
-                              ,cmd :arguments ,args :output :stream))
-         (with-output-to-string (out)
-           (loop :for line = (read-line in nil nil)
-                 :while line
-                 :do (write-line line out)))))))
 
 (defun read-integer (string)
   "Return integer from STRING."
@@ -237,3 +221,12 @@ the current package."
   "Return true if all forms in BODY evaluates to false."
   `(unless (and ,@body)
      t))
+
+(defun getuid ()
+  #+sbcl (sb-posix:getuid)
+  #+cmu (unix:unix-getuid)
+  #+clisp (posix:uid)
+  #+ecl (ext:getuid)
+  #+ccl (ccl::getuid)
+  #+allegro (excl.osi:getuid)
+  #-(or sbcl cmu clisp ecl ccl allegro) (error "no getuid"))

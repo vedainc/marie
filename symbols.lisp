@@ -2,18 +2,24 @@
 
 (uiop:define-package #:marie/symbols
   (:use #:cl)
-  (:export #:defun*
+  (:export #:define-alias
+           #:defun*
+           #:defmacro*
            #:defvar*
            #:defparameter*
            #:define-constant
            #:define-constant*
-           #:define-alias
            #:symbols
            #:with-gensyms
            #:macroexpand*
            #:symbol*))
 
 (in-package #:marie/symbols)
+
+(defmacro define-alias (name alias)
+  "Define ALIAS as an alternate name for function NAME."
+  `(defun ,alias (&rest args)
+     (apply #',name args)))
 
 (defmacro defun* (spec args &rest body)
   "Define a function with aliases and optionally export the names. SPEC is
@@ -33,10 +39,21 @@ function names, including the aliases, are exported."
                    :collect `(progn (define-alias ,name ,alias)
                                     ,(when exportp `(export ',alias)))))))))
 
-(defmacro defvar* (spec &rest body)
-  "Define a special variable by DEFVAR and optionally export the name. SPEC is either a
+(defmacro defmacro* (spec &rest body)
+  "Define a macro by DEFMACRO and optionaly export the name. SPEC is either a
 single symbol, or a list where the second element of the list is a boolean
 indicating whether to export the symbol or not."
+  (let ((id (if (consp spec) spec (list spec))))
+    (destructuring-bind (name &optional exportp)
+        id
+      `(progn
+         (defmacro ,name ,@body)
+         ,(when exportp `(export ',name))))))
+
+(defmacro defvar* (spec &rest body)
+  "Define a special variable by DEFVAR and optionally export the name. SPEC is
+either a single symbol, or a list where the second element of the list is a
+boolean indicating whether to export the symbol or not."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &optional exportp)
         id
@@ -45,9 +62,9 @@ indicating whether to export the symbol or not."
          ,(when exportp `(export ',name))))))
 
 (defmacro defparameter* (spec &rest body)
-  "Define a special variable by DEFPARAMETER and optionally export the name. SPEC is either a
-single symbol, or a list where the second element of the list is a boolean
-indicating whether to export the symbol or not."
+  "Define a special variable by DEFPARAMETER and optionally export the
+name. SPEC is either a single symbol, or a list where the second element of the
+list is a boolean indicating whether to export the symbol or not."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &optional exportp)
         id
@@ -76,15 +93,10 @@ macro."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &optional exportp)
         id
-      `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'call-continue-restart))
-                     #-sbcl ((simple-error #'call-continue-restart))
-         ,(when exportp `(export ',name))
-         (defconstant ,name ,@body)))))
-
-(defmacro define-alias (name alias)
-  "Define ALIAS as an alternate name for function NAME."
-  `(defun ,alias (&rest args)
-     (apply #',name args)))
+      `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'continue))
+                     #-sbcl ((simple-error #'continue))
+         (defconstant ,name ,@body)
+         ,(when exportp `(export ',name))))))
 
 (defmacro symbols (package &key (location :external-symbols))
   "Collect symbols in a package. Prints external symbols by default."
