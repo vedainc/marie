@@ -31,7 +31,9 @@
            #:assoc-value
            #:stemmedp
            #:stem
-           #:mem))
+           #:mem
+           #:mem*
+           #:remove*))
 
 (in-package #:marie/sequences)
 
@@ -217,3 +219,20 @@ and the length of each list as the value."
   "Return true if ELEM is a member of LIST using TEST as the equality function."
   (when (member elem list :test test)
     t))
+
+(defun mem* (elems list &key (test #'equal))
+  "Return true if all items ELEMS are members of LIST using TEST as the equality
+function."
+  (labels ((fn (args)
+             (cond ((null args) t)
+                   ((member (car args) list :test test) (fn (cdr args)))
+                   (t nil))))
+    (or (funcall test elems list)
+        (fn elems))))
+
+(defun remove* (elems list &key (test #'equal))
+  "Remove all items in ELEMS in LIST."
+  (labels ((fn (args list)
+             (cond ((null args) list)
+                   (t (fn (cdr args) (remove (car args) list :test test))))))
+    (fn elems list)))
