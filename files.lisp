@@ -27,7 +27,7 @@
 
 (defun files (pathname)
   "Return all regular files under PATHNAME."
-  (flatten-list (collect-entries (directory-entries pathname))))
+  (marie/sequences:flatten-list (collect-entries (directory-entries pathname))))
 
 (defun slurp-file (path)
   "Read entire file as string."
