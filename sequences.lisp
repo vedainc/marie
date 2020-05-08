@@ -63,29 +63,29 @@
 (defun partition (source n)
   "Create partition of N from SOURCE."
   (when (zerop n) (error "Zero length"))
-  (labels ((fn (source accumulator)
+  (labels ((fn (source acc)
              (let ((rest (nthcdr n source)))
                (if (consp rest)
-                   (fn rest (cons (subseq source 0 n) accumulator))
-                   (nreverse (cons source accumulator))))))
+                   (fn rest (cons (subseq source 0 n) acc))
+                   (nreverse (cons source acc))))))
     (when source
       (fn source nil))))
 
 (defun flatten-list (list)
   "Merge all symbols from LIST to one list."
-  (labels ((fn (list accumulator)
-             (cond ((null list) accumulator)
-                   ((atom list) (cons list accumulator))
-                   (t (fn (car list) (fn (cdr list) accumulator))))))
+  (labels ((fn (list acc)
+             (cond ((null list) acc)
+                   ((atom list) (cons list acc))
+                   (t (fn (car list) (fn (cdr list) acc))))))
     (fn list nil)))
 
 (defun filter-if (fn list)
   "Collect the results of applying FN to  LIST which returns true."
-  (let ((accumulator nil))
+  (let ((acc nil))
     (dolist (x list)
       (let ((value (funcall fn x)))
-        (when value (push value accumulator))))
-    (nreverse accumulator)))
+        (when value (push value acc))))
+    (nreverse acc)))
 
 (defun filter-if-not (fn list)
   "Collect the results of applying FN to LIST which returns false."
@@ -93,15 +93,15 @@
 
 (defun prune-if (fn tree)
   "Remove all items from TREE to which FN returns true."
-  (labels ((fn (tree accumulator)
-             (cond ((null tree) (nreverse accumulator))
+  (labels ((fn (tree acc)
+             (cond ((null tree) (nreverse acc))
                    ((consp (car tree)) (fn (cdr tree)
                                            (cons (fn (car tree) nil)
-                                                 accumulator)))
+                                                 acc)))
                    (t (fn (cdr tree)
                           (if (funcall fn (car tree))
-                              accumulator
-                              (cons (car tree) accumulator)))))))
+                              acc
+                              (cons (car tree) acc)))))))
     (fn tree nil)))
 
 (defun prune-if-not (fn tree)
@@ -138,11 +138,11 @@ FN, as values. Otherwise, return false."
 (defun split-if (fn list)
   "Return two lists wherein the first list contains everything that satisfies FN, until it
 doesn't, and another list that starts where FN returns true,as values."
-  (let ((accumulator nil))
+  (let ((acc nil))
     (do ((source list (cdr source)))
         ((or (null source) (funcall fn (car source)))
-         (values (nreverse accumulator) source))
-      (push (car source) accumulator))))
+         (values (nreverse acc) source))
+      (push (car source) acc))))
 
 (defun append* (list data)
   "Destructively update list with data."
@@ -169,11 +169,11 @@ doesn't, and another list that starts where FN returns true,as values."
 
 (defun group-alike (list)
   "Group similar elements together."
-  (labels ((fn (list accumulator)
-             (cond ((null list) (nreverse accumulator))
+  (labels ((fn (list acc)
+             (cond ((null list) (nreverse acc))
                    (t (fn (remove (first list) list)
                           (cons (make-list (count (first list) list) :initial-element (first list))
-                                accumulator))))))
+                                acc))))))
     (fn list nil)))
 
 (defun build-length-index (groups)

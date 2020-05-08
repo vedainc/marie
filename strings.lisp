@@ -12,7 +12,7 @@
            #:trim-whitespace
            #:fmt
            #:fmt*
-           #:build-string
+           #:list-string
            #:string-chars))
 
 (in-package #:marie/strings)
@@ -74,10 +74,16 @@
   "Print ARGS to stdout with FORMAT."
   (apply #'format t args))
 
-(defun build-string (items)
-  "Return a string from the concatenation of items."
-  (let ((strings (loop :for item :in items :collect (string* item))))
-    (format nil "~{~A~^ ~}" strings)))
+(defun list-string (list)
+  "Return the string version of LIST."
+  (labels ((fn (args &optional acc)
+             (cond ((null args) (string* (nreverse acc)))
+                   ((consp (car args))
+                    (fn (cdr args)
+                        (cons (fn (car args) nil)
+                              acc)))
+                   (t (fn (cdr args) (cons (car args) acc))))))
+    (fn list)))
 
 (defun string-chars (string)
   "Return STRING as individual characters."

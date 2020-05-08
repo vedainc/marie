@@ -22,7 +22,6 @@
            #:hyphenate-intern
            #:dump-table
            #:dump-table*
-           #:muffle-debugger
            #:with-muffled-debugger
            #:map-and
            #:map-or
@@ -178,18 +177,16 @@ the current package."
                         key
                         value))))
 
-(defun muffle-debugger ()
-  "Hide the debugger output."
-  (setf *debugger-hook*
-        (lambda (condition hook)
-          (declare (ignore hook))
-          (format *error-output* "Caught error: ~A" condition)
-          (finish-output *error-output*))))
+(defun muffle-debugger-handler (condition hook)
+  "Define a handler for muffling the debugger messages."
+  (declare (ignore hook))
+  (format *error-output* "Caught error: ~A" condition)
+  (finish-output *error-output*))
 
 (defmacro with-muffled-debugger (&body body)
   "Evaluate body with the debugger warnings turned off."
   `(let ((*debugger-hook* *debugger-hook*))
-     (muffle-debugger)
+     (setf *debugger-hook* #'muffle-debugger-handler)
      ,@body))
 
 (defmacro map-and (fn &rest args)
@@ -223,6 +220,7 @@ the current package."
      t))
 
 (defun getuid ()
+  "Return the real UID of the user."
   #+sbcl (sb-posix:getuid)
   #+cmu (unix:unix-getuid)
   #+clisp (posix:uid)
