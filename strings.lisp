@@ -87,4 +87,4 @@
 
 (defun string-chars (string)
   "Return STRING as individual characters."
-  (loop :for c :across string :collect c))
+  (loop :for char :across string :collect char))

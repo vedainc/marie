@@ -22,6 +22,7 @@
            #:hyphenate-intern
            #:dump-table
            #:dump-table*
+           #:muffle-debugger
            #:with-muffled-debugger
            #:map-and
            #:map-or
@@ -29,7 +30,7 @@
            #:rmap-or
            #:when*
            #:unless*
-           #:getuid))
+           #+unix #:getuid))
 
 (in-package #:marie/etc)
 
@@ -183,6 +184,10 @@ the current package."
   (format *error-output* "Caught error: ~A" condition)
   (finish-output *error-output*))
 
+(defun muffle-debugger ()
+  "Hide debugger messages."
+  (setf *debugger-hook* #'muffle-debugger-handler))
+
 (defmacro with-muffled-debugger (&body body)
   "Evaluate body with the debugger warnings turned off."
   `(let ((*debugger-hook* *debugger-hook*))
@@ -219,6 +224,7 @@ the current package."
   `(unless (and ,@body)
      t))
 
+#+unix
 (defun getuid ()
   "Return the real UID of the user."
   #+sbcl (sb-posix:getuid)
