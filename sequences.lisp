@@ -3,8 +3,9 @@
 (uiop:define-package #:marie/sequences
   (:use #:cl)
   (:export #:last*
-           #:solop
-           #:seq-solo-p
+           #:length-1
+           #:single
+           #:singlep
            #:longerp
            #:partition
            #:flatten-list
@@ -29,8 +30,6 @@
            #:join
            #:assoc-key
            #:assoc-value
-           #:stemmedp
-           #:stem
            #:mem
            #:mem*
            #:remove*))
@@ -41,14 +40,21 @@
   "Return the first of the last element of LIST."
   (first (last list)))
 
-(defun solop (list)
+(defun length-1 (seq)
+  "Return true if the length of SEQ is 1."
+  (declare (type sequence seq))
+  (= (length seq) 1))
+
+(defun single (seq)
+  "Return the only item in SEQUENCE if SEQUENCE has only one element."
+  (if (null (length-1 seq))
+      (error "Argument must exactly be of length 1.")
+      (elt seq 0)))
+
+(defun singlep (list)
   "Return true if there is only one element in LIST."
   (and (consp list)
        (null (cdr list))))
-
-(defun seq-solo-p (sequence)
-  "Return true if there is only one element in SEQUENCE."
-  (= (length sequence) 1))
 
 (defun longerp (x y)
   "Return true if X is longer than Y."
@@ -208,12 +214,6 @@ and the length of each list as the value."
   (let ((val (assoc key items :test test)))
     (when val
       (cdr val))))
-
-(defun stem (sequence)
-  "Return the only item in SEQUENCE if SEQUENCE has only one element."
-  (if (null (= (length sequence) 1))
-      (error "Argument must exactly be of length 1.")
-      (elt sequence 0)))
 
 (defun mem (elem list &key (test #'equal))
   "Return true if ELEM is a member of LIST using TEST as the equality function."
