@@ -32,7 +32,8 @@
            #:assoc-value
            #:mem
            #:mem*
-           #:remove*))
+           #:remove*
+           #:sequence-string))
 
 (in-package #:marie/sequences)
 
@@ -236,3 +237,7 @@ function."
              (cond ((null args) list)
                    (t (fn (cdr args) (remove (car args) list :test test))))))
     (fn elems list)))
+
+(defun sequence-string (seq)
+  "Return SEQ as a string."
+  (format nil "~{~A~}" seq))

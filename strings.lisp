@@ -12,8 +12,7 @@
            #:trim-whitespace
            #:fmt
            #:fmt*
-           #:list-string
-           #:string-chars))
+           #:list-string))
 
 (in-package #:marie/strings)
 
@@ -84,7 +83,3 @@
                               acc)))
                    (t (fn (cdr args) (cons (car args) acc))))))
     (fn list)))
-
-(defun string-chars (string)
-  "Return STRING as individual characters."
-  (loop :for char :across string :collect char))
