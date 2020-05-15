@@ -30,7 +30,8 @@
            #:rmap-or
            #:when*
            #:unless*
-           #+unix #:getuid))
+           #+unix #:getuid
+           #:gethash*))
 
 (in-package #:marie/etc)
 
@@ -234,3 +235,10 @@ the current package."
   #+ccl (ccl::getuid)
   #+allegro (excl.osi:getuid)
   #-(or sbcl cmu clisp ecl ccl allegro) (error "no getuid"))
+
+(defun gethash* (path table)
+  "Return the value specified by path starting from TABLE."
+  (cond ((marie/sequences:singlep path) (gethash (car path) table))
+        ((null (hash-table-p (gethash (car path) table))) nil)
+        (t (gethash* (cdr path)
+                     (gethash (car path) table)))))

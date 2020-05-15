@@ -7,7 +7,6 @@
            #:cat
            #:cat-intern
            #:string-list
-           #:split-string
            #:normalize-strings
            #:trim-whitespace
            #:fmt
@@ -43,13 +42,6 @@
   "Create a list from STRiNG."
   (declare (type (simple-array character (*))  string))
   (loop :for char :across string :collect char))
-
-(defun split-string (string char)
-  "Split STRING separated by CHAR."
-  (loop :for start = 0 :then (1+ finish)
-        :for finish = (position char string :start start)
-        :collecting (subseq string start finish)
-        :until (null finish)))
 
 (defun normalize-strings (list &key (character #\_))
   "Return list of characters with equal length using CHARACTER as end padding."
