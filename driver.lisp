@@ -1,7 +1,7 @@
 ;;;; driver.lisp - re-export all the functionality in MARIE
 
 (uiop:define-package :marie/driver
-  (:nicknames :marie :m)
+  (:nicknames :marie)
   (:use :uiop/common-lisp)
   (:use-reexport #:marie/strings
                  #:marie/sequences

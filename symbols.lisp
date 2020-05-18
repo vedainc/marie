@@ -7,8 +7,8 @@
            #:defmacro*
            #:defvar*
            #:defparameter*
+           #:defconstant*
            #:define-constant
-           #:define-constant*
            #:symbols
            #:with-gensyms
            #:macroexpand*
@@ -22,64 +22,56 @@
      (apply #',name args)))
 
 (defmacro defun* (spec args &rest body)
-  "Define a function with aliases and optionally export the names. SPEC is
-either a single symbol, or a list where the first element is the name of the
-function and the rest are aliases. If the last element of SPEC is T, the
-function names, including the aliases, are exported."
+  "Define a function with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
-    (destructuring-bind (name &rest handles)
+    (destructuring-bind (name &rest aliases)
         id
-      (let* ((exportp (equal (car (reverse handles)) t))
-             (aliases (if exportp (butlast handles) handles)))
-        `(progn
-           (defun ,name ,args ,@body)
-           ,(when exportp `(export ',name))
-           ,@(loop :for alias :in aliases
-                   :when alias
-                   :collect `(progn (define-alias ,name ,alias)
-                                    ,(when exportp `(export ',alias)))))))))
+      `(progn
+         (defun ,name ,args ,@body)
+         (export ',name)
+         ,@(loop :for alias :in aliases
+                 :when alias
+                 :collect `(progn (setf (fdefinition ',alias) (fdefinition ',name))
+                                  (export ',alias)))))))
 
 (defmacro defmacro* (spec &rest body)
-  "Define a macro by DEFMACRO and optionaly export the name. SPEC is either a
-single symbol, or a list where the second element of the list is a boolean
-indicating whether to export the symbol or not."
+  "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
-    (destructuring-bind (name &optional exportp)
+    (destructuring-bind (name &rest aliases)
         id
       `(progn
          (defmacro ,name ,@body)
-         ,(when exportp `(export ',name))))))
+         (export ',name)
+         ,@(loop :for alias :in aliases
+                 :when alias
+                 :collect `(progn (setf (macro-function ',alias) (macro-function ',name))
+                                  (export ',alias)))))))
 
 (defmacro defvar* (spec &rest body)
-  "Define a special variable by DEFVAR and optionally export the name. SPEC is
-either a single symbol, or a list where the second element of the list is a
-boolean indicating whether to export the symbol or not."
+  "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
-    (destructuring-bind (name &optional exportp)
+    (destructuring-bind (name &rest aliases)
         id
       `(progn
          (defvar ,name ,@body)
-         ,(when exportp `(export ',name))))))
+         (export ',name)
+         ,@(loop :for alias :in aliases
+                 :when alias
+                 :collect `(progn (defvar ,alias ,@body)
+                                  (export ',alias)))))))
 
 (defmacro defparameter* (spec &rest body)
-  "Define a special variable by DEFPARAMETER and optionally export the
-name. SPEC is either a single symbol, or a list where the second element of the
-list is a boolean indicating whether to export the symbol or not."
+  "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
-    (destructuring-bind (name &optional exportp)
+    (destructuring-bind (name &rest aliases)
         id
       `(progn
          (defparameter ,name ,@body)
-         ,(when exportp `(export ',name))))))
-
-(defmacro define-constant (name value &optional doc)
-  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains
-about constants being redefined, hence, this macro."
-  (if (boundp name)
-      (format t "~&already defined ~A~%old value ~s~%attempted value ~s~%"
-              name (symbol-value name) value))
-  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
-     ,@(when doc (list doc))))
+         (export ',name)
+         ,@(loop :for alias :in aliases
+                 :when alias
+                 :collect `(progn (defparameter ,alias ,@body)
+                                  (export ',alias)))))))
 
 (defun call-continue-restart (condition)
   "Call the continue restart on CONDITION."
@@ -87,16 +79,27 @@ about constants being redefined, hence, this macro."
     (when restart
       (invoke-restart restart))))
 
-(defmacro define-constant* (spec &rest body)
-  "Bind NAME to VALUE and only change the binding after subsequent calls to the
-macro."
+(defmacro defconstant* (spec &rest body)
+  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
   (let ((id (if (consp spec) spec (list spec))))
-    (destructuring-bind (name &optional exportp)
+    (destructuring-bind (name &rest aliases)
         id
       `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'continue))
                      #-sbcl ((simple-error #'continue))
          (defconstant ,name ,@body)
-         ,(when exportp `(export ',name))))))
+         (export ',name)
+         ,@(loop :for alias :in aliases
+                 :when alias
+                 :collect `(progn (defconstant ,alias ,@body)
+                                  (export ',alias)))))))
+
+(defmacro define-constant (name value &optional doc)
+  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains about constants being redefined, hence, this macro."
+  (if (boundp name)
+      (format t "~&already defined ~A~%old value ~s~%attempted value ~s~%"
+              name (symbol-value name) value))
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+     ,@(when doc (list doc))))
 
 (defmacro symbols (package &key (location :external-symbols))
   "Collect symbols in a package. Prints external symbols by default."

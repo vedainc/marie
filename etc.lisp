@@ -31,7 +31,8 @@
            #:when*
            #:unless*
            #+unix #:getuid
-           #:gethash*))
+           #:gethash*
+           #:null*))
 
 (in-package #:marie/etc)
 
@@ -242,3 +243,8 @@ the current package."
         ((null (hash-table-p (gethash (car path) table))) nil)
         (t (gethash* (cdr path)
                      (gethash (car path) table)))))
+
+(defun null* (value)
+  "Return true if VALUE is null or every item is."
+  (or (null value)
+      (every #'null value)))
