@@ -161,7 +161,8 @@ the current package."
 (defun dump-table (table)
   "Print the contents of hash table TABLE."
   (maphash #'(lambda (k v)
-               (format t "~S => ~S~%" k v))
+               (format t "~S => ~S~%" k v)
+               (force-output *standard-output*))
            table))
 
 (defun dump-table* (table &optional (pad 0))
