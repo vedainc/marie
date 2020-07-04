@@ -4,6 +4,7 @@
   (:use #:cl)
   (:export #:last*
            #:length-1
+           #:length=
            #:single
            #:singlep
            #:longerp
@@ -45,6 +46,11 @@
   "Return true if the length of SEQ is 1."
   (declare (type sequence seq))
   (= (length seq) 1))
+
+(defun length= (seq len)
+  "Return true if the length of SEQ is LEN."
+  (declare (type sequence seq))
+  (= (length seq) len))
 
 (defun single (seq)
   "Return the only item in SEQUENCE if SEQUENCE has only one element."
