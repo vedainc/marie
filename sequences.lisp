@@ -61,6 +61,11 @@
   (declare (type sequence seq))
   (< (length seq) len))
 
+(defun length> (seq len)
+  "Return true if the length of SEQ is LEN."
+  (declare (type sequence seq))
+  (> (length seq) len))
+
 (defun length<= (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))

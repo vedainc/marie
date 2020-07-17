@@ -249,3 +249,8 @@ the current package."
   "Return true if VALUE is null or every item is."
   (or (null value)
       (every #'null value)))
+
+(defmacro eval-always (&body body)
+  "Always evaluate BODY."
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     ,@body))
