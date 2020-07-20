@@ -32,7 +32,8 @@
            #:unless*
            #+unix #:getuid
            #:gethash*
-           #:null*))
+           #:null*
+           #:eval-always))
 
 (in-package #:marie/etc)
 
