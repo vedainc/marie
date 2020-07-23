@@ -3,7 +3,6 @@
 (uiop:define-package #:marie/sequences
   (:use #:cl)
   (:export #:last*
-           #:length-1
            #:length=
            #:length<
            #:length>
@@ -38,18 +37,14 @@
            #:mem
            #:mem*
            #:remove*
-           #:sequence-string))
+           #:sequence-string
+           #:butrest))
 
 (in-package #:marie/sequences)
 
 (defun last* (list)
   "Return the first of the last element of LIST."
   (first (last list)))
-
-(defun length-1 (seq)
-  "Return true if the length of SEQ is 1."
-  (declare (type sequence seq))
-  (= (length seq) 1))
 
 (defun length= (seq len)
   "Return true if the length of SEQ is LEN."
@@ -78,7 +73,7 @@
 
 (defun single (seq)
   "Return the only item in SEQUENCE if SEQUENCE has only one element."
-  (if (null (length-1 seq))
+  (if (null (length= seq 1))
       (error "Argument must exactly be of length 1.")
       (elt seq 0)))
 
@@ -252,8 +247,7 @@ and the length of each list as the value."
     t))
 
 (defun mem* (elems list &key (test #'equal))
-  "Return true if all items ELEMS are members of LIST using TEST as the equality
-function."
+  "Return true if all items ELEMS are members of LIST using TEST as the equality function."
   (labels ((fn (args)
              (cond ((null args) t)
                    ((member (car args) list :test test) (fn (cdr args)))
@@ -271,3 +265,7 @@ function."
 (defun sequence-string (seq)
   "Return SEQ as a string."
   (format nil "~{~A~}" seq))
+
+(defun butrest (list)
+  "Return everything from LIST except the rest."
+  (butlast list (1- (length list))))
