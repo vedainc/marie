@@ -31,6 +31,7 @@
            #:build-length-index
            #:map-append
            #:map-nappend
+           #:reduce-append
            #:join
            #:assoc-key
            #:assoc-value
@@ -223,6 +224,12 @@ and the length of each list as the value."
 (defun map-nappend (fn sequence1 sequence2)
   "Apply NCONC to the result of applying FN to sequence1 and sequence2."
   (nconc (mapcar fn sequence1) (mapcar fn sequence2)))
+
+(defun reduce-append (&rest args)
+  "Apply APPEND with REDUCE to ARGS."
+  (if (length= args 1)
+      (reduce #'append (car args))
+      (reduce #'append args)))
 
 (defun join (list &optional (char #\Space))
   "Merge items in LIST by the space character."
