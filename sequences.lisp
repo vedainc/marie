@@ -233,8 +233,9 @@ and the length of each list as the value."
 
 (defun join (list &optional (char #\Space))
   "Merge items in LIST by the space character."
-  (let ((fmt (marie/strings:cat "~{~A~^" (string char) "~}")))
-    (format nil fmt list)))
+  (let ((separator (if char (string char) "")))
+    (let ((fmt (marie/strings:cat "~{~A~^" separator "~}")))
+      (format nil fmt list))))
 
 (defun assoc-key (key items &key (test #'equal))
   "Return the key found in ITEMS if KEY is found."
