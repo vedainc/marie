@@ -17,7 +17,7 @@
 
 (defun empty-string-p (string)
   "Return true if STRING is of length zero."
-  (declare (type (simple-array character (*))  string))
+  ;;(declare (type (simple-array character (*))  string))
   (zerop (length string)))
 
 (defun string* (value)
