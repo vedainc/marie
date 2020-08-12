@@ -33,13 +33,15 @@
            #:map-nappend
            #:reduce-append
            #:join
+           #:join*
            #:assoc-key
            #:assoc-value
            #:mem
            #:mem*
            #:remove*
            #:sequence-string
-           #:butrest))
+           #:butrest
+           #:insert-after))
 
 (in-package #:marie/sequences)
 
@@ -231,11 +233,11 @@ and the length of each list as the value."
       (reduce #'append (car args))
       (reduce #'append args)))
 
-(defun join (list &optional (char #\Space))
+(defun join (list &optional (pad " "))
   "Merge items in LIST by the space character."
-  (let ((separator (if char (string char) "")))
-    (let ((fmt (marie/strings:cat "~{~A~^" separator "~}")))
-      (format nil fmt list))))
+  (let* ((separator (if (null pad) "" pad))
+         (fmt (marie/strings:cat "~{~A~^" separator "~}")))
+    (format nil fmt list)))
 
 (defun assoc-key (key items &key (test #'equal))
   "Return the key found in ITEMS if KEY is found."
@@ -277,3 +279,9 @@ and the length of each list as the value."
 (defun butrest (list)
   "Return everything from LIST except the rest."
   (butlast list (1- (length list))))
+
+(defun insert-after (list index item)
+  "Return a new list from LIST where ITEM is inserted after INDEX."
+  (let ((copy (copy-list list)))
+    (push item (cdr (nthcdr index copy)))
+    copy))

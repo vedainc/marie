@@ -40,7 +40,7 @@
 
 (defun string-list (string)
   "Create a list from STRiNG."
-  (declare (type (simple-array character (*))  string))
+  ;;(declare (type (simple-array character (*))  string))
   (loop :for char :across string :collect char))
 
 (defun normalize-strings (list &key (character #\_))
@@ -65,10 +65,10 @@
   "Print ARGS to stdout with FORMAT."
   (apply #'format t args))
 
-(defun list-string (list)
+(defun list-string (list &optional (converter 'string*))
   "Return the string version of LIST."
   (labels ((fn (args &optional acc)
-             (cond ((null args) (string* (nreverse acc)))
+             (cond ((null args) (funcall converter (nreverse acc)))
                    ((consp (car args))
                     (fn (cdr args)
                         (cons (fn (car args) nil)
