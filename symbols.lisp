@@ -12,7 +12,8 @@
            #:symbols
            #:with-gensyms
            #:macroexpand*
-           #:symbol*))
+           #:symbol*
+           #:mapply))
 
 (in-package #:marie/symbols)
 
@@ -118,9 +119,9 @@
           (value-1 (macroexpand-1 ,form))
           (value-2 (macroexpand ,form)))
      (cond ((equal value-1 value-2)
-            (format t "~&~A:~%~A" text value-1))
-           (t (format t "~&~A-1:~%~A" text value-1)
-              (format t "~&~A:~%~A" text value-2)))
+            (format t "~&~S:~%~S" text value-1))
+           (t (format t "~&~S-1:~%~S" text value-1)
+              (format t "~&~S:~%~S" text value-2)))
      (values)))
 
 (defun symbol* (value)
@@ -129,3 +130,8 @@
     (number value)
     (string (intern (string-upcase value)))
     (t value)))
+
+(defmacro mapply (name &rest args)
+  "Apply macro under NAME to ARGS."
+  `(progn
+     ,@(loop :for arg :in args :collect `(,name ,arg))))

@@ -41,6 +41,7 @@
            #:remove*
            #:sequence-string
            #:butrest
+           #:insert-before
            #:insert-after))
 
 (in-package #:marie/sequences)
@@ -285,3 +286,11 @@ and the length of each list as the value."
   (let ((copy (copy-list list)))
     (push item (cdr (nthcdr index copy)))
     copy))
+
+(defun insert-before (list index item)
+  "Return a new list from LIST where ITEM is inserted after INDEX."
+  (let ((copy (copy-list list)))
+    (if (zerop index)
+        (push item copy)
+        (insert-after copy (1- index) item))))
+
