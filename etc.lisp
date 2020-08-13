@@ -28,9 +28,8 @@
            #:map-or
            #:rmap-and
            #:rmap-or
-           #:when*
            #:∧
-           #:unless*
+           #:∨
            #+unix #:getuid
            #:gethash*
            #:null*
@@ -193,7 +192,7 @@ the current package."
   "Hide debugger messages."
   (setf *debugger-hook* #'muffle-debugger-handler))
 
-(defmacro with-muffled-debugger (&body body)
+(defmacro with-muffled-debugger ((&optional) &body body)
   "Evaluate body with the debugger warnings turned off."
   `(let ((*debugger-hook* *debugger-hook*))
      (setf *debugger-hook* #'muffle-debugger-handler)

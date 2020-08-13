@@ -131,7 +131,7 @@
     (string (intern (string-upcase value)))
     (t value)))
 
-(defmacro mapply (name &rest args)
-  "Apply macro under NAME to ARGS."
+(defmacro mapply (macro &rest args)
+  "Apply macro MACRO to each item in ARGS."
   `(progn
-     ,@(loop :for arg :in args :collect `(,name ,arg))))
+     ,@(loop :for arg :in args :collect `(,macro ,arg))))
