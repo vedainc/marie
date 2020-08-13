@@ -29,6 +29,7 @@
            #:rmap-and
            #:rmap-or
            #:when*
+           #:∧
            #:unless*
            #+unix #:getuid
            #:gethash*
@@ -218,14 +219,14 @@ the current package."
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
 
-(defmacro when* (&body body)
+(defmacro ∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
   `(when (and ,@body)
      t))
 
-(defmacro unless* (&body body)
+(defmacro ∨ (&body body)
   "Return true if all forms in BODY evaluates to false."
-  `(unless (and ,@body)
+  `(when (or ,@body)
      t))
 
 #+unix
