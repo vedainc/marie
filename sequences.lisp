@@ -26,14 +26,13 @@
            #:vector-list
            #:list-vector
            #:remove-items
-           #:join-stream-string
            #:group-alike
            #:build-length-index
            #:map-append
            #:map-nappend
            #:reduce-append
            #:join
-           #:join*
+           #:join-stream-string
            #:assoc-key
            #:assoc-value
            #:mem
@@ -199,10 +198,6 @@ doesn't, and another list that starts where FN returns true,as values."
             (remove (first items) list :test #'equal)
             (rest items)))))
 
-(defun join-stream-string (stream lines)
-  "Read lines from 1 to END from STREAM."
-  (join (loop :for i :from 1 :to lines :collect (read-line stream nil nil))))
-
 (defun group-alike (list)
   "Group similar elements together."
   (labels ((fn (list acc)
@@ -239,6 +234,11 @@ and the length of each list as the value."
   (let* ((separator (if (null pad) "" pad))
          (fmt (marie/strings:cat "~{~A~^" separator "~}")))
     (format nil fmt list)))
+
+(defun join-stream (stream end)
+  "Read lines from 1 to END from STREAM."
+  (join (loop :for i :from 1 :to end
+              :collect (read-line stream nil nil))))
 
 (defun assoc-key (key items &key (test #'equal))
   "Return the key found in ITEMS if KEY is found."
