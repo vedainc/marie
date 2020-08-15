@@ -1,4 +1,4 @@
-;;;; files.lisp - file and path utilities
+;;;; files.lisp
 
 (uiop:define-package #:marie/files
   (:use #:cl)

@@ -1,4 +1,4 @@
-;;;; sequences.lisp - utilities for working with lists and trees
+;;;; sequences.lisp
 
 (uiop:define-package #:marie/sequences
   (:use #:cl)

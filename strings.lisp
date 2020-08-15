@@ -1,4 +1,4 @@
-;;;; strings.lisp - utilities for working with strings
+;;;; strings.lisp
 
 (uiop:define-package #:marie/strings
   (:use #:cl)

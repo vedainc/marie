@@ -1,4 +1,4 @@
-;;;; etc.lisp - miscellaneous utilities
+;;;; etc.lisp
 
 (uiop:define-package #:marie/etc
   (:use #:cl)

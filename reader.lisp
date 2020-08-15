@@ -1,4 +1,4 @@
-;;;; reader.lisp - stuff for the lisp reader
+;;;; reader.lisp
 
 (uiop:define-package #:marie/reader
   (:use #:cl)

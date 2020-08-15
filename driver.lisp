@@ -1,4 +1,4 @@
-;;;; driver.lisp - re-export all the functionality in MARIE
+;;;; driver.lisp
 
 (uiop:define-package :marie/driver
   (:nicknames :marie)

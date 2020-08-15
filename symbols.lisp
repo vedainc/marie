@@ -1,4 +1,4 @@
-;;;; symbols.lisp - utilities for woking with symbols, macros, and definitions
+;;;; symbols.lisp
 
 (uiop:define-package #:marie/symbols
   (:use #:cl)
