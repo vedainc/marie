@@ -30,6 +30,8 @@
            #:rmap-or
            #:∧
            #:∨
+           #:empty
+           #:empty*
            #+unix #:getuid
            #:gethash*
            #:null*
@@ -227,6 +229,16 @@ the current package."
   "Return true if all forms in BODY evaluates to false."
   `(when (or ,@body)
      t))
+
+(defmacro empty (object)
+  "Set the value of OBJECT to null."
+  `(setf ,object nil))
+
+(defmacro empty* (&rest objects)
+  "Set the value of OBJECTS to null."
+  `(progn
+     ,@(loop :for object :in objects
+             :collect `(empty ,object))))
 
 #+unix
 (defun getuid ()
