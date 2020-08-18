@@ -25,7 +25,8 @@
      (apply #',name args)))
 
 (defmacro defun* (spec args &rest body)
-  "Define a function with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
+  "Define a function with aliases and export the names. SPEC is either a single symbol, or a list
+where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -38,7 +39,8 @@
                                   (export ',alias)))))))
 
 (defmacro defmacro* (spec &rest body)
-  "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
+  "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where
+the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -51,7 +53,8 @@
                                   (export ',alias)))))))
 
 (defmacro defvar* (spec &rest body)
-  "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
+  "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single
+symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -64,7 +67,8 @@
                                   (export ',alias)))))))
 
 (defmacro defparameter* (spec &rest body)
-  "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases."
+  "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol,
+or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -97,7 +101,8 @@
                                   (export ',alias)))))))
 
 (defmacro define-constant (name value &optional doc)
-  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains about constants being redefined, hence, this macro."
+  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains about constants
+being redefined, hence, this macro."
   (if (boundp name)
       (format t "~&already defined ~A~%old value ~s~%attempted value ~s~%"
               name (symbol-value name) value))
@@ -152,7 +157,8 @@
 
 (defmacro rename (name-1 name-2)
   "Rename special variable NAME-1 to NAME-2."
-  `(when (boundp ',name-1)
-     (let ((value ,name-1))
-       (defparameter ,name-2 value)
-       (forget ,name-1))))
+  `(if (boundp ',name-1)
+       (let ((value ,name-1))
+         (defparameter ,name-2 value)
+         (forget ,name-1))
+       (values)))
