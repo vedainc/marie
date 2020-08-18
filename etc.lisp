@@ -96,7 +96,7 @@
   "Use ASDF to load system by force. "
   (asdf:make system :force t))
 
-(defmacro with-time (&body body)
+(defmacro with-time ((&optional) &body body)
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 

@@ -13,7 +13,9 @@
            #:with-gensyms
            #:macroexpand*
            #:symbol*
-           #:mapply))
+           #:mapply
+           #:forget
+           #:rename))
 
 (in-package #:marie/symbols)
 
@@ -135,3 +137,22 @@
   "Apply macro MACRO to each item in ARGS."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
+
+(defmacro forget (arg-1 &optional arg-2)
+  "Unbind ARG-1; if ARG-2 is present, unbind ARG-2 in instance of ARG-1."
+  `(progn
+     (when (fboundp ',arg-1)
+       (fmakunbound ',arg-1))
+     (when (boundp ',arg-1)
+       (makunbound ',arg-1))
+     (when (and ,arg-2 (slot-boundp ',arg-1 ',arg-2))
+       (slot-makunbound ',arg-1 ',arg-2))
+     (unintern ',arg-1)
+     (values)))
+
+(defmacro rename (name-1 name-2)
+  "Rename special variable NAME-1 to NAME-2."
+  `(when (boundp ',name-1)
+     (let ((value ,name-1))
+       (defparameter ,name-2 value)
+       (forget ,name-1))))

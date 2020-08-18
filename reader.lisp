@@ -49,7 +49,7 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
              sub-character))
      `(last* +)))
 
-(defmacro with-preserved-case (&body body)
+(defmacro with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."
   `(let ((*readtable* (copy-readtable nil)))
      (setf (readtable-case *readtable*) :preserve)
@@ -57,4 +57,5 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
 
 (defun read-from-string* (string)
   "Evaluate STRING with preserved case."
-  (with-preserved-case (read-from-string string)))
+  (with-preserved-case ()
+    (read-from-string string)))
