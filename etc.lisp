@@ -30,6 +30,7 @@
            #:rmap-or
            #:∧
            #:∨
+           #:¬
            #:empty
            #:empty*
            #+unix #:getuid
@@ -116,12 +117,15 @@
      ,@(loop :for arg :in args
              :collect (if (stringp arg)
                           `(format t "~&~A~%" ,arg)
-                          `(format t "~&~S: ~S~%" ',arg ,arg)))))
+                          `(format t "~&~S: ~S~%" ',arg ,arg)))
+     ,@args))
 
 (defmacro dbg* ((&rest args) &body body)
   "Print information about ARGS, then evaluate BODY."
-  `(progn (dbg ,@args)
-          ,@body))
+  `(progn
+     (dbg ,@args)
+     ,@body
+     ,@args))
 
 (defmacro when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
@@ -229,6 +233,10 @@ the current package."
   "Return true if all forms in BODY evaluates to false."
   `(when (or ,@body)
      t))
+
+(defmacro ¬ (arg)
+  "Return the negation of ARG."
+  `(not ,arg))
 
 (defmacro empty (object)
   "Set the value of OBJECT to null."

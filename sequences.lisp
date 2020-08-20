@@ -74,16 +74,23 @@
   (declare (type sequence seq))
   (>= (length seq) len))
 
+;; (defun singlep (list)
+;;   "Return true if there is only one element in LIST."
+;;   (and (consp list)
+;;        (null (cdr list))))
+
+(defun singlep (seq)
+  "Return true if there is only one item in SEQ."
+  (length= seq 1))
+
 (defun single (seq)
   "Return the only item in SEQUENCE if SEQUENCE has only one element."
-  (if (null (length= seq 1))
-      (error "Argument must exactly be of length 1.")
-      (elt seq 0)))
-
-(defun singlep (list)
-  "Return true if there is only one element in LIST."
-  (and (consp list)
-       (null (cdr list))))
+  ;; (if (null (length= seq 1))
+  ;;     (error "Argument must exactly be of length 1.")
+  ;;     (elt seq 0))
+  (if (singlep seq)
+      (elt seq 0)
+      (error "Argument must exactly be of length 1.")))
 
 (defun longerp (x y)
   "Return true if X is longer than Y."

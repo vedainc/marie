@@ -14,8 +14,9 @@
            #:macroexpand*
            #:symbol*
            #:mapply
-           #:forget
-           #:rename))
+           #:unbind
+           #:rename
+           #:swap))
 
 (in-package #:marie/symbols)
 
@@ -143,7 +144,7 @@ being redefined, hence, this macro."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
 
-(defmacro forget (arg-1 &optional arg-2)
+(defmacro unbind (arg-1 &optional arg-2)
   "Unbind ARG-1; if ARG-2 is present, unbind ARG-2 in instance of ARG-1."
   `(progn
      (when (fboundp ',arg-1)
@@ -156,9 +157,19 @@ being redefined, hence, this macro."
      (values)))
 
 (defmacro rename (name-1 name-2)
-  "Rename special variable NAME-1 to NAME-2."
+  "Rename the special variable NAME-1 to NAME-2."
   `(if (boundp ',name-1)
        (let ((value ,name-1))
          (defparameter ,name-2 value)
-         (forget ,name-1))
+         (unbind ,name-1))
        (values)))
+
+(defmacro swap (name-1 name-2)
+  "Interchange the values of special variables NAME-1 and NAME-2."
+  (let ((temp (gensym)))
+    `(when (and (symbol-value ',name-1)
+                (symbol-value ',name-2))
+       (let ((,temp ,name-1))
+         (setf (symbol-value ',name-1) ,name-2)
+         (setf (symbol-value ',name-2) ,temp)
+         (values)))))
