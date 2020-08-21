@@ -2,30 +2,26 @@
 
 (uiop:define-package #:marie/symbols
   (:use #:cl)
-  (:export #:define-alias
-           #:defun*
-           #:defmacro*
-           #:defvar*
-           #:defparameter*
-           #:defconstant*
-           #:define-constant
+  (:export #:def
+           #:defm
+           #:defv
+           #:defp
+           #:defc
            #:symbols
-           #:with-gensyms
-           #:macroexpand*
+           #:external-symbols
+           #:present-symbols
            #:symbol*
+           #:with-gensyms
+           #:mx
            #:mapply
            #:unbind
            #:rename
-           #:swap))
+           #:swap
+           #:flet*))
 
 (in-package #:marie/symbols)
 
-(defmacro define-alias (name alias)
-  "Define ALIAS as an alternate name for function NAME."
-  `(defun ,alias (&rest args)
-     (apply #',name args)))
-
-(defmacro defun* (spec args &rest body)
+(defmacro def (spec args &rest body)
   "Define a function with aliases and export the names. SPEC is either a single symbol, or a list
 where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
@@ -39,7 +35,7 @@ where the first element is the name of the function and the rest are aliases."
                  :collect `(progn (setf (fdefinition ',alias) (fdefinition ',name))
                                   (export ',alias)))))))
 
-(defmacro defmacro* (spec &rest body)
+(defmacro defm (spec &rest body)
   "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where
 the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
@@ -53,7 +49,7 @@ the first element is the name of the function and the rest are aliases."
                  :collect `(progn (setf (macro-function ',alias) (macro-function ',name))
                                   (export ',alias)))))))
 
-(defmacro defvar* (spec &rest body)
+(defmacro defv (spec &rest body)
   "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single
 symbol, or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
@@ -67,7 +63,7 @@ symbol, or a list where the first element is the name of the function and the re
                  :collect `(progn (defvar ,alias ,@body)
                                   (export ',alias)))))))
 
-(defmacro defparameter* (spec &rest body)
+(defmacro defp (spec &rest body)
   "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol,
 or a list where the first element is the name of the function and the rest are aliases."
   (let ((id (if (consp spec) spec (list spec))))
@@ -87,7 +83,7 @@ or a list where the first element is the name of the function and the rest are a
     (when restart
       (invoke-restart restart))))
 
-(defmacro defconstant* (spec &rest body)
+(defmacro defc (spec &rest body)
   "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
@@ -101,27 +97,34 @@ or a list where the first element is the name of the function and the rest are a
                  :collect `(progn (defconstant ,alias ,@body)
                                   (export ',alias)))))))
 
-(defmacro define-constant (name value &optional doc)
-  "Create a constant only if it hasn’t been bound or created, yet. SBCL complains about constants
-being redefined, hence, this macro."
-  (if (boundp name)
-      (format t "~&already defined ~A~%old value ~s~%attempted value ~s~%"
-              name (symbol-value name) value))
-  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
-     ,@(when doc (list doc))))
+(defmacro symbols (package &optional (location :symbols))
+  "Return the symbols in PACKAGE denoted by LOCATION."
+  `(loop :for symbol
+         :being :the ,location
+         :in (find-package ,package)
+         :collect symbol))
 
-(defmacro symbols (package &key (location :external-symbols))
-  "Collect symbols in a package. Prints external symbols by default."
-  (let ((pkg (find-package package)))
-    `(loop :for symbol :being :the ,location :in ,pkg
-           :collect symbol)))
+(defun external-symbols (package)
+  "Return the external symbols in PACKAGE."
+  (symbols package :external-symbols))
 
-;;; From Practical Common Lisp (2005)—Peter Seibel
+(defun present-symbols (package)
+  "Return the external symbols in PACKAGE."
+  (symbols package :present-symbols))
+
 (defmacro with-gensyms ((&rest names) &body body)
+  "Evaluate BODY where NAMES are unique symbols."
   `(let ,(loop :for napme :in names :collect `(,name (gensym)))
      ,@body))
 
-(defmacro macroexpand* (form)
+(defun symbol* (value)
+  "Return a symbol from VALUE."
+  (etypecase value
+    (number value)
+    (string (intern (string-upcase value)))
+    (t value)))
+
+(defmacro mx (form)
   "Pretty print the macro expansion of FORM."
   `(let* ((text "MACROEXPAND")
           (value-1 (macroexpand-1 ,form))
@@ -132,15 +135,8 @@ being redefined, hence, this macro."
               (format t "~&~S:~%~S" text value-2)))
      (values)))
 
-(defun symbol* (value)
-  "Convert VALUE to a symbol."
-  (etypecase value
-    (number value)
-    (string (intern (string-upcase value)))
-    (t value)))
-
 (defmacro mapply (macro &rest args)
-  "Apply macro MACRO to each item in ARGS."
+  "Invoke the macro MACRO to each item in ARGS."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
 
@@ -173,3 +169,7 @@ being redefined, hence, this macro."
          (setf (symbol-value ',name-1) ,name-2)
          (setf (symbol-value ',name-2) ,temp)
          (values)))))
+
+(defmacro flet* (&rest body)
+  "Evaluate BODY in LABELS."
+  `(labels ,@body))

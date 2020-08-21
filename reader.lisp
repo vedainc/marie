@@ -47,7 +47,7 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
      (when infix-parameter
        (error "#~A does not take an integer infix parameter."
              sub-character))
-     `(last* +)))
+     `(car (last +))))
 
 (defmacro with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."
@@ -59,3 +59,16 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   "Evaluate STRING with preserved case."
   (with-preserved-case ()
     (read-from-string string)))
+
+(defun lambda-reader (stream char)
+  "Define the reader for λ."
+  (declare (ignore stream char))
+  'LAMBDA)
+
+(set-macro-character #\λ #'lambda-reader)
+
+(defun dollar-reader (stream char)
+  (declare (ignore char))
+  (list (quote function) (read stream t nil t)))
+
+;;(set-macro-character #\$ #'dollar-reader)

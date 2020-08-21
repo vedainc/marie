@@ -31,6 +31,7 @@
            #:∧
            #:∨
            #:¬
+           #:δ
            #:empty
            #:empty*
            #+unix #:getuid
@@ -237,6 +238,10 @@ the current package."
 (defmacro ¬ (arg)
   "Return the negation of ARG."
   `(not ,arg))
+
+(defmacro δ (&body body)
+  "Evaluate BODY in COND."
+  `(cond ,@body))
 
 (defmacro empty (object)
   "Set the value of OBJECT to null."

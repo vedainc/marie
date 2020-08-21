@@ -300,4 +300,3 @@ and the length of each list as the value."
     (if (zerop index)
         (push item copy)
         (insert-after copy (1- index) item))))
-
