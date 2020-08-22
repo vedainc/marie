@@ -11,7 +11,8 @@
            #:trim-whitespace
            #:fmt
            #:fmt*
-           #:list-string))
+           #:list-string
+           #:genstr))
 
 (in-package #:marie/strings)
 
@@ -75,3 +76,7 @@
                               acc)))
                    (t (fn (cdr args) (cons (car args) acc))))))
     (fn list)))
+
+(defun genstr (&optional (prefix "G"))
+  "Return a random string."
+  (string (gensym prefix)))

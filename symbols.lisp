@@ -80,12 +80,6 @@ or a list where the first element is the name of the function and the rest are a
                :collect `(progn (defparameter ,alias ,@body)
                                 (export ',alias))))))
 
-(defun call-continue-restart (condition)
-  "Call the continue restart on CONDITION."
-  (let ((restart (find-restart 'continue condition)))
-    (when restart
-      (invoke-restart restart))))
-
 (defmacro defc (spec &rest body)
   "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
   (let ((id (if (consp spec) spec (list spec))))
@@ -158,9 +152,13 @@ or a list where the first element is the name of the function and the rest are a
 (defmacro rename (name-1 name-2)
   "Rename the special variable NAME-1 to NAME-2."
   `(if (boundp ',name-1)
-       (let ((value ,name-1))
-         (defparameter ,name-2 value)
-         (unbind ,name-1))
+       (let ((value-1 ,name-1)
+             (genstring (string (gensym))))
+         (cond ((not (equalp (defvar ,name-1 genstring) genstring))
+                (defvar ,name-2 value-1))
+               (t (defparameter ,name-2 value-1)))
+         (unbind ,name-1)
+         ',name-2)
        (values)))
 
 (defmacro swap (name-1 name-2)
