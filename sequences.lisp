@@ -1,98 +1,53 @@
 ;;;; sequences.lisp
 
 (uiop:define-package #:marie/sequences
-  (:use #:cl)
-  (:export #:last*
-           #:length=
-           #:length<
-           #:length>
-           #:length<=
-           #:length>=
-           #:single
-           #:singlep
-           #:longerp
-           #:partition
-           #:flatten-list
-           #:filter-if
-           #:filter-if-not
-           #:prune-if
-           #:prune-if-not
-           #:locate-if
-           #:beforep
-           #:afterp
-           #:duplicatep
-           #:split-if
-           #:append*
-           #:vector-list
-           #:list-vector
-           #:remove-items
-           #:group-alike
-           #:build-length-index
-           #:map-append
-           #:map-nappend
-           #:reduce-append
-           #:join
-           #:join-stream-string
-           #:assoc-key
-           #:assoc-value
-           #:mem
-           #:mem*
-           #:remove*
-           #:sequence-string
-           #:butrest
-           #:insert-before
-           #:insert-after))
+  (:use #:cl
+        #:marie/defs))
 
 (in-package #:marie/sequences)
 
-(defun last* (list)
-  "Return the first of the last element of LIST."
-  (first (last list)))
+(def end (seq)
+  "Return the last element of SEQ."
+  (etypecase seq
+    (cons (first (last seq)))
+    (string (elt seq (1- (length seq))))))
 
-(defun length= (seq len)
+(def length= (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))
   (= (length seq) len))
 
-(defun length< (seq len)
+(def length< (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))
   (< (length seq) len))
 
-(defun length> (seq len)
+(def length> (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))
   (> (length seq) len))
 
-(defun length<= (seq len)
+(def length<= (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))
   (<= (length seq) len))
 
-(defun length>= (seq len)
+(def length>= (seq len)
   "Return true if the length of SEQ is LEN."
   (declare (type sequence seq))
   (>= (length seq) len))
 
-;; (defun singlep (list)
-;;   "Return true if there is only one element in LIST."
-;;   (and (consp list)
-;;        (null (cdr list))))
-
-(defun singlep (seq)
+(def singlep (seq)
   "Return true if there is only one item in SEQ."
   (length= seq 1))
 
-(defun single (seq)
+(def single (seq)
   "Return the only item in SEQUENCE if SEQUENCE has only one element."
-  ;; (if (null (length= seq 1))
-  ;;     (error "Argument must exactly be of length 1.")
-  ;;     (elt seq 0))
   (if (singlep seq)
       (elt seq 0)
       (error "Argument must exactly be of length 1.")))
 
-(defun longerp (x y)
+(def longerp (x y)
   "Return true if X is longer than Y."
   (labels ((fn (x y)
              (and (consp x)
@@ -102,7 +57,7 @@
         (fn x y)
         (> (length x) (length y)))))
 
-(defun partition (source n)
+(def partition (source n)
   "Create partition of N from SOURCE."
   (when (zerop n) (error "Zero length"))
   (labels ((fn (source acc)
@@ -113,7 +68,7 @@
     (when source
       (fn source nil))))
 
-(defun flatten-list (list)
+(def flatten-list (list)
   "Merge all symbols from LIST to one list."
   (labels ((fn (list acc)
              (cond ((null list) acc)
@@ -121,19 +76,19 @@
                    (t (fn (car list) (fn (cdr list) acc))))))
     (fn list nil)))
 
-(defun filter-if (fn list)
-  "Collect the results of applying FN to  LIST which returns true."
+(def filter-if (fn list)
+  "Collect the results of applying FN to LIST which returns true."
   (let ((acc nil))
     (dolist (x list)
       (let ((value (funcall fn x)))
         (when value (push value acc))))
     (nreverse acc)))
 
-(defun filter-if-not (fn list)
+(def filter-if-not (fn list)
   "Collect the results of applying FN to LIST which returns false."
   (filter-if (complement fn) list))
 
-(defun prune-if (fn tree)
+(def prune-if (fn tree)
   "Remove all items from TREE to which FN returns true."
   (labels ((fn (tree acc)
              (cond ((null tree) (nreverse acc))
@@ -146,11 +101,11 @@
                               (cons (car tree) acc)))))))
     (fn tree nil)))
 
-(defun prune-if-not (fn tree)
+(def prune-if-not (fn tree)
   "Remove all items from TREE to which FN returns false."
   (prune-if (complement fn) tree))
 
-(defun locate-if (fn list)
+(def locate-if (fn list)
   "Find element in list satisfying FN. When found, return the car of LIST and the result of applying
 FN, as values. Otherwise, return false."
   (unless (null list)
@@ -159,7 +114,7 @@ FN, as values. Otherwise, return false."
           (values (car list) val)
           (find-if fn (cdr list))))))
 
-(defun beforep (x y list &key (test #'eql))
+(def beforep (x y list &key (test #'eql))
   "Return true if X occurs before Y in LIST."
   (when list
     (let ((first (car list)))
@@ -167,17 +122,17 @@ FN, as values. Otherwise, return false."
             ((funcall test x first) list)
             (t (beforep x y (cdr list) :test test))))))
 
-(defun afterp (x y list &key (test #'eql))
+(def afterp (x y list &key (test #'eql))
   "Return true if X occurs after Y in LIST."
   (let ((rest (beforep y x list :test test)))
     (when rest
       (member x rest :test test))))
 
-(defun duplicatep (x list &key (test #'eql))
+(def duplicatep (x list &key (test #'eql))
   "Return true if X has a duplicate in LIST."
   (member x (cdr (member x list :test test)) :test test))
 
-(defun split-if (fn list)
+(def split-if (fn list)
   "Return two lists wherein the first list contains everything that satisfies FN, until it
 doesn't, and another list that starts where FN returns true,as values."
   (let ((acc nil))
@@ -186,26 +141,26 @@ doesn't, and another list that starts where FN returns true,as values."
          (values (nreverse acc) source))
       (push (car source) acc))))
 
-(defun append* (list data)
+(def append* (list data)
   "Destructively update list with data."
   (setf list (nconc list data)))
 
-(defun vector-list (list)
+(def vector-list (list)
   "Return list as vector."
   (map 'vector #'identity list))
 
-(defun list-vector (vector)
+(def list-vector (vector)
   "Return list as vector."
   (map 'list #'identity vector))
 
-(defun remove-items (list items)
+(def remove-items (list items)
   "Remove ITEMS from LIST."
   (cond ((null items) list)
         (t (remove-items
             (remove (first items) list :test #'equal)
             (rest items)))))
 
-(defun group-alike (list)
+(def group-alike (list)
   "Group similar elements together."
   (labels ((fn (list acc)
              (cond ((null list) (nreverse acc))
@@ -214,7 +169,7 @@ doesn't, and another list that starts where FN returns true,as values."
                                 acc))))))
     (fn list nil)))
 
-(defun build-length-index (groups)
+(def build-length-index (groups)
   "Return a hash table from a list of lists, with the first member of each list as the key
 and the length of each list as the value."
   (let ((table (make-hash-table :test #'equal)))
@@ -222,49 +177,49 @@ and the length of each list as the value."
           :do (setf (gethash (first group) table) (length group)))
     table))
 
-(defun map-append (fn sequence1 sequence2)
+(def map-append (fn sequence1 sequence2)
   "Apply APPEND to the result of applying FN to sequence1 and sequence2."
   (append (mapcar fn sequence1) (mapcar fn sequence2)))
 
-(defun map-nappend (fn sequence1 sequence2)
+(def map-nappend (fn sequence1 sequence2)
   "Apply NCONC to the result of applying FN to sequence1 and sequence2."
   (nconc (mapcar fn sequence1) (mapcar fn sequence2)))
 
-(defun reduce-append (&rest args)
+(def reduce-append (&rest args)
   "Apply APPEND with REDUCE to ARGS."
   (if (length= args 1)
       (reduce #'append (car args))
       (reduce #'append args)))
 
-(defun join (list &optional (pad " "))
+(def join (list &optional (pad " "))
   "Merge items in LIST by the space character."
   (let* ((separator (if (null pad) "" pad))
          (fmt (marie/strings:cat "~{~A~^" separator "~}")))
     (format nil fmt list)))
 
-(defun join-stream (stream end)
+(def join-stream (stream end)
   "Read lines from 1 to END from STREAM."
   (join (loop :for i :from 1 :to end
               :collect (read-line stream nil nil))))
 
-(defun assoc-key (key items &key (test #'equal))
+(def assoc-key (key items &key (test #'equal))
   "Return the key found in ITEMS if KEY is found."
   (let ((val (assoc key items :test test)))
     (when val
       (car val))))
 
-(defun assoc-value (key items &key (test #'equal))
+(def assoc-value (key items &key (test #'equal))
   "Return the value found in ITEMS if KEY is found."
   (let ((val (assoc key items :test test)))
     (when val
       (cdr val))))
 
-(defun mem (elem list &key (test #'equal))
+(def mem (elem list &key (test #'equal))
   "Return true if ELEM is a member of LIST using TEST as the equality function."
   (when (member elem list :test test)
     t))
 
-(defun mem* (elems list &key (test #'equal))
+(def mem* (elems list &key (test #'equal))
   "Return true if all items ELEMS are members of LIST using TEST as the equality function."
   (labels ((fn (args)
              (cond ((null args) t)
@@ -273,28 +228,28 @@ and the length of each list as the value."
     (or (funcall test elems list)
         (fn elems))))
 
-(defun remove* (elems list &key (test #'equal))
+(def remove* (elems list &key (test #'equal))
   "Remove all items in ELEMS in LIST."
   (labels ((fn (args list)
              (cond ((null args) list)
                    (t (fn (cdr args) (remove (car args) list :test test))))))
     (fn elems list)))
 
-(defun sequence-string (seq)
+(def sequence-string (seq)
   "Return SEQ as a string."
   (format nil "~{~A~}" seq))
 
-(defun butrest (list)
+(def butrest (list)
   "Return everything from LIST except the rest."
   (butlast list (1- (length list))))
 
-(defun insert-after (list index item)
+(def insert-after (list index item)
   "Return a new list from LIST where ITEM is inserted after INDEX."
   (let ((copy (copy-list list)))
     (push item (cdr (nthcdr index copy)))
     copy))
 
-(defun insert-before (list index item)
+(def insert-before (list index item)
   "Return a new list from LIST where ITEM is inserted after INDEX."
   (let ((copy (copy-list list)))
     (if (zerop index)

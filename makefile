@@ -1,4 +1,4 @@
 .PHONY: all
 
 all:
-	sbcl --noinform --eval '(progn (asdf:make :marie) (quit))'
+sbcl --noinform --eval '(progn (asdf:make :marie) (quit))'

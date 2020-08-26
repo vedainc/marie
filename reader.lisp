@@ -1,11 +1,8 @@
 ;;;; reader.lisp
 
 (uiop:define-package #:marie/reader
-  (:use #:cl)
-  (:export #:bracket-reader
-           #:brace-reader
-           #:with-preserved-case
-           #:read-from-string*))
+  (:use #:cl
+        #:marie/defs))
 
 (in-package #:marie/reader)
 
@@ -36,7 +33,7 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
      (declare (ignore stream))
      (when infix-parameter
        (error "#~A does not take an integer infix parameter."
-             sub-character))
+              sub-character))
      `(car +)))
 
 ;;; Return last expression from the last expression evaluated.
@@ -46,16 +43,16 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
      (declare (ignore stream))
      (when infix-parameter
        (error "#~A does not take an integer infix parameter."
-             sub-character))
+              sub-character))
      `(car (last +))))
 
-(defmacro with-preserved-case ((&optional) &body body)
+(defm with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."
   `(let ((*readtable* (copy-readtable nil)))
      (setf (readtable-case *readtable*) :preserve)
      (progn ,@body)))
 
-(defun read-from-string* (string)
+(def read-from-string* (string)
   "Evaluate STRING with preserved case."
   (with-preserved-case ()
     (read-from-string string)))

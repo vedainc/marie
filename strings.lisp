@@ -1,27 +1,16 @@
 ;;;; strings.lisp
 
 (uiop:define-package #:marie/strings
-  (:use #:cl)
-  (:export #:empty-string-p
-           #:string*
-           #:cat
-           #:cat-intern
-           #:string-list
-           #:normalize-strings
-           #:trim-whitespace
-           #:fmt
-           #:fmt*
-           #:list-string
-           #:genstr))
+  (:use #:cl
+        #:marie/defs))
 
 (in-package #:marie/strings)
 
-(defun empty-string-p (string)
+(def empty-string-p (string)
   "Return true if STRING is of length zero."
-  ;;(declare (type (simple-array character (*))  string))
   (zerop (length string)))
 
-(defun string* (value)
+(def string* (value)
   "Return VALUE to a string."
   (etypecase value
     (number (format nil "~A" value))
@@ -29,22 +18,21 @@
     (string value)
     (t (string value))))
 
-(defun cat (&rest args)
+(def cat (&rest args)
   "Concatenate ARGS to a string."
-  (let ((v (loop :for arg :in args :collect (string* arg))))
-    (apply #'concatenate 'string v)))
+  (let ((value (loop :for arg :in args :collect (string* arg))))
+    (apply #'concatenate 'string value)))
 
-(defun cat-intern (package &rest args)
+(def cat-intern (package &rest args)
   "Concatenate ARGS to a string then intern it to the current package."
   (let ((p (if (null package) *package* package)))
     (intern (apply #'cat args) (find-package p))))
 
-(defun string-list (string)
+(def string-list (string)
   "Create a list from STRiNG."
-  ;;(declare (type (simple-array character (*))  string))
   (loop :for char :across string :collect char))
 
-(defun normalize-strings (list &key (character #\_))
+(def normalize-strings (list &key (character #\_))
   "Return list of characters with equal length using CHARACTER as end padding."
   (assert (>= (length list) 1))
   (let ((max (apply #'max (mapcar #'length list))))
@@ -54,19 +42,19 @@
           :else
           :collect (cat item (make-string (- max length) :initial-element character)))))
 
-(defun trim-whitespace (string)
+(def trim-whitespace (string)
   "Trim whitespace characters from STRING."
   (string-trim '(#\Space #\Tab #\Newline #\Linefeed) string))
 
-(defun fmt (&rest args)
+(def fmt (&rest args)
   "Simply return a string with FORMAT."
   (apply #'format nil args))
 
-(defun fmt* (&rest args)
+(def fmt* (&rest args)
   "Print ARGS to stdout with FORMAT."
   (apply #'format t args))
 
-(defun list-string (list &optional (converter 'string*))
+(def list-string (list &optional (converter 'string*))
   "Return the string version of LIST."
   (labels ((fn (args &optional acc)
              (cond ((null args) (funcall converter (nreverse acc)))
@@ -77,6 +65,6 @@
                    (t (fn (cdr args) (cons (car args) acc))))))
     (fn list)))
 
-(defun genstr (&optional (prefix "G"))
+(def genstr (&optional (prefix "G"))
   "Return a random string."
   (string (gensym prefix)))
