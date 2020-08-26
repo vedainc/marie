@@ -7,7 +7,7 @@
 (in-package #:marie/etc)
 
 (def apropos* (&rest args)
-  "Display sorted matching symbols from SYMBOL with CL:APROPOS."
+  "Display sorted matching symbols from ARGS with CL:APROPOS."
   (loop :for symbol :in (sort (apply #'apropos-list args) #'string<)
         :do (format t "~S~%" symbol)))
 
@@ -32,8 +32,8 @@
   "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
-(def copy-hash-table (hash-table)
-  "Create a new hash table from HASH-TABLE."
+(def copy-table (hash-table)
+  "Return a new hash table from HASH-TABLE."
   (let ((table (make-hash-table :test (hash-table-test hash-table)
                                 :rehash-size (hash-table-rehash-size hash-table)
                                 :rehash-threshold (hash-table-rehash-threshold hash-table)
@@ -78,7 +78,7 @@
   nil)
 
 (defm dbg (&rest args)
-  "Print information about ARGS."
+  "Print information about ARGS, then return the result of evaluating ARGS."
   `(progn
      ,@(loop :for arg :in args
              :collect (if (stringp arg)
@@ -87,7 +87,7 @@
      ,@args))
 
 (defm dbg* ((&rest args) &body body)
-  "Print information about ARGS, then evaluate BODY."
+  "Print information about ARGS, evaluate BODY, then return the result of evaluating ARGS."
   `(progn
      (dbg ,@args)
      ,@body
@@ -122,8 +122,8 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   "Return a new symbol from the hyphen concatenation of NAMES, then intern it in
 the current package."
   (format nil "~{~A~^-~}"
-          (mapcar #'(lambda (name)
-                      (string-upcase (marie/strings:string* name)))
+          (mapcar (λ (name)
+                    (string-upcase (marie/strings:string* name)))
                   names)))
 
 (def hyphenate-intern (package &rest names)
@@ -133,9 +133,9 @@ the current package."
 
 (def dump-table (table)
   "Print the contents of hash table TABLE."
-  (maphash #'(lambda (k v)
-               (format t "~S => ~S~%" k v)
-               (force-output *standard-output*))
+  (maphash (λ (k v)
+             (format t "~S => ~S~%" k v)
+             (force-output *standard-output*))
            table))
 
 (def dump-table* (table &optional (pad 0))
