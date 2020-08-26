@@ -43,7 +43,7 @@
           :do (setf (gethash key table) value)
           :finally (return table))))
 
-(def home (path)
+(def (home ~) (path)
   "Return a path relative to the home directory."
   (uiop:subpathname (user-homedir-pathname) path))
 

@@ -11,7 +11,7 @@
   (zerop (length string)))
 
 (def string* (value)
-  "Return VALUE to a string."
+  "Return VALUE as a string."
   (etypecase value
     (number (format nil "~A" value))
     (cons (format nil "(~{~A~^ ~})" value))
@@ -41,10 +41,6 @@
           :if (= length max) :collect item
           :else
           :collect (cat item (make-string (- max length) :initial-element character)))))
-
-(def trim-whitespace (string)
-  "Trim whitespace characters from STRING."
-  (string-trim '(#\Space #\Tab #\Newline #\Linefeed) string))
 
 (def fmt (&rest args)
   "Simply return a string with FORMAT."
