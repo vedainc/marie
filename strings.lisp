@@ -2,7 +2,8 @@
 
 (uiop:define-package #:marie/strings
   (:use #:cl
-        #:marie/defs))
+        #:marie/defs
+        #:marie/sequences))
 
 (in-package #:marie/strings)
 
@@ -22,6 +23,14 @@
   "Concatenate ARGS to a string."
   (let ((value (loop :for arg :in args :collect (string* arg))))
     (apply #'concatenate 'string value)))
+
+(def red-cat (&rest args)
+  "Reduce ARGS with CAT."
+  (flet ((fn (arg)
+           (reduce #'cat arg)))
+    (if (length= args 1)
+        (fn (car args))
+        (fn args))))
 
 (def cat-intern (package &rest args)
   "Concatenate ARGS to a string then intern it to the current package."

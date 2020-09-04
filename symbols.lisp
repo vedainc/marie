@@ -39,9 +39,9 @@
           (value-1 (macroexpand-1 ,form))
           (value-2 (macroexpand ,form)))
      (cond ((equal value-1 value-2)
-            (format t "~&~S:~%~S" text value-1))
-           (t (format t "~&~S-1:~%~S" text value-1)
-              (format t "~&~S:~%~S" text value-2)))
+            (format t "~&~A:~%~S" text value-1))
+           (t (format t "~&~A-1:~%~S" text value-1)
+              (format t "~&~A:~%~S" text value-2)))
      (values)))
 
 (defm mapply (macro &rest args)

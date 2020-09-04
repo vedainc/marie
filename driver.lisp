@@ -5,8 +5,8 @@
   (:use :uiop/common-lisp)
   (:use-reexport #:marie/defs
                  #:marie/reader
-                 #:marie/strings
                  #:marie/sequences
+                 #:marie/strings
                  #:marie/symbols
                  #:marie/files
                  #:marie/etc))
