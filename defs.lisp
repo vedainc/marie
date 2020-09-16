@@ -75,7 +75,7 @@ or a list where the first element is the name of the function and the rest are a
     (destructuring-bind (name &rest aliases)
         id
       `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'continue))
-         #-sbcl ((simple-error #'continue))
+                     #-sbcl ((simple-error #'continue))
          (defconstant ,name ,@body)
          (export ',name)
          ,@(loop :for alias :in aliases

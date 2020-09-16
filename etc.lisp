@@ -190,12 +190,12 @@ the current package."
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
 
-(defm ∧ (&body body)
+(defm (logical-and ∧) (&body body)
   "Return true if all forms in BODY evaluates to true."
   `(when (and ,@body)
      t))
 
-(defm ∨ (&body body)
+(defm (logical-or ∨) (&body body)
   "Return true if all forms in BODY evaluates to false."
   `(when (or ,@body)
      t))
@@ -203,10 +203,6 @@ the current package."
 (defm ¬ (arg)
   "Return the negation of ARG."
   `(not ,arg))
-
-(defm δ (&body body)
-  "Evaluate BODY in COND."
-  `(cond ,@body))
 
 (defm empty (object)
   "Set the value of OBJECT to null."
