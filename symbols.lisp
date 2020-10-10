@@ -49,8 +49,8 @@
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
 
-(defm unbind (arg-1 &optional arg-2)
-  "Unbind ARG-1; if ARG-2 is present, unbind ARG-2 in instance of ARG-1."
+(defm free (arg-1 &optional arg-2)
+  "Unbind ARG-1; if ARG-2 is present, free ARG-2 in instance of ARG-1."
   `(progn
      (when (fboundp ',arg-1)
        (fmakunbound ',arg-1))
@@ -69,7 +69,7 @@
          (cond ((not (equalp (defvar ,name-1 genstring) genstring))
                 (defvar ,name-2 value-1))
                (t (defparameter ,name-2 value-1)))
-         (unbind ,name-1)
+         (free ,name-1)
          ',name-2)
        (values)))
 
