@@ -23,7 +23,7 @@
 
 (defm with-gensyms ((&rest names) &body body)
   "Evaluate BODY where NAMES are unique symbols."
-  `(let ,(loop :for napme :in names :collect `(,name (gensym)))
+  `(let ,(loop :for name :in names :collect `(,name (gensym)))
      ,@body))
 
 (def symbol* (value)
