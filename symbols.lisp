@@ -61,7 +61,7 @@
      (unintern ',arg-1)
      (values)))
 
-(defm rename (name-1 name-2)
+(defm rename-special (name-1 name-2)
   "Rename the special variable NAME-1 to NAME-2."
   `(if (boundp ',name-1)
        (let ((value-1 ,name-1)
@@ -73,7 +73,7 @@
          ',name-2)
        (values)))
 
-(defm swap (name-1 name-2)
+(defm swap-specials (name-1 name-2)
   "Interchange the values of special variables NAME-1 and NAME-2."
   (let ((temp (gensym)))
     `(when (and (symbol-value ',name-1)
