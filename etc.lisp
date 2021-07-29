@@ -241,3 +241,8 @@ the current package."
   "Always evaluate BODY."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
+
+(def fmt-error (string)
+  "Output STRING to *STANDARD-ERROR* then return."
+  (format *error-output* string)
+  (finish-output *error-output*))
