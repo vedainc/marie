@@ -69,7 +69,7 @@ or a list where the first element is the name of the function and the rest are a
                :collect `(progn (defparameter ,alias ,@body)
                                 (export ',alias))))))
 
-(defmacro defc (spec &rest body)
+(defmacro deft (spec &rest body)
   "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
@@ -82,3 +82,29 @@ or a list where the first element is the name of the function and the rest are a
                  :when alias
                  :collect `(progn (defconstant ,alias ,@body)
                                   (export ',alias)))))))
+
+(defmacro defc (name (&rest superclasses) (&rest slot-specs)
+                &optional class-option)
+  "Define a class like DEFCLASS. If an element in SLOT-SPECS contains `:export t`, export that slot. If CLASS-OPTION contains `:export t`, export the entire class."
+  (let ((exports (mapcan (lambda (spec)
+                           (when (getf (cdr spec) :export)
+                             (let ((name (or (getf (cdr spec) :accessor)
+                                             (getf (cdr spec) :reader)
+                                             (getf (cdr spec) :writer))))
+                               (when name (list name)))))
+                         slot-specs)))
+    `(progn
+       (defclass ,name (,@superclasses)
+         ,(append
+           (mapcar (lambda (spec)
+                     (let ((export-pos (position :export spec)))
+                       (if export-pos
+                           (append (subseq spec 0 export-pos)
+                                   (subseq spec (+ 2 export-pos)))
+                           spec)))
+                   slot-specs)
+           (when class-option (list class-option))))
+       ,@(mapcar (lambda (name) `(export ',name))
+                 exports)
+       ,(when (getf class-option :export)
+          `(export ',name)))))
