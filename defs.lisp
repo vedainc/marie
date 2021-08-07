@@ -19,7 +19,7 @@
 
 (defmacro def (spec args &rest body)
   "Define a function with aliases and export the names. SPEC is either a single symbol, or a list
-where the first element is the name of the function and the rest are aliases."
+where the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -32,7 +32,7 @@ where the first element is the name of the function and the rest are aliases."
 
 (defmacro defm (spec &rest body)
   "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where
-the first element is the name of the function and the rest are aliases."
+the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -45,7 +45,7 @@ the first element is the name of the function and the rest are aliases."
 
 (defmacro defv (spec &rest body)
   "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single
-symbol, or a list where the first element is the name of the function and the rest are aliases."
+symbol, or a list where the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -58,7 +58,7 @@ symbol, or a list where the first element is the name of the function and the re
 
 (defmacro defp (spec &rest body)
   "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol,
-or a list where the first element is the name of the function and the rest are aliases."
+or a list where the first element is the name of the function and the rest are aliases, then export then names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -70,7 +70,7 @@ or a list where the first element is the name of the function and the rest are a
                                 (export ',alias))))))
 
 (defmacro deft (spec &rest body)
-  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro."
+  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro, then export the names."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -85,26 +85,16 @@ or a list where the first element is the name of the function and the rest are a
 
 (defmacro defc (name (&rest superclasses) (&rest slot-specs)
                 &optional class-option)
-  "Define a class like DEFCLASS. If an element in SLOT-SPECS contains `:export t`, export that slot. If CLASS-OPTION contains `:export t`, export the entire class."
+  "Define a class like DEFCLASS and export the slots and the class name."
   (let ((exports (mapcan (lambda (spec)
-                           (when (getf (cdr spec) :export)
-                             (let ((name (or (getf (cdr spec) :accessor)
-                                             (getf (cdr spec) :reader)
-                                             (getf (cdr spec) :writer))))
-                               (when name (list name)))))
+                           (let ((name (or (getf (cdr spec) :accessor)
+                                           (getf (cdr spec) :reader)
+                                           (getf (cdr spec) :writer))))
+                             (when name (list name))))
                          slot-specs)))
     `(progn
        (defclass ,name (,@superclasses)
-         ,(append
-           (mapcar (lambda (spec)
-                     (let ((export-pos (position :export spec)))
-                       (if export-pos
-                           (append (subseq spec 0 export-pos)
-                                   (subseq spec (+ 2 export-pos)))
-                           spec)))
-                   slot-specs)
-           (when class-option (list class-option))))
+         ,(append slot-specs (when class-option (list class-option))))
        ,@(mapcar (lambda (name) `(export ',name))
                  exports)
-       ,(when (getf class-option :export)
-          `(export ',name)))))
+       (export ',name))))
