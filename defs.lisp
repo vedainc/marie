@@ -69,8 +69,8 @@ or a list where the first element is the name of the function and the rest are a
                :collect `(progn (defparameter ,alias ,@body)
                                 (export ',alias))))))
 
-(defmacro deft (spec &rest body)
-  "Bind NAME to VALUE and only change the binding after subsequent calls to the macro, then export the names."
+(defmacro defk (spec &rest body)
+  "Bind NAME to VALUE by DEFCONSTANT and only change the binding after subsequent calls to the macro, then export the names."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
