@@ -6,7 +6,10 @@
            #:defm
            #:defv
            #:defp
-           #:defc))
+           #:defk
+           #:defc
+           #:defg
+           #:deft))
 
 (in-package #:marie/defs)
 
@@ -18,8 +21,7 @@
       (export symbol))))
 
 (defmacro def (spec args &rest body)
-  "Define a function with aliases and export the names. SPEC is either a single symbol, or a list
-where the first element is the name of the function and the rest are aliases, then export the names."
+  "Define a function with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -31,8 +33,7 @@ where the first element is the name of the function and the rest are aliases, th
                                 (export ',alias))))))
 
 (defmacro defm (spec &rest body)
-  "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where
-the first element is the name of the function and the rest are aliases, then export the names."
+  "Define a macro with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -44,8 +45,7 @@ the first element is the name of the function and the rest are aliases, then exp
                                 (export ',alias))))))
 
 (defmacro defv (spec &rest body)
-  "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single
-symbol, or a list where the first element is the name of the function and the rest are aliases, then export the names."
+  "Define a special variable by DEFVAR with aliases and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases, then export the names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -57,8 +57,7 @@ symbol, or a list where the first element is the name of the function and the re
                                 (export ',alias))))))
 
 (defmacro defp (spec &rest body)
-  "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol,
-or a list where the first element is the name of the function and the rest are aliases, then export then names."
+  "Define a special variable by DEFPARAMETER and export the names. SPEC is either a single symbol, or a list where the first element is the name of the function and the rest are aliases, then export then names."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list spec)
     `(progn
@@ -70,7 +69,7 @@ or a list where the first element is the name of the function and the rest are a
                                 (export ',alias))))))
 
 (defmacro defk (spec &rest body)
-  "Bind NAME to VALUE by DEFCONSTANT and only change the binding after subsequent calls to the macro, then export the names."
+  "Define a constant like DEFCONSTANT, but allow the definition to change on subsequent calls to DEFK, then export the constant name."
   (let ((id (if (consp spec) spec (list spec))))
     (destructuring-bind (name &rest aliases)
         id
@@ -94,7 +93,23 @@ or a list where the first element is the name of the function and the rest are a
                          slot-specs)))
     `(progn
        (defclass ,name (,@superclasses)
-         ,(append slot-specs (when class-option (list class-option))))
+         ,@(append (list slot-specs)
+            (when class-option
+              (list class-option))))
        ,@(mapcar (lambda (name) `(export ',name))
                  exports)
        (export ',name))))
+
+(defmacro defg (name (&rest parameters) &body body)
+  "Define a generic function like DEFGENERIC and export NAME."
+  `(progn
+     (defgeneric ,name (,@parameters)
+       ,@body)
+     (export ',name)))
+
+(defmacro deft (name (&rest parameters) &body body)
+  "Define a method like DEFMETHOD and export NAME."
+  `(progn
+     (defmethod ,name (,@parameters)
+       ,@body)
+     (export ',name)))
