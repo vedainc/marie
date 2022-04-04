@@ -85,20 +85,27 @@
 (defmacro defc (name (&rest superclasses) (&rest slot-specs)
                 &optional class-option)
   "Define a class like DEFCLASS and export the slots and the class name."
-  (let ((exports (mapcan (lambda (spec)
-                           (let ((name (or (getf (cdr spec) :accessor)
-                                           (getf (cdr spec) :reader)
-                                           (getf (cdr spec) :writer))))
-                             (when name (list name))))
-                         slot-specs)))
-    `(progn
-       (defclass ,name (,@superclasses)
-         ,@(append (list slot-specs)
-            (when class-option
-              (list class-option))))
-       ,@(mapcar (lambda (name) `(export ',name))
-                 exports)
-       (export ',name))))
+  (flet ((fn (&rest names)
+           (intern (format nil "~{~A~^-~}"
+                           (mapcar (lambda (name)
+                                     (string-upcase (string name)))
+                                   names)))))
+    (let ((exports (mapcan (lambda (spec)
+                             (let ((name (or (getf (cdr spec) :accessor)
+                                             (getf (cdr spec) :reader)
+                                             (getf (cdr spec) :writer))))
+                               (when name (list name))))
+                           slot-specs)))
+      `(progn
+         (defclass ,name (,@superclasses)
+           ,@(append (list slot-specs)
+              (when class-option
+                (list class-option))))
+         (defun ,(fn 'make name) (&rest args)
+           (apply #'make-instance ',name args))
+         ,@(mapcar (lambda (name) `(export ',name))
+                   exports)
+         (export ',name)))))
 
 (defmacro defg (name (&rest parameters) &body body)
   "Define a generic function like DEFGENERIC and export NAME."
