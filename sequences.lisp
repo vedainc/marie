@@ -257,3 +257,15 @@ and the length of each list as the value."
     (if (zerop index)
         (push item copy)
         (insert-after copy (1- index) item))))
+
+(def append1 (list obj)
+  "Apply APPEND to LIST and OBJ ensuring that OBJ is a list."
+  (append list (uiop:ensure-list obj)))
+
+(def nconc1 (list obj)
+  "Apply NCONC to LIST and OBJ ensuring that OBJ is a list."
+  (nconc list (uiop:ensure-list obj)))
+
+(def include-if (&rest args)
+  "Apply REMOVE-IF-NOT to ARGS."
+  (apply #'remove-if-not args))
