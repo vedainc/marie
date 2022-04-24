@@ -269,3 +269,31 @@ and the length of each list as the value."
 (def include-if (&rest args)
   "Apply REMOVE-IF-NOT to ARGS."
   (apply #'remove-if-not args))
+
+(def take (seq count)
+  "Return COUNT amount of items from SEQ."
+  (loop :for s :in seq
+        :for n = 0 :then (1+ n)
+        :while (< n count)
+        :collect s))
+
+(def take-if (fn seq count)
+  "Return COUNT amount of items from SEQ that satisfy FN."
+  (loop :for s :in seq
+        :for n = 0 :then (if (funcall fn s) (1+ n) n)
+        :when (and (funcall fn s) (> count 0) (<= n count))
+          :collect s))
+
+(def drop (seq count)
+  "Return items from SEQ without the first COUNT items."
+  (loop :for s :in seq
+        :for n = 1 :then (1+ n)
+        :when (>= count n)
+          :collect s))
+
+(def drop-if (fn seq count)
+  "Return items from SEQ without the first COUNT items that satisfy FN."
+  (loop :for s :in seq
+        :for n = 1 :then (if (funcall fn s) (1+ n) n)
+        :unless (and (funcall fn s) (> count 0) (<= n count))
+          :collect s))
