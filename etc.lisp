@@ -246,3 +246,15 @@ the current package."
   "Output STRING to *STANDARD-ERROR* then return."
   (format *error-output* string)
   (finish-output *error-output*))
+
+(def true-false-p (x y)
+  "Return true if X is true and Y is false."
+  (if (and x (null y)) t nil))
+
+(def false-true-p (x y)
+  "Return true if X is false and Y is true."
+  (true-false-p y x))
+
+(def true-true-p (x y)
+  "Return true if X is true and Y is true."
+  (and x y t))
