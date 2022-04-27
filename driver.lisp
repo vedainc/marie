@@ -9,6 +9,7 @@
                  #:marie/strings
                  #:marie/symbols
                  #:marie/files
+                 #:marie/conditions
                  #:marie/etc))
 
 (provide "marie")
