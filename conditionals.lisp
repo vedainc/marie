@@ -1,10 +1,11 @@
-;;;; conditions.lisp
+;;;; conditionals.lisp
 
-(uiop:define-package #:marie/conditions
+(uiop:define-package #:marie/conditionals
   (:use #:cl
-        #:marie/defs))
+        #:marie/defs)
+  (:export #:it))
 
-(in-package #:marie/conditions)
+(in-package #:marie/conditionals)
 
 (defm map-and (fn &rest args)
   "Return true if FN returns true for all items in ARGS."
@@ -77,7 +78,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   "Return true if X is true and Y is true."
   (and x y t))
 
-(defmacro aif (test-form then-form &optional else-form)
+(defm aif (test-form then-form &optional else-form)
   "Anaphoric IF."
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
