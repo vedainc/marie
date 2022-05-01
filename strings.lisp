@@ -73,3 +73,7 @@
 (def genstr (&optional (prefix "G"))
   "Return a random string."
   (string (gensym prefix)))
+
+(def earmuff (&rest args)
+  "Return a hyphenated symbol from ARGS with surrounding *s."
+  (read-from-string (format nil "*~:@(~{~A~^-~}~)*" args)))

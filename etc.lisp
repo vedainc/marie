@@ -94,26 +94,25 @@
      ,@args))
 
 (def hyphenate (&rest names)
-  "Return a new symbol from the hyphen concatenation of NAMES, then intern it in
-the current package."
+  "Return a new symbol from the hyphen concatenation of NAMES."
   (format nil "~{~A~^-~}"
           (mapcar (λ (name)
                     (string-upcase (marie/strings:string* name)))
                   names)))
 
 (def hyphenate-intern (package &rest names)
-  "Intern names from NAMES in PACKAGE with HYPHENATE."
+  "Apply hyphenate to NAMES then return an interned symbol in the current package."
   (let ((pkg (if (null package) *package* package)))
     (intern (apply #'hyphenate names) (find-package pkg))))
 
-(def dump-table (table)
+(def show-table (table)
   "Print the contents of hash table TABLE."
   (maphash (λ (k v)
              (format t "~S => ~S~%" k v)
              (force-output *standard-output*))
            table))
 
-(def dump-table* (table &optional (pad 0))
+(def show-table* (table &optional (pad 0))
   "Print the contents of hash table TABLE recursively."
   (loop :for key :being :the :hash-keys :in table
         :for value :being :the :hash-values :in table
@@ -123,7 +122,7 @@ the current package."
                           (make-string pad :initial-element #\space)
                           key
                           value)
-                  (dump-table* value (+ pad 2)))
+                  (show-table* value (+ pad 2)))
                 (format t "~A~S => ~S~%"
                         (make-string pad :initial-element #\space)
                         key

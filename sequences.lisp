@@ -10,7 +10,8 @@
   "Return the last element of SEQ."
   (etypecase seq
     (cons (first (last seq)))
-    (string (elt seq (1- (length seq))))))
+    (string (elt seq (1- (length seq))))
+    (null nil)))
 
 (def length= (seq len)
   "Return true if the length of SEQ is LEN."
