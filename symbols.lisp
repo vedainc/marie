@@ -6,12 +6,17 @@
 
 (in-package #:marie/symbols)
 
-(defm symbols (package &optional (location :symbols))
-  "Return the symbols in PACKAGE denoted by LOCATION."
-  `(loop :for symbol
-         :being :the ,location
-         :in (find-package ,package)
-         :collect symbol))
+(def symbols (package &optional (type :external-symbols))
+  "Return the symbols in PACKAGE denoted by TYPE."
+  (let ((symbols '()))
+    (macrolet ((mac (fn)
+                 `(,fn (symbol (find-package package))
+                      (push symbol symbols))))
+      (ecase type
+        ((:symbols) (mac do-symbols))
+        ((:external-symbols) (mac do-external-symbols))
+        (null nil))
+      symbols)))
 
 (def external-symbols (package)
   "Return the external symbols in PACKAGE."
@@ -20,6 +25,14 @@
 (def present-symbols (package)
   "Return the external symbols in PACKAGE."
   (symbols package :present-symbols))
+
+(def (pretty-print-symbols pp-symbols) (package &optional (type :external-symbols) (sort #'string<))
+  "Display the external smbols in PACKAGE in the order that they were declared as dependencies."
+  (let ((dependencies (asdf:system-depends-on (asdf:find-system package))))
+    (loop :for dependency :in dependencies
+          :do (let* ((symbols (symbols (read-from-string dependency) type))
+                     (sorted-symbols (sort symbols sort)))
+                (format t "~&~%** ~A~%~{~A~^~%~}" dependency sorted-symbols)))))
 
 (defm with-gensyms ((&rest names) &body body)
   "Evaluate BODY where NAMES are unique symbols."
