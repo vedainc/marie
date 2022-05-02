@@ -46,7 +46,7 @@
     (string (intern (string-upcase value)))
     (t value)))
 
-(defm mx (form)
+(defm (macro-expand mx) (form)
   "Pretty print the macro expansion of FORM."
   `(let* ((text "MACROEXPAND")
           (value-1 (macroexpand-1 ,form))
