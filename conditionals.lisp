@@ -89,3 +89,9 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
      (when it
        ,@body)))
 
+(defun omega-reader (stream char)
+  "Define the reader for Ω."
+  (declare (ignore stream char))
+  'MARIE/CONDITIONALS:IT)
+
+(set-macro-character #\Ω #'omega-reader)
