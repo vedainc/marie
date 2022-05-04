@@ -83,14 +83,30 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
 
-(defm awhen (condition &body body)
+(defm awhen (test-form &body then-form)
   "Anaphoric WHEN."
-  `(let ((it ,condition))
-     (when it
-       ,@body)))
+  `(aif ,test-form
+        (progn ,@then-form)))
+
+(defm aand (&rest args)
+  "Anaphoric AND."
+  (cond ((null args) t)
+        ((null (cdr args)) (car args))
+        (t `(aif ,(car args) (aand ,@(cdr args))))))
+
+(defm acond (&rest clauses)
+  "Anaphoric COND."
+  (if (null clauses)
+      nil
+      (let ((clause (car clauses))
+            (symbol (gensym)))
+        `(let ((,symbol ,(car clause)))
+           (if ,symbol
+               (let ((it ,symbol)) ,@(cdr clause))
+               (acond ,@(cdr clauses)))))))
 
 (defun omega-reader (stream char)
-  "Define the reader for Ω."
+  "Define the reader for Ω, so that Ω can be used to refer to the anaphora."
   (declare (ignore stream char))
   'MARIE/CONDITIONALS:IT)
 
