@@ -3,7 +3,8 @@
 (uiop:define-package #:marie/strings
   (:use #:cl
         #:marie/defs
-        #:marie/sequences))
+        #:marie/sequences
+        #:marie/conditionals))
 
 (in-package #:marie/strings)
 
@@ -77,3 +78,17 @@
 (def earmuff (&rest args)
   "Return a hyphenated symbol from ARGS with surrounding *s."
   (read-from-string (format nil "*~:@(~{~A~^-~}~)*" args)))
+
+(def separators (string &optional (filter #'alphanumericp))
+  "Return the separators used in STRING, applying FILTER to remove characters."
+  (loop :for char :across (remove-if filter string)
+        :collecting char :into chars
+        :finally (return (remove-duplicates chars))))
+
+(def strict-substring-p (x y)
+  "Return true if X is part of Y, and that X is found from the start of Y."
+  (∧ (not (= (length x)
+             (length y)))
+     (let ((val (search x y)))
+       (awhen val
+         (zerop Ω)))))

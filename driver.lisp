@@ -6,10 +6,10 @@
   (:use-reexport #:marie/defs
                  #:marie/reader
                  #:marie/sequences
-                 #:marie/strings
                  #:marie/symbols
                  #:marie/files
                  #:marie/conditionals
+                 #:marie/strings
                  #:marie/etc))
 
 (provide "marie")
