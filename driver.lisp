@@ -7,10 +7,10 @@
                  #:marie/reader
                  #:marie/sequences
                  #:marie/symbols
-                 #:marie/files
                  #:marie/conditionals
                  #:marie/strings
-                 #:marie/etc))
+                 #:marie/etc
+                 #:marie/files))
 
 (provide "marie")
 (provide "MARIE")

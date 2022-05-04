@@ -111,3 +111,13 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   'MARIE/CONDITIONALS:IT)
 
 (set-macro-character #\Ω #'omega-reader)
+
+(def every-list-p (object)
+  "Return true if OBJECT is a list and all members are lists."
+  (∧ (listp object)
+     (every #'listp object)))
+
+(def every-string-p (object)
+  "Return true if OBJECT is a list and all members are strings."
+  (∧ (listp object)
+     (every #'stringp object)))

@@ -2,7 +2,8 @@
 
 (uiop:define-package #:marie/files
   (:use #:cl
-        #:marie/defs))
+        #:marie/defs
+        #:marie/sequences))
 
 (in-package #:marie/files)
 
@@ -24,7 +25,7 @@
 
 (def files (pathname)
   "Return all regular files under PATHNAME."
-  (marie/sequences:flatten-list (collect-entries (directory-entries pathname))))
+  (flatten-list (collect-entries (directory-entries pathname))))
 
 (def slurp-file (path)
   "Read entire file as string."
