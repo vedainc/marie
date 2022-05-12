@@ -82,30 +82,51 @@
                  :collect `(progn (defconstant ,alias ,@body)
                                   (export ',alias)))))))
 
+(defun p-symbol (symbol)
+  "Return a conditionally hyphenated predicate symbol."
+  (let* ((string (prin1-to-string symbol))
+         (split (uiop:split-string string :separator '(#\-))))
+    (if (> (length split) 1)
+        (read-from-string (format nil "~{~A~^-~}" (append split '("P"))))
+        (read-from-string (format nil "~{~A~^-~}P" split)))))
+
 (defmacro defc (name (&rest superclasses) (&rest slot-specs)
                 &optional class-option)
   "Define a class like DEFCLASS and export the slots and the class name."
-  (flet ((fn (&rest names)
-           (intern (format nil "~{~A~^-~}"
-                           (mapcar (lambda (name)
-                                     (string-upcase (string name)))
-                                   names)))))
+  (flet ((fn (predicate &rest names)
+             (let ((val (read-from-string
+                         (format nil "~{~A~^-~}"
+                                 (mapcar (lambda (name)
+                                           (string-upcase (string name)))
+                                         names)))))
+               (if predicate
+                   (p-symbol val)
+                   val))))
     (let ((exports (mapcan (lambda (spec)
                              (let ((name (or (getf (cdr spec) :accessor)
                                              (getf (cdr spec) :reader)
                                              (getf (cdr spec) :writer))))
                                (when name (list name))))
-                           slot-specs)))
+                           slot-specs))
+          (make-name (fn nil 'make name))
+          (p-name (fn t name)))
       `(progn
          (defclass ,name (,@superclasses)
            ,@(append (list slot-specs)
               (when class-option
                 (list class-option))))
-         (defun ,(fn 'make name) (&rest args)
+         (defun ,make-name (&rest args)
+           ,(format nil "Return a new instance of ~A." name)
            (apply #'make-instance ',name args))
+         (defun ,p-name (object)
+           ,(format nil "Return true if OBJECT is of type ~A." name)
+           (when (typep object ',name)
+             t))
          ,@(mapcar (lambda (name) `(export ',name))
                    exports)
-         (export ',name)))))
+         (export ',make-name)
+         (export ',name)
+         (export ',p-name)))))
 
 (defmacro defg (name (&rest parameters) &body body)
   "Define a generic function like DEFGENERIC and export NAME."

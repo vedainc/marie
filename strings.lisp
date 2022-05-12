@@ -91,4 +91,4 @@
              (length y)))
      (let ((val (search x y)))
        (awhen val
-         (zerop Ω)))))
+         (zerop α)))))

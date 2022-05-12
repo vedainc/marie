@@ -2,7 +2,9 @@
 
 (uiop:define-package #:marie/etc
   (:use #:cl
-        #:marie/defs))
+        #:marie/defs
+        #:marie/sequences
+        #:marie/strings))
 
 (in-package #:marie/etc)
 
@@ -97,7 +99,7 @@
   "Return a new symbol from the hyphen concatenation of NAMES."
   (format nil "~{~A~^-~}"
           (mapcar (λ (name)
-                    (string-upcase (marie/strings:string* name)))
+                    (string-upcase (string* name)))
                   names)))
 
 (def hyphenate-intern (package &rest names)
@@ -167,7 +169,7 @@
 
 (def gethash* (path table)
   "Return the value specified by path starting from TABLE."
-  (cond ((marie/sequences:singlep path) (gethash (car path) table))
+  (cond ((singlep path) (gethash (car path) table))
         ((null (hash-table-p (gethash (car path) table))) nil)
         (t (gethash* (cdr path)
                      (gethash (car path) table)))))
