@@ -61,10 +61,6 @@
            (uiop:subpathname home (subseq pathstring 1)))
           (t (uiop:ensure-absolute-pathname pathstring)))))
 
-(def make (system)
-  "Use ASDF to load SYSTEM forcibly. "
-  (asdf:make system :force t))
-
 (defm with-time ((&optional) &body body)
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
@@ -180,7 +176,7 @@
       (every #'null value)))
 
 (defm eval-always (&body body)
-  "Always evaluate BODY."
+  "Evaluate the forms in BODY in all situations."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
 
@@ -188,4 +184,3 @@
   "Output STRING to *STANDARD-ERROR* then return."
   (format *error-output* string)
   (finish-output *error-output*))
-
