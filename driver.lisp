@@ -1,7 +1,7 @@
 ;;;; driver.lisp
 
 (uiop:define-package :marie/driver
-  (:nicknames :marie :m)
+  (:nicknames :marie)
   (:use :uiop/common-lisp)
   (:use-reexport #:marie/defs
                  #:marie/reader

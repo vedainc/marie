@@ -16,6 +16,7 @@
            #:defg
            #:deft-
            #:deft
+           #:defc-
            #:defc))
 
 (in-package #:marie/defs)
@@ -150,7 +151,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defmacro %deft (names (&rest parameters) &body body)
-  #.(compose-docstring "Define methods")
+  #.(compose-docstring "Define methods with DEFMETHOD")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
@@ -167,48 +168,77 @@ NAMES is either a single symbol, or a list of symbols where the first element is
   "Define generic functions with %DEFT then export NAMES."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
-(defun p-symbol (symbol)
-  "Return a conditionally hyphenated predicate symbol."
-  (let* ((string (prin1-to-string symbol))
-         (split (uiop:split-string string :separator '(#\-))))
-    (if (> (length split) 1)
-        (read-from-string (format nil "~{~A~^-~}" (append split '("P"))))
-        (read-from-string (format nil "~{~A~^-~}P" split)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun p-symbol (symbol)
+    "Return a conditionally hyphenated predicate symbol."
+    (let* ((string (prin1-to-string symbol))
+           (split (uiop:split-string string :separator '(#\-))))
+      (if (> (length split) 1)
+          (read-from-string (format nil "~{~A~^-~}" (append split '("P"))))
+          (read-from-string (format nil "~{~A~^-~}P" split)))))
 
-(defmacro defc (name (&rest superclasses) (&rest slot-specs)
-                &optional class-option)
+  (defun compose-name (predicate &rest names)
+    "Compose a hyphenated symbol from NAMES. Return a symbol for predicate use if PREDICATE is true."
+    (let ((val (read-from-string
+                (format nil "~{~A~^-~}"
+                        (mapcar (lambda (name)
+                                  (string-upcase (string name)))
+                                names)))))
+      (if predicate
+          (p-symbol val)
+          val))))
+
+(defmacro compose-definitions (name superclasses slot-specs &optional class-option)
+  "Compose the definitions in creating a class."
+  `(progn
+     (defclass ,name (,@superclasses)
+       ,@(append (list slot-specs)
+          (when class-option
+            (list class-option))))
+     (defun ,(compose-name nil 'make name) (&rest args)
+       ,(format nil "Return a new instance of ~A." name)
+       (apply #'make-instance ',name args))
+     (defun ,(compose-name t name) (object)
+       ,(format nil "Return true if OBJECT is of type ~A." name)
+       (when (typep object ',name)
+         t))))
+
+(defmacro compose-exports (name)
+  "Export symbols suitable for %DEFC."
+  `(progn
+     (export ',(compose-name nil 'make name))
+     (export ',name)
+     (export ',(compose-name t name))))
+
+(defmacro %defc (names (&rest superclasses)
+                 (&rest slot-specs) &optional class-option)
   "Define a class with DEFCLASS and export the slots and the class name."
-  (flet ((fn (predicate &rest names)
-             (let ((val (read-from-string
-                         (format nil "~{~A~^-~}"
-                                 (mapcar (lambda (name)
-                                           (string-upcase (string name)))
-                                         names)))))
-               (if predicate
-                   (p-symbol val)
-                   val))))
+  (destructuring-bind (name &rest aliases)
+      (uiop:ensure-list names)
     (let ((exports (mapcan (lambda (spec)
                              (let ((name (or (getf (cdr spec) :accessor)
                                              (getf (cdr spec) :reader)
                                              (getf (cdr spec) :writer))))
                                (when name (list name))))
-                           slot-specs))
-          (make-name (fn nil 'make name))
-          (p-name (fn t name)))
+                           slot-specs)))
       `(progn
-         (defclass ,name (,@superclasses)
-           ,@(append (list slot-specs)
-              (when class-option
-                (list class-option))))
-         (defun ,make-name (&rest args)
-           ,(format nil "Return a new instance of ~A." name)
-           (apply #'make-instance ',name args))
-         (defun ,p-name (object)
-           ,(format nil "Return true if OBJECT is of type ~A." name)
-           (when (typep object ',name)
-             t))
-         ,@(mapcar (lambda (name) `(export ',name))
-                   exports)
-         (export ',make-name)
-         (export ',name)
-         (export ',p-name)))))
+         (compose-definitions ,name ,superclasses
+                              ,slot-specs ,class-option)
+         ,@(loop :for alias :in (remove t aliases)
+                 :collect `(compose-definitions ,alias ,superclasses
+                                                ,slot-specs ,class-option))
+         (when (member t ',aliases)
+           (progn
+             ,@(mapcar (lambda (name) `(export ',name))
+                       exports)
+             (compose-exports ,name)
+             ,@(loop :for alias :in (remove t aliases)
+                     :collect `(compose-exports ,alias))))))))
+
+(defmacro defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
+  "Define classes with %DEFC but do not export NAMES."
+  `(%defc ,names ,superclasses ,slot-specs ,class-option))
+
+(defmacro defc (names (&rest superclasses) (&rest slot-specs) &optional class-option)
+  "Define classes with %DEFC then export NAMES."
+  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses ,slot-specs ,class-option))
