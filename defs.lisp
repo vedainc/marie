@@ -20,24 +20,37 @@
 
 (in-package #:marie/defs)
 
-(defmacro %def (names args &rest body)
-  "Define a function with aliases, and conditionally export the names.
+(defmacro export-names (name aliases)
+  "Return a stub for exporting names in definers."
+  `(when (member t ',aliases)
+     (progn
+       (export ',name)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(export ',alias))))  )
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *docstring*
+    ", and conditionally export the names.
 
 NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+    "The common docstring in the definers.")
+
+  (defun compose-docstring (text)
+    "Return a docstring suitable for a definer."
+    (format nil "~A~A" text *docstring*)))
+
+(defmacro %def (names args &rest body)
+  #.(compose-docstring "Define functions")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defun ,name ,args ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(setf (fdefinition ',alias) (fdefinition ',name)))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro def- (names args &rest body)
-  "Define a function wit %DEF but do not export NAMES."
+  "Define a function with %DEF but do not export NAMES."
   `(%def ,names ,args ,@body))
 
 (defmacro def (names args &rest body)
@@ -45,71 +58,53 @@ NAMES is either a single symbol, or a list of symbols where the first element is
   `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro %defm (names args &rest body)
-  "Define a macro with aliases, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define macros")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defmacro ,name ,args ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(setf (macro-function ',alias) (macro-function ',name)))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro defm- (names args &rest body)
-  "Define a macro wit %DEFM but do not export NAMES."
+  "Define a macro with %DEFM but do not export NAMES."
   `(%defm ,names ,args ,@body))
 
 (defmacro defm (names args &rest body)
-  "Define a macro wit %DEFM then export NAMES."
+  "Define a macro with %DEFM then export NAMES."
   `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro %defv (names &rest body)
-  "Define special variables with DEFVAR, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define special variables with DEFVAR")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defvar ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defvar ,alias ,@body))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro defv- (names &rest body)
   "Define a special variable with %DEFV but do not export NAMES."
   `(%defv ,names ,@body))
 
 (defmacro defv (names &rest body)
-  "Define a special variable wit %DEFV then export NAMES."
+  "Define a special variable with %DEFV then export NAMES."
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defp (names &rest body)
-  "Define special variables with DEFPARAMETER, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define special variables with DEFPARAMETER")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defparameter ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defparameter ,alias ,@body))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro defp- (names &rest body)
-  "Define a special variable wit %DEFP but do not export NAMES."
+  "Define a special variable with %DEFP but do not export NAMES."
   `(%defp ,names ,@body))
 
 (defmacro defp (names &rest body)
@@ -117,9 +112,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
   `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defk (names &rest body)
-  "Define constants with DEFCONSTANT but allow the definition to change on subsequent calls to %DEFK,, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
   (let ((id (if (consp names) names (list names))))
     (destructuring-bind (name &rest aliases)
         id
@@ -128,11 +121,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
          (defconstant ,name ,@body)
          ,@(loop :for alias :in (remove t aliases)
                  :collect `(defconstant ,alias ,@body))
-         (when (member t ',aliases)
-           (progn
-             (export ',name)
-             ,@(loop :for alias :in (remove t aliases)
-                     :collect `(export ',alias))))))))
+         (export-names ,name ,aliases)))))
 
 (defmacro defk- (names &rest body)
   "Define a special variable with %DEFK but do not export NAMES."
@@ -143,51 +132,39 @@ NAMES is either a single symbol, or a list of symbols where the first element is
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
-  "Define a generic function with DEFGENERIC with aliases, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define generic functions")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defgeneric ,name (,@parameters) ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defgeneric ,alias (,@parameters) ,@body))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro defg- (names (&rest parameters) &rest body)
-  "Define a generic function with %DEFG but do not export NAMES."
+  "Define generic functions with %DEFG but do not export NAMES."
   `(%defg ,names ,parameters ,@body))
 
 (defmacro defg (names (&rest parameters) &rest body)
-  "Define a generic function with %DEFG then export NAMES."
+  "Define generic functions with %DEFG then export NAMES."
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defmacro %deft (names (&rest parameters) &body body)
-  "Define a method with DEFMETHOD with aliases, and conditionally export the names.
-
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+  #.(compose-docstring "Define methods")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     `(progn
        (defmethod ,name (,@parameters) ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defmethod ,alias (,@parameters) ,@body))
-       (when (member t ',aliases)
-         (progn
-           (export ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export ',alias)))))))
+       (export-names ,name ,aliases))))
 
 (defmacro deft- (names (&rest parameters) &rest body)
-  "Define a generic function with %DEFT but do not export NAMES."
+  "Define generic functions with %DEFT but do not export NAMES."
   `(%deft ,names ,parameters ,@body))
 
 (defmacro deft (names (&rest parameters) &rest body)
-  "Define a generic function with %DEFT then export NAMES."
+  "Define generic functions with %DEFT then export NAMES."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defun p-symbol (symbol)
