@@ -167,8 +167,8 @@ The expressions
     (defp *grault* nil \"The grault.\")
     (defp (*garply* *waldo*) nil \"Like grault.\")
 
-define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."`
-  (%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
+  `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defk (names &rest body)
   #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
@@ -190,7 +190,7 @@ The expressions
     (defk- +fred+ nil \"The Fred constant.\")
     (defk- (+plugh+ +xyzzy+) nil \"Like Fred.\")
 
-define the constants +FRED+, +PLUGH+, +XYZZY+ but do not export those names."`
+define the constants +FRED+, +PLUGH+, +XYZZY+ but do not export those names."
   `(%defk ,names ,@body))
 
 (defmacro defk (names &rest body)
@@ -201,7 +201,7 @@ The expressions
     (defk +fred+ nil \"The Fred constant.\")
     (defk (+plugh+ +xyzzy+) nil \"Like Fred.\")
 
-define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."`
+define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
