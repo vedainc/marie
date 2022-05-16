@@ -1,4 +1,5 @@
 ;;;; defs.lisp
+;;;; Exporting replacements for functions and macros that create definitions and bindings
 
 (uiop:define-package #:marie/defs
   (:use #:cl)
@@ -51,11 +52,25 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro def- (names args &rest body)
-  "Define a function with %DEF but do not export NAMES."
+  "Define functions with DEFUN.
+
+The expressions
+
+    (def- foo (n) (1- n))
+    (def- (bar baz) (n) (1+ n))
+
+define the functions FOO, BAR, and BAZ, but do not export those names."
   `(%def ,names ,args ,@body))
 
 (defmacro def (names args &rest body)
-  "Define a function with %DEF then export NAMES."
+  "Define functions with DEFUN.
+
+The expressions
+
+    (def foo (n) (1- n))
+    (def (bar baz) (n) (+ n 1))
+
+define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro %defm (names args &rest body)
@@ -69,11 +84,25 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro defm- (names args &rest body)
-  "Define a macro with %DEFM but do not export NAMES."
+  "Define macros with DEFMACRO.
+
+The expressions
+
+    (defm- qux (op) `(progn (,op 1)))
+    (defm- (quux corge) (op) `(progn (,op 2)))
+
+define the macros QUX, QUUX, and CORGE but do not export those names."
   `(%defm ,names ,args ,@body))
 
 (defmacro defm (names args &rest body)
-  "Define a macro with %DEFM then export NAMES."
+  "Define macros with DEFMACRO.
+
+The expressions
+
+    (defm qux (op) `(progn (,op 1)))
+    (defm (quux corge) (op) `(progn (,op 2)))
+
+define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro %defv (names &rest body)
@@ -87,11 +116,26 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro defv- (names &rest body)
-  "Define a special variable with %DEFV but do not export NAMES."
+  "Define special variables with DEFVAR.
+
+The expr
+essions
+
+    (defv- *grault* nil \"The grault.\")
+    (defv- (*garply* *waldo*) nil \"Like grault.\")
+
+define the special variables *GRAULTY*, *GARPY*, and *WALDO* but do not export those names."
   `(%defv ,names ,@body))
 
 (defmacro defv (names &rest body)
-  "Define a special variable with %DEFV then export NAMES."
+  "Define special variables with DEFVAR.
+
+The expressions
+
+    (defv *grault* nil \"The grault.\")
+    (defv (*garply* *waldo*) nil \"Like grault.\")
+
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defp (names &rest body)
@@ -105,12 +149,26 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro defp- (names &rest body)
-  "Define a special variable with %DEFP but do not export NAMES."
+  "Define special variables with DEFPARAMETER.
+
+The expressions
+
+    (defp- *grault* nil \"The grault.\")
+    (defp- (*garply* *waldo*) nil \"Like grault.\")
+
+define the special variables *GRAULTY*, *GARPY*, and *WALDO* but do not export those names."
   `(%defp ,names ,@body))
 
 (defmacro defp (names &rest body)
-  "Define a special variable with %DEFP then export NAMES."
-  `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
+  "Define special variables with DEFPARAMETER.
+
+The expressions
+
+    (defp *grault* nil \"The grault.\")
+    (defp (*garply* *waldo*) nil \"Like grault.\")
+
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."`
+  (%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defk (names &rest body)
   #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
@@ -125,11 +183,25 @@ NAMES is either a single symbol, or a list of symbols where the first element is
          (export-names ,name ,aliases)))))
 
 (defmacro defk- (names &rest body)
-  "Define a special variable with %DEFK but do not export NAMES."
+  "Define constants with %DEFK.
+
+The expressions
+
+    (defk- +fred+ nil \"The Fred constant.\")
+    (defk- (+plugh+ +xyzzy+) nil \"Like Fred.\")
+
+define the constants +FRED+, +PLUGH+, +XYZZY+ but do not export those names."`
   `(%defk ,names ,@body))
 
 (defmacro defk (names &rest body)
-  "Define a special variable with %DEFK then export NAMES."
+  "Define constants with %DEFK.
+
+The expressions
+
+    (defk +fred+ nil \"The Fred constant.\")
+    (defk (+plugh+ +xyzzy+) nil \"Like Fred.\")
+
+define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."`
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
@@ -143,11 +215,31 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro defg- (names (&rest parameters) &rest body)
-  "Define generic functions with %DEFG but do not export NAMES."
+  "Define generic functions with DEFGENERIC
+
+The expressions
+
+    (defg- delete (volume registry)
+      (:documentation \"Delete VOLUME in REGISTRY.\"))
+
+    (defg- (create update) (volume registry)
+      (:documentation \"Update VOLUME in REGISTRY.\"))
+
+define the generic functions DELETE, CREATE, and UPDATE but do not export those names."
   `(%defg ,names ,parameters ,@body))
 
 (defmacro defg (names (&rest parameters) &rest body)
-  "Define generic functions with %DEFG then export NAMES."
+  "Define generic functions with DEFGENERIC
+
+The expressions
+
+    (defg delete (volume registry)
+      (:documentation \"Delete VOLUME in REGISTRY.\"))
+
+    (defg (create update) (volume registry)
+      (:documentation \"Update VOLUME in REGISTRY.\"))
+
+define the generic functions DELETE, CREATE, and UPDATE; and export those names."
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defmacro %deft (names (&rest parameters) &body body)
@@ -161,11 +253,35 @@ NAMES is either a single symbol, or a list of symbols where the first element is
        (export-names ,name ,aliases))))
 
 (defmacro deft- (names (&rest parameters) &rest body)
-  "Define generic functions with %DEFT but do not export NAMES."
+  "Define methods with DEFMETHOD.
+
+The expressions
+
+    (deft- current ((o null))
+      \"Return T on null objects\"
+      t)
+
+    (deft- (prev next) ((o null))
+      \"Return NIL on null objects.\"
+      nil)
+
+define the methods CURRENT, PREV, AND NEXT but do not export those names."
   `(%deft ,names ,parameters ,@body))
 
 (defmacro deft (names (&rest parameters) &rest body)
-  "Define generic functions with %DEFT then export NAMES."
+  "Define methods with DEFMETHOD.
+
+The expressions
+
+    (deft current ((o null))
+      \"Return T on null objects\"
+      t)
+
+    (deft (prev next) ((o null))
+      \"Return NIL on null objects.\"
+      nil)
+
+define the methods CURRENT, PREV, AND NEXT; and export those names."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -189,7 +305,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
           val))))
 
 (defmacro compose-definitions (name superclasses slot-specs &optional class-option)
-  "Compose the definitions in creating a class."
+  "Compose the forms for creating a class."
   `(progn
      (defclass ,name (,@superclasses)
        ,@(append (list slot-specs)
@@ -204,7 +320,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
          t))))
 
 (defmacro compose-exports (name)
-  "Export symbols suitable for %DEFC."
+  "Compose the forms for exporting symbols."
   `(progn
      (export ',(compose-name nil 'make name))
      (export ',name)
@@ -212,7 +328,7 @@ NAMES is either a single symbol, or a list of symbols where the first element is
 
 (defmacro %defc (names (&rest superclasses)
                  (&rest slot-specs) &optional class-option)
-  "Define a class with DEFCLASS and export the slots and the class name."
+  "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
     (let ((exports (mapcan (lambda (spec)
@@ -236,9 +352,41 @@ NAMES is either a single symbol, or a list of symbols where the first element is
                      :collect `(compose-exports ,alias))))))))
 
 (defmacro defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
-  "Define classes with %DEFC but do not export NAMES."
+  "Define classes with DEFCLASS.
+
+The expression
+
+    (defc- (unit blank) (frame)
+      ((id :initarg :id
+           :initform -1
+           :reader id
+           :documentation \"The unique numeric ID of a hole in a registry.\")
+       (name :initarg :name
+             :initform \"\"
+             :reader name
+             :documentation \"The name of the hole.\"))
+      (:documentation \"An empty frame.\"))
+
+defines the classes UNIT and BLANK whose superclass is FRAME. In addition to that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and UNITP—predicate to test if an object is an instance of UNIT. The same is also created for BLANK. Those symbols are not exported.
+"
   `(%defc ,names ,superclasses ,slot-specs ,class-option))
 
 (defmacro defc (names (&rest superclasses) (&rest slot-specs) &optional class-option)
-  "Define classes with %DEFC then export NAMES."
-  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses ,slot-specs ,class-option))
+  "Define classes with DEFCLASS.
+
+The expression
+
+    (defc (unit blank) (frame)
+      ((id :initarg :id
+           :initform -1
+           :reader id
+           :documentation \"The unique numeric ID of a hole in a registry.\")
+       (name :initarg :name
+             :initform \"\"
+             :reader name
+             :documentation \"The name of the hole.\"))
+      (:documentation \"An empty frame.\"))
+
+defines the classes UNIT and BLANK whose superclass is FRAME. In addition to that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and UNITP—predicate to test if an object is an instance of UNIT. The same is also created for BLANK. Those symbols are exported along with the names of the classes.
+"
+  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses,slot-specs ,class-option))
