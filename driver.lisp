@@ -1,4 +1,5 @@
 ;;;; driver.lisp
+;;;; Top-level definitions for exporting definitions under a single package
 
 (uiop:define-package :marie/driver
   (:nicknames :marie)

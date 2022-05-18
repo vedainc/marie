@@ -1,4 +1,5 @@
 ;;;; etc.lisp
+;;;; Utilities that don't fit elsewhere
 
 (uiop:define-package #:marie/etc
   (:use #:cl
@@ -91,7 +92,7 @@
      ,@body
      ,@args))
 
-(def hyphenate (&rest names)
+(def (hyphenate-string hyphenate) (&rest names)
   "Return a new symbol from the hyphen concatenation of NAMES."
   (format nil "~{~A~^-~}"
           (mapcar (λ (name)
@@ -99,9 +100,13 @@
                   names)))
 
 (def hyphenate-intern (package &rest names)
-  "Apply hyphenate to NAMES then return an interned symbol in the current package."
+  "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
   (let ((pkg (if (null package) *package* package)))
     (intern (apply #'hyphenate names) (find-package pkg))))
+
+(def hyphenate-symbol (&rest names)
+  "Apply hyphenate to names then return it as a symbol."
+  (read-from-string (apply #'hyphenate names)))
 
 (def show-table (table)
   "Print the contents of hash table TABLE."

@@ -1,4 +1,5 @@
 ;;;; reader.lisp
+;;;; Minor tweaks to the Lisp reader
 
 (uiop:define-package #:marie/reader
   (:use #:cl
@@ -6,7 +7,7 @@
 
 (in-package #:marie/reader)
 
-(defun bracket-reader (stream char)
+(def- bracket-reader (stream char)
   "Use [+ _ 1] as a shorthand for #'(lambda (_) (+ _ 1))
 See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
   (declare (ignore char))
@@ -14,17 +15,21 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
      (declare (ignorable ,(intern "__")))
      ,(read-delimited-list #\] stream t)))
 
-;; (set-macro-character #\[ #'bracket-reader)
-;; (set-macro-character #\] (get-macro-character #\) nil))
+(def use-bracket-reader ()
+  "Put the bracket reader into effect."
+  (set-macro-character #\[ #'bracket-reader)
+  (set-macro-character #\] (get-macro-character #\) nil)))
 
-(defun brace-reader (stream char)
+(def- brace-reader (stream char)
   "Use {foo 5} as a shorthand for (funcall foo 5)
 See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (declare (ignore char))
   `(funcall ,@(read-delimited-list #\} stream t)))
 
-;; (set-macro-character #\{ #'brace-reader)
-;; (set-macro-character #\} (get-macro-character #\) nil))
+(def use-brace-reader ()
+  "Put the brace reader into effect."
+  (set-macro-character #\{ #'brace-reader)
+  (set-macro-character #\} (get-macro-character #\) nil)))
 
 ;;; Return first expression from the last expression evaluated.
 (set-dispatch-macro-character
@@ -57,15 +62,17 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (with-preserved-case ()
     (read-from-string string)))
 
-(defun lambda-reader (stream char)
+(def- lambda-reader (stream char)
   "Define the reader for λ."
   (declare (ignore stream char))
   'LAMBDA)
 
 (set-macro-character #\λ #'lambda-reader)
 
-(defun dollar-reader (stream char)
+(def- dollar-reader (stream char)
   (declare (ignore char))
   (list (quote function) (read stream t nil t)))
 
-;;(set-macro-character #\$ #'dollar-reader)
+(def use-dollar-reader ()
+  "Put the dollar reader into effect."
+  (set-macro-character #\$ #'dollar-reader))

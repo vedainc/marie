@@ -1,4 +1,5 @@
 ;;;; sequences.lisp
+;;;; Utilities for dealing with sequences
 
 (uiop:define-package #:marie/sequences
   (:use #:cl

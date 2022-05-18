@@ -1,4 +1,5 @@
 ;;;; conditionals.lisp
+;;;; Utilities for handling conditional expressions
 
 (uiop:define-package #:marie/conditionals
   (:use #:cl
