@@ -265,7 +265,7 @@ The expressions
       \"Return NIL on null objects.\"
       nil)
 
-define the methods CURRENT, PREV, AND NEXT but do not export those names."
+define the methods CURRENT, PREV, and NEXT but do not export those names."
   `(%deft ,names ,parameters ,@body))
 
 (defmacro deft (names (&rest parameters) &rest body)
@@ -281,7 +281,7 @@ The expressions
       \"Return NIL on null objects.\"
       nil)
 
-define the methods CURRENT, PREV, AND NEXT; and export those names."
+define the methods CURRENT, PREV, and NEXT; and export those names."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
