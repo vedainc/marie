@@ -106,12 +106,12 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
                (let ((it ,symbol)) ,@(cdr clause))
                (acond ,@(cdr clauses)))))))
 
-(defun alpha-reader (stream char)
-  "Define the reader for α, so that α can be used to refer to the anaphora."
+(defun at-reader (stream char)
+  "Define the reader for @, so that @ can be used to refer to the anaphora."
   (declare (ignore stream char))
   'MARIE/CONDITIONALS:IT)
 
-(set-macro-character #\α #'alpha-reader)
+(set-macro-character #\@ #'at-reader)
 
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."
