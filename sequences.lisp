@@ -3,7 +3,8 @@
 
 (uiop:define-package #:marie/sequences
   (:use #:cl
-        #:marie/defs))
+        #:marie/defs
+        #:marie/conditionals))
 
 (in-package #:marie/sequences)
 
@@ -301,3 +302,8 @@ and the length of each list as the value."
         :for n = 0 :then (if val (1+ n) n)
         :unless (and val (> count 0) (< n (1+ count)))
           :collect s))
+
+(def every-list-p (object)
+  "Return true if OBJECT is a list and all members are lists."
+  (∧ (listp object)
+     (every #'listp object)))
