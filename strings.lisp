@@ -92,4 +92,9 @@
              (length y)))
      (let ((val (search x y)))
        (awhen val
-         (zerop α)))))
+         (zerop @)))))
+
+(def every-string-p (object)
+  "Return true if OBJECT is a list and all members are strings."
+  (∧ (listp object)
+     (every #'stringp object)))
