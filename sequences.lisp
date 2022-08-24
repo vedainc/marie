@@ -307,3 +307,38 @@ and the length of each list as the value."
   "Return true if OBJECT is a list and all members are lists."
   (∧ (listp object)
      (every #'listp object)))
+
+(def remove-from-plist (plist &rest keys)
+  "Returns a property-list with same keys and values as PLIST, except that keys in the list designated
+by KEYS and values corresponding to them are removed.  The returned property-list may share
+structure with the PLIST, but PLIST is not destructively modified. Keys are compared using EQ."
+  (declare (optimize speed))
+  (loop :for (key . rest) :on plist :by #'cddr
+        :do (assert rest () "Expected a proper plist, got ~S" plist)
+        :unless (member key keys :test #'eq)
+        :collect key :and :collect (first rest)))
+
+(define-modify-macro remove-from-plistf (&rest keys)
+  remove-from-plist
+  "Modify macro for REMOVE-FROM-PLIST.")
+
+(def delete-from-plist (plist &rest keys)
+  "Just like REMOVE-FROM-PLIST, but this version may destructively modify the provided PLIST."
+  (declare (optimize speed))
+  (loop :with head = plist
+        :with tail = nil                ; a nil tail means an empty result so far
+        :for (key . rest) :on plist :by #'cddr
+        :do (assert rest () "Expected a proper plist, got ~S" plist)
+            (if (member key keys :test #'eq)
+                ;; skip over this pair
+                (let ((next (cdr rest)))
+                  (if tail
+                      (setf (cdr tail) next)
+                      (setf head next)))
+                ;; keep this pair
+                (setf tail rest))
+        :finally (return head)))
+
+(define-modify-macro delete-from-plistf (&rest keys)
+  delete-from-plist
+  "Modify macro for DELETE-FROM-PLIST.")
