@@ -102,11 +102,11 @@
 (def hyphenate-intern (package &rest names)
   "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
   (let ((pkg (if (null package) *package* package)))
-    (intern (apply #'hyphenate names) (find-package pkg))))
+    (intern (apply #'hyphenate-string names) (find-package pkg))))
 
 (def hyphenate-symbol (&rest names)
   "Apply hyphenate to names then return it as a symbol."
-  (read-from-string (apply #'hyphenate names)))
+  (read-from-string (apply #'hyphenate-string names)))
 
 (def show-table (table)
   "Print the contents of hash table TABLE."
