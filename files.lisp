@@ -34,3 +34,11 @@
 (def resolve-system-file (file system)
   "Return the path of FILE relative to SYSTEM."
   (uiop:merge-pathnames* file (asdf:system-source-directory (asdf:find-system system))))
+
+(defm with-output-file ((var path) &body body)
+  "A thin wrapper over WITH-OPEN-FILE."
+  `(with-open-file (,var ,path
+		                     :direction :output
+		                     :if-exists :supersede
+		                     :if-does-not-exist :create)
+     ,@body))

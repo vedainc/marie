@@ -189,3 +189,6 @@
   "Output STRING to *STANDARD-ERROR* then return."
   (format *error-output* string)
   (finish-output *error-output*))
+
+(define-modify-macro maxf (&rest numbers) max)
+(define-modify-macro minf (&rest numbers) min)
