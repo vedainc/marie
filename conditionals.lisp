@@ -28,19 +28,20 @@
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
 
-(defm (logical-and ∧) (&body body)
+(defm (logical-and land ∧) (&body body)
   "Return true if all forms in BODY evaluates to true."
   `(when (and ,@body)
      t))
 
-(defm (logical-or ∨) (&body body)
+(defm (logical-or lor ∨) (&body body)
   "Return true if all forms in BODY evaluates to false."
   `(when (or ,@body)
      t))
 
-(defm ¬ (arg)
+(defm (negation neg ¬) (arg)
   "Return the negation of ARG."
-  `(not ,arg))
+  `(cond ((integerp ,arg) (- ,arg))
+         (t (not ,arg))))
 
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a

@@ -2,8 +2,8 @@
 ;;;; Minor tweaks to the Lisp reader
 
 (uiop:define-package #:marie/reader
-  (:use #:cl
-        #:marie/defs))
+    (:use #:cl
+          #:marie/defs))
 
 (in-package #:marie/reader)
 

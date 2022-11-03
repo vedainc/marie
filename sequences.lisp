@@ -2,9 +2,9 @@
 ;;;; Utilities for dealing with sequences
 
 (uiop:define-package #:marie/sequences
-  (:use #:cl
-        #:marie/defs
-        #:marie/conditionals))
+    (:use #:cl
+          #:marie/defs
+          #:marie/conditionals))
 
 (in-package #:marie/sequences)
 
@@ -53,9 +53,9 @@
 (def longerp (x y)
   "Return true if X is longer than Y."
   (labels ((fn (x y)
-             (and (consp x)
-                  (or (null y)
-                      (fn (cdr x) (cdr y))))))
+               (and (consp x)
+                    (or (null y)
+                        (fn (cdr x) (cdr y))))))
     (if (and (listp x) (listp y))
         (fn x y)
         (> (length x) (length y)))))
@@ -64,19 +64,19 @@
   "Create partition of N from SOURCE."
   (when (zerop n) (error "Zero length"))
   (labels ((fn (source acc)
-             (let ((rest (nthcdr n source)))
-               (if (consp rest)
-                   (fn rest (cons (subseq source 0 n) acc))
-                   (nreverse (cons source acc))))))
+               (let ((rest (nthcdr n source)))
+                 (if (consp rest)
+                     (fn rest (cons (subseq source 0 n) acc))
+                     (nreverse (cons source acc))))))
     (when source
       (fn source nil))))
 
 (def flatten-list (list)
   "Merge all symbols from LIST to one list."
   (labels ((fn (list acc)
-             (cond ((null list) acc)
-                   ((atom list) (cons list acc))
-                   (t (fn (car list) (fn (cdr list) acc))))))
+               (cond ((null list) acc)
+                     ((atom list) (cons list acc))
+                     (t (fn (car list) (fn (cdr list) acc))))))
     (fn list nil)))
 
 (def filter-if (fn list)
@@ -94,14 +94,14 @@
 (def prune-if (fn tree)
   "Remove all items from TREE to which FN returns true."
   (labels ((fn (tree acc)
-             (cond ((null tree) (nreverse acc))
-                   ((consp (car tree)) (fn (cdr tree)
-                                           (cons (fn (car tree) nil)
-                                                 acc)))
-                   (t (fn (cdr tree)
-                          (if (funcall fn (car tree))
-                              acc
-                              (cons (car tree) acc)))))))
+               (cond ((null tree) (nreverse acc))
+                     ((consp (car tree)) (fn (cdr tree)
+                                             (cons (fn (car tree) nil)
+                                                   acc)))
+                     (t (fn (cdr tree)
+                            (if (funcall fn (car tree))
+                                acc
+                                (cons (car tree) acc)))))))
     (fn tree nil)))
 
 (def prune-if-not (fn tree)
@@ -166,10 +166,10 @@ doesn't, and another list that starts where FN returns true,as values."
 (def group-alike (list)
   "Group similar elements together."
   (labels ((fn (list acc)
-             (cond ((null list) (nreverse acc))
-                   (t (fn (remove (first list) list)
-                          (cons (make-list (count (first list) list) :initial-element (first list))
-                                acc))))))
+               (cond ((null list) (nreverse acc))
+                     (t (fn (remove (first list) list)
+                            (cons (make-list (count (first list) list) :initial-element (first list))
+                                  acc))))))
     (fn list nil)))
 
 (def build-length-index (groups)
@@ -191,7 +191,7 @@ and the length of each list as the value."
 (def red-append (&rest args)
   "Reduce ARGS with APPEND."
   (flet ((fn (arg)
-           (reduce #'append arg)))
+             (reduce #'append arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
@@ -227,17 +227,17 @@ and the length of each list as the value."
 (def mem* (elems list &key (test #'equal))
   "Return true if all items ELEMS are members of LIST using TEST as the equality function."
   (labels ((fn (args)
-             (cond ((null args) t)
-                   ((member (car args) list :test test) (fn (cdr args)))
-                   (t nil))))
+               (cond ((null args) t)
+                     ((member (car args) list :test test) (fn (cdr args)))
+                     (t nil))))
     (or (funcall test elems list)
         (fn elems))))
 
 (def remove* (elems list &key (test #'equal))
   "Remove all items in ELEMS in LIST."
   (labels ((fn (args list)
-             (cond ((null args) list)
-                   (t (fn (cdr args) (remove (car args) list :test test))))))
+               (cond ((null args) list)
+                     (t (fn (cdr args) (remove (car args) list :test test))))))
     (fn elems list)))
 
 (def sequence-string (seq)
@@ -286,14 +286,14 @@ and the length of each list as the value."
         :for val = (funcall fn s)
         :for n = 0 :then (if val (1+ n) n)
         :when (and val (> count 0) (< n (1+ count)))
-          :collect s))
+        :collect s))
 
 (def drop (seq count)
   "Return items from SEQ without the first COUNT items."
   (loop :for s :in seq
         :for n = 1 :then (1+ n)
         :when (>= count n)
-          :collect s))
+        :collect s))
 
 (def drop-if (fn seq count)
   "Return items from SEQ without the first COUNT items that satisfy FN."
@@ -301,7 +301,7 @@ and the length of each list as the value."
         :for val = (funcall fn s)
         :for n = 0 :then (if val (1+ n) n)
         :unless (and val (> count 0) (< n (1+ count)))
-          :collect s))
+        :collect s))
 
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."

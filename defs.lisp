@@ -2,7 +2,7 @@
 ;;;; Exporting replacements for functions and macros that create definitions and bindings
 
 (uiop:define-package #:marie/defs
-  (:use #:cl)
+    (:use #:cl)
   (:export #:def-
            #:def
            #:defm-
@@ -176,7 +176,7 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
     (destructuring-bind (name &rest aliases)
         id
       `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'continue))
-                     #-sbcl ((simple-error #'continue))
+         #-sbcl ((simple-error #'continue))
          (defconstant ,name ,@body)
          ,@(loop :for alias :in (remove t aliases)
                  :collect `(defconstant ,alias ,@body))

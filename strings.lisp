@@ -2,10 +2,10 @@
 ;;;; Utilities for dealing with strings
 
 (uiop:define-package #:marie/strings
-  (:use #:cl
-        #:marie/defs
-        #:marie/sequences
-        #:marie/conditionals))
+    (:use #:cl
+          #:marie/defs
+          #:marie/sequences
+          #:marie/conditionals))
 
 (in-package #:marie/strings)
 
@@ -29,7 +29,7 @@
 (def red-cat (&rest args)
   "Reduce ARGS with CAT."
   (flet ((fn (arg)
-           (reduce #'cat arg)))
+             (reduce #'cat arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
@@ -64,12 +64,12 @@
 (def list-string (list &optional (converter 'string*))
   "Return the string version of LIST."
   (labels ((fn (args &optional acc)
-             (cond ((null args) (funcall converter (nreverse acc)))
-                   ((consp (car args))
-                    (fn (cdr args)
-                        (cons (fn (car args) nil)
-                              acc)))
-                   (t (fn (cdr args) (cons (car args) acc))))))
+               (cond ((null args) (funcall converter (nreverse acc)))
+                     ((consp (car args))
+                      (fn (cdr args)
+                          (cons (fn (car args) nil)
+                                acc)))
+                     (t (fn (cdr args) (cons (car args) acc))))))
     (fn list)))
 
 (def genstr (&optional (prefix "G"))

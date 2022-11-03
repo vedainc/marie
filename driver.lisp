@@ -2,7 +2,7 @@
 ;;;; Top-level definitions for exporting definitions under a single package
 
 (uiop:define-package :marie/driver
-  (:nicknames :marie :m)
+    (:nicknames :marie :m)
   (:use :uiop/common-lisp)
   (:use-reexport #:marie/defs
                  #:marie/reader
