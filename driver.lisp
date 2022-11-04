@@ -4,7 +4,7 @@
 (uiop:define-package :marie/driver
     (:nicknames :marie :m)
   (:use :uiop/common-lisp)
-  (:use-reexport #:marie/defs
+  (:use-reexport #:marie/definitions
                  #:marie/reader
                  #:marie/sequences
                  #:marie/symbols
