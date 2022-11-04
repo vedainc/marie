@@ -2,7 +2,7 @@
 
 (uiop:define-package #:marie/symbols
   (:use #:cl
-        #:marie/defs))
+        #:marie/definitions))
 
 (in-package #:marie/symbols)
 

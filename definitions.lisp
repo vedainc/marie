@@ -1,7 +1,7 @@
 ;;;; defs.lisp
 ;;;; Exporting replacements for functions and macros that create definitions and bindings
 
-(uiop:define-package #:marie/defs
+(uiop:define-package #:marie/definitions
     (:use #:cl)
   (:export #:def-
            #:def
@@ -20,7 +20,7 @@
            #:defc-
            #:defc))
 
-(in-package #:marie/defs)
+(in-package #:marie/definitions)
 
 (defmacro export-names (name aliases)
   "Return a stub for exporting names in definers."

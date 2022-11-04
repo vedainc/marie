@@ -3,7 +3,7 @@
 
 (uiop:define-package #:marie/files
   (:use #:cl
-        #:marie/defs
+        #:marie/definitions
         #:marie/sequences))
 
 (in-package #:marie/files)

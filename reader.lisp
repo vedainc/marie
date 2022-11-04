@@ -3,7 +3,7 @@
 
 (uiop:define-package #:marie/reader
     (:use #:cl
-          #:marie/defs))
+          #:marie/definitions))
 
 (in-package #:marie/reader)
 

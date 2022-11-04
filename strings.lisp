@@ -3,7 +3,7 @@
 
 (uiop:define-package #:marie/strings
     (:use #:cl
-          #:marie/defs
+          #:marie/definitions
           #:marie/sequences
           #:marie/conditionals))
 

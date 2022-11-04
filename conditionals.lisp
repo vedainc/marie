@@ -3,7 +3,7 @@
 
 (uiop:define-package #:marie/conditionals
   (:use #:cl
-        #:marie/defs)
+        #:marie/definitions)
   (:export #:it))
 
 (in-package #:marie/conditionals)
