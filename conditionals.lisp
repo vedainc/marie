@@ -40,8 +40,10 @@
 
 (defm (negation neg ¬) (arg)
   "Return the negation of ARG."
-  `(cond ((integerp ,arg) (- ,arg))
-         (t (not ,arg))))
+  (let ((value (gensym)))
+    `(let ((,value ,arg))
+       (cond ((integerp ,value) (- ,value))
+             (t (not ,value))))))
 
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
