@@ -45,7 +45,7 @@
   (length= seq 1))
 
 (def single (seq)
-  "Return the only item in SEQUENCE if SEQUENCE has only one element."
+  "Return the only item in SEQ if SEQ has only one element."
   (if (singlep seq)
       (elt seq 0)
       (error "Argument must exactly be of length 1.")))

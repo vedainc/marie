@@ -32,24 +32,24 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (set-macro-character #\} (get-macro-character #\) nil)))
 
 ;;; Return first expression from the last expression evaluated.
-(set-dispatch-macro-character
- #\# #\^
- #'(lambda (stream sub-character infix-parameter)
-     (declare (ignore stream))
-     (when infix-parameter
-       (error "#~A does not take an integer infix parameter."
-              sub-character))
-     `(car +)))
+;; (set-dispatch-macro-character
+;;  #\# #\^
+;;  #'(lambda (stream sub-character infix-parameter)
+;;      (declare (ignore stream))
+;;      (when infix-parameter
+;;        (error "#~A does not take an integer infix parameter."
+;;               sub-character))
+;;      `(car +)))
 
-;;; Return last expression from the last expression evaluated.
-(set-dispatch-macro-character
- #\# #\$
- #'(lambda (stream sub-character infix-parameter)
-     (declare (ignore stream))
-     (when infix-parameter
-       (error "#~A does not take an integer infix parameter."
-              sub-character))
-     `(car (last +))))
+;; ;;; Return last expression from the last expression evaluated.
+;; (set-dispatch-macro-character
+;;  #\# #\$
+;;  #'(lambda (stream sub-character infix-parameter)
+;;      (declare (ignore stream))
+;;      (when infix-parameter
+;;        (error "#~A does not take an integer infix parameter."
+;;               sub-character))
+;;      `(car (last +))))
 
 (defm with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."

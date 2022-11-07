@@ -165,8 +165,13 @@
   #+clisp (posix:uid)
   #+ecl (ext:getuid)
   #+ccl (ccl::getuid)
+  #+lispworks (sys::get-user-id)
   #+allegro (excl.osi:getuid)
-  #-(or sbcl cmu clisp ecl ccl allegro) (error "no getuid"))
+  #-(or sbcl cmu clisp ecl ccl lispworks allegro) (error "no getuid"))
+
+#-unix
+(def getuid ()
+  (error "no getuid"))
 
 (def gethash* (path table)
   "Return the value specified by path starting from TABLE."

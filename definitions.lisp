@@ -51,27 +51,20 @@ NAMES is either a single symbol, or a list of symbols where the first element is
                :collect `(setf (fdefinition ',alias) (fdefinition ',name)))
        (export-names ,name ,aliases))))
 
-(defmacro def- (names args &rest body)
-  "Define functions with DEFUN.
-
-The expressions
-
-    (def- foo (n) (1- n))
-    (def- (bar baz) (n) (1+ n))
-
-define the functions FOO, BAR, and BAZ, but do not export those names."
-  `(%def ,names ,args ,@body))
-
 (defmacro def (names args &rest body)
   "Define functions with DEFUN.
 
-The expressions
+The forms
 
     (def foo (n) (1- n))
     (def (bar baz) (n) (+ n 1))
 
 define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+
+(defmacro def- (names args &rest body)
+  "Like DEF, but do not export the names."
+  `(%def ,names ,args ,@body))
 
 (defmacro %defm (names args &rest body)
   #.(compose-docstring "Define macros")
@@ -83,27 +76,20 @@ define the functions FOO, BAR, and BAZ; and export those names."
                :collect `(setf (macro-function ',alias) (macro-function ',name)))
        (export-names ,name ,aliases))))
 
-(defmacro defm- (names args &rest body)
-  "Define macros with DEFMACRO.
-
-The expressions
-
-    (defm- qux (op) `(progn (,op 1)))
-    (defm- (quux corge) (op) `(progn (,op 2)))
-
-define the macros QUX, QUUX, and CORGE but do not export those names."
-  `(%defm ,names ,args ,@body))
-
 (defmacro defm (names args &rest body)
   "Define macros with DEFMACRO.
 
-The expressions
+The forms
 
     (defm qux (op) `(progn (,op 1)))
     (defm (quux corge) (op) `(progn (,op 2)))
 
 define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+
+(defmacro defm- (names args &rest body)
+  "Like DEFM, but do not export the names."
+  `(%defm ,names ,args ,@body))
 
 (defmacro %defv (names &rest body)
   #.(compose-docstring "Define special variables with DEFVAR")
@@ -115,28 +101,20 @@ define the macros QUX, QUUX, and CORGE; and export those names."
                :collect `(defvar ,alias ,@body))
        (export-names ,name ,aliases))))
 
-(defmacro defv- (names &rest body)
-  "Define special variables with DEFVAR.
-
-The expr
-essions
-
-    (defv- *grault* nil \"The grault.\")
-    (defv- (*garply* *waldo*) nil \"Like grault.\")
-
-define the special variables *GRAULTY*, *GARPY*, and *WALDO* but do not export those names."
-  `(%defv ,names ,@body))
-
 (defmacro defv (names &rest body)
   "Define special variables with DEFVAR.
 
-The expressions
+The forms
 
     (defv *grault* nil \"The grault.\")
     (defv (*garply* *waldo*) nil \"Like grault.\")
 
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
+
+(defmacro defv- (names &rest body)
+  "Like DEFV, but do not export the names."
+  `(%defv ,names ,@body))
 
 (defmacro %defp (names &rest body)
   #.(compose-docstring "Define special variables with DEFPARAMETER")
@@ -148,21 +126,10 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
                :collect `(defparameter ,alias ,@body))
        (export-names ,name ,aliases))))
 
-(defmacro defp- (names &rest body)
-  "Define special variables with DEFPARAMETER.
-
-The expressions
-
-    (defp- *grault* nil \"The grault.\")
-    (defp- (*garply* *waldo*) nil \"Like grault.\")
-
-define the special variables *GRAULTY*, *GARPY*, and *WALDO* but do not export those names."
-  `(%defp ,names ,@body))
-
 (defmacro defp (names &rest body)
   "Define special variables with DEFPARAMETER.
 
-The expressions
+The forms
 
     (defp *grault* nil \"The grault.\")
     (defp (*garply* *waldo*) nil \"Like grault.\")
@@ -170,39 +137,37 @@ The expressions
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
   `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
+(defmacro defp- (names &rest body)
+  "Like DEFP, but do not export the names."
+  `(%defp ,names ,@body))
+
 (defmacro %defk (names &rest body)
   #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
   (let ((id (if (consp names) names (list names))))
     (destructuring-bind (name &rest aliases)
         id
-      `(handler-bind #+sbcl ((sb-ext:defconstant-uneql #'continue))
+      `(handler-bind
+           #+sbcl ((sb-ext:defconstant-uneql #'continue))
          #-sbcl ((simple-error #'continue))
          (defconstant ,name ,@body)
          ,@(loop :for alias :in (remove t aliases)
                  :collect `(defconstant ,alias ,@body))
          (export-names ,name ,aliases)))))
 
-(defmacro defk- (names &rest body)
-  "Define constants with %DEFK.
-
-The expressions
-
-    (defk- +fred+ nil \"The Fred constant.\")
-    (defk- (+plugh+ +xyzzy+) nil \"Like Fred.\")
-
-define the constants +FRED+, +PLUGH+, +XYZZY+ but do not export those names."
-  `(%defk ,names ,@body))
-
 (defmacro defk (names &rest body)
   "Define constants with %DEFK.
 
-The expressions
+The forms
 
     (defk +fred+ nil \"The Fred constant.\")
     (defk (+plugh+ +xyzzy+) nil \"Like Fred.\")
 
 define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
+
+(defmacro defk- (names &rest body)
+  "Like DEFK, but do not export the names."
+  `(%defk ,names ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
   #.(compose-docstring "Define generic functions")
@@ -214,24 +179,10 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
                :collect `(defgeneric ,alias (,@parameters) ,@body))
        (export-names ,name ,aliases))))
 
-(defmacro defg- (names (&rest parameters) &rest body)
-  "Define generic functions with DEFGENERIC
-
-The expressions
-
-    (defg- delete (volume registry)
-      (:documentation \"Delete VOLUME in REGISTRY.\"))
-
-    (defg- (create update) (volume registry)
-      (:documentation \"Update VOLUME in REGISTRY.\"))
-
-define the generic functions DELETE, CREATE, and UPDATE but do not export those names."
-  `(%defg ,names ,parameters ,@body))
-
 (defmacro defg (names (&rest parameters) &rest body)
   "Define generic functions with DEFGENERIC
 
-The expressions
+The forms
 
     (defg delete (volume registry)
       (:documentation \"Delete VOLUME in REGISTRY.\"))
@@ -242,36 +193,35 @@ The expressions
 define the generic functions DELETE, CREATE, and UPDATE; and export those names."
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
-(defmacro %deft (names (&rest parameters) &body body)
+(defmacro defg- (names (&rest parameters) &rest body)
+  "Like DEFG, but do not export the names."
+  `(%defg ,names ,parameters ,@body))
+
+(defmacro %deft (names &body body)
   #.(compose-docstring "Define methods with DEFMETHOD")
   (destructuring-bind (name &rest aliases)
       (uiop:ensure-list names)
-    `(progn
-       (defmethod ,name (,@parameters) ,@body)
-       ,@(loop :for alias :in (remove t aliases)
-               :collect `(defmethod ,alias (,@parameters) ,@body))
-       (export-names ,name ,aliases))))
+    (let ((aliases-1 (remove t aliases)))
+      (if (keywordp (first body))
+          (destructuring-bind (type (&rest parameters) &body content)
+              body
+            `(progn
+               (defmethod ,name ,type (,@parameters) ,@content)
+               ,@(loop :for alias :in aliases-1
+                       :collect `(defmethod ,alias ,type (,@parameters) ,@content))
+               (export-names ,name ,aliases)))
+          (destructuring-bind ((&rest parameters) &body content)
+              body
+            `(progn
+               (defmethod ,name (,@parameters) ,@content)
+               ,@(loop :for alias :in aliases-1
+                       :collect `(defmethod ,alias (,@parameters) ,@content))
+               (export-names ,name ,aliases)))))))
 
-(defmacro deft- (names (&rest parameters) &rest body)
+(defmacro deft (names &rest body)
   "Define methods with DEFMETHOD.
 
-The expressions
-
-    (deft- current ((o null))
-      \"Return T on null objects\"
-      t)
-
-    (deft- (prev next) ((o null))
-      \"Return NIL on null objects.\"
-      nil)
-
-define the methods CURRENT, PREV, and NEXT but do not export those names."
-  `(%deft ,names ,parameters ,@body))
-
-(defmacro deft (names (&rest parameters) &rest body)
-  "Define methods with DEFMETHOD.
-
-The expressions
+The forms
 
     (deft current ((o null))
       \"Return T on null objects\"
@@ -282,7 +232,11 @@ The expressions
       nil)
 
 define the methods CURRENT, PREV, and NEXT; and export those names."
-  `(%deft ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
+  `(%deft ,(append (uiop:ensure-list names) (list t)) ,@body))
+
+(defmacro deft- (names &rest body)
+  "Like DEFT, but do not export the names."
+  `(%deft ,names ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun p-symbol (symbol)
