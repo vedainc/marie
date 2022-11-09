@@ -32,7 +32,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *docstring*
-    ", and conditionally export the names.
+    ", and conditionally export the symbols.
 
 NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
     "The common docstring in the definers.")
@@ -63,7 +63,7 @@ define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro def- (names args &rest body)
-  "Like DEF, but do not export the names."
+  "Like DEF, but do not export the symbols."
   `(%def ,names ,args ,@body))
 
 (defmacro %defm (names args &rest body)
@@ -88,7 +88,7 @@ define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro defm- (names args &rest body)
-  "Like DEFM, but do not export the names."
+  "Like DEFM, but do not export the symbols."
   `(%defm ,names ,args ,@body))
 
 (defmacro %defv (names &rest body)
@@ -113,7 +113,7 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defv- (names &rest body)
-  "Like DEFV, but do not export the names."
+  "Like DEFV, but do not export the symbols."
   `(%defv ,names ,@body))
 
 (defmacro %defp (names &rest body)
@@ -138,7 +138,7 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
   `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defp- (names &rest body)
-  "Like DEFP, but do not export the names."
+  "Like DEFP, but do not export the symbols."
   `(%defp ,names ,@body))
 
 (defmacro %defk (names &rest body)
@@ -166,7 +166,7 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defk- (names &rest body)
-  "Like DEFK, but do not export the names."
+  "Like DEFK, but do not export the symbols."
   `(%defk ,names ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
@@ -194,7 +194,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defmacro defg- (names (&rest parameters) &rest body)
-  "Like DEFG, but do not export the names."
+  "Like DEFG, but do not export the symbols."
   `(%defg ,names ,parameters ,@body))
 
 (defmacro %deft (names &body body)
@@ -235,7 +235,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro deft- (names &rest body)
-  "Like DEFT, but do not export the names."
+  "Like DEFT, but do not export the symbols."
   `(%deft ,names ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
