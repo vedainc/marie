@@ -3,22 +3,25 @@
 
 (uiop:define-package #:marie/definitions
     (:use #:cl)
-  (:export #:def-
+  (:export
            #:def
-           #:defm-
+           #:def-
            #:defm
-           #:defv-
+           #:defm-
            #:defv
-           #:defp-
+           #:defv-
            #:defp
-           #:defk-
+           #:defp-
            #:defk
-           #:defg-
+           #:defk-
            #:defg
-           #:deft-
+           #:defg-
            #:deft
+           #:deft-
+           #:defc
            #:defc-
-           #:defc))
+           #:defmm
+           #:defmm-))
 
 (in-package #:marie/definitions)
 
@@ -32,9 +35,9 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *docstring*
-    ", and conditionally export the symbols.
+    ", and conditionally export NAMES.
 
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. Export the symbols if T is present in NAMES."
+NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. export NAMES if T is present in NAMES."
     "The common docstring in the definers.")
 
   (defun compose-docstring (text)
@@ -63,7 +66,7 @@ define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro def- (names args &rest body)
-  "Like DEF, but do not export the symbols."
+  "Like DEF, but do not export NAMES."
   `(%def ,names ,args ,@body))
 
 (defmacro %defm (names args &rest body)
@@ -88,7 +91,7 @@ define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro defm- (names args &rest body)
-  "Like DEFM, but do not export the symbols."
+  "Like DEFM, but do not export NAMES."
   `(%defm ,names ,args ,@body))
 
 (defmacro %defv (names &rest body)
@@ -113,7 +116,7 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defv- (names &rest body)
-  "Like DEFV, but do not export the symbols."
+  "Like DEFV, but do not export NAMES."
   `(%defv ,names ,@body))
 
 (defmacro %defp (names &rest body)
@@ -138,7 +141,7 @@ define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those n
   `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defp- (names &rest body)
-  "Like DEFP, but do not export the symbols."
+  "Like DEFP, but do not export NAMES."
   `(%defp ,names ,@body))
 
 (defmacro %defk (names &rest body)
@@ -166,7 +169,7 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defk- (names &rest body)
-  "Like DEFK, but do not export the symbols."
+  "Like DEFK, but do not export NAMES."
   `(%defk ,names ,@body))
 
 (defmacro %defg (names (&rest parameters) &body body)
@@ -194,7 +197,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
   `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
 
 (defmacro defg- (names (&rest parameters) &rest body)
-  "Like DEFG, but do not export the symbols."
+  "Like DEFG, but do not export NAMES."
   `(%defg ,names ,parameters ,@body))
 
 (defmacro %deft (names &body body)
@@ -235,7 +238,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
   `(%deft ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro deft- (names &rest body)
-  "Like DEFT, but do not export the symbols."
+  "Like DEFT, but do not export NAMES."
   `(%deft ,names ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -305,26 +308,6 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
              ,@(loop :for alias :in (remove t aliases)
                      :collect `(compose-exports ,alias))))))))
 
-(defmacro defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
-  "Define classes with DEFCLASS.
-
-The expression
-
-    (defc- (unit blank) (frame)
-      ((id :initarg :id
-           :initform -1
-           :reader id
-           :documentation \"The unique numeric ID of a hole in a registry.\")
-       (name :initarg :name
-             :initform \"\"
-             :reader name
-             :documentation \"The name of the hole.\"))
-      (:documentation \"An empty frame.\"))
-
-defines the classes UNIT and BLANK whose superclass is FRAME. In addition to that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and UNITP—predicate to test if an object is an instance of UNIT. The same is also created for BLANK. Those symbols are not exported.
-"
-  `(%defc ,names ,superclasses ,slot-specs ,class-option))
-
 (defmacro defc (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS.
 
@@ -344,3 +327,31 @@ The expression
 defines the classes UNIT and BLANK whose superclass is FRAME. In addition to that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and UNITP—predicate to test if an object is an instance of UNIT. The same is also created for BLANK. Those symbols are exported along with the names of the classes.
 "
   `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses,slot-specs ,class-option))
+
+(defmacro defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
+  "Like DEFC, but do not export NAMES."
+  `(%defc ,names ,superclasses ,slot-specs ,class-option))
+
+(defmacro %defmm (names args function &optional doc)
+  #.(compose-docstring "Define modify macros")
+  (destructuring-bind (name &rest aliases)
+      (uiop:ensure-list names)
+    `(progn
+       (define-modify-macro ,name ,args ,function ,doc)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(define-modify-macro ,alias ,args ,function ,doc))
+       (export-names ,name ,aliases))))
+
+(defmacro defmm (names args &rest body)
+  "Define modify macros with DEFINE-MODIFY-MACRO.
+
+The forms
+
+    ...
+
+define the modify macros ...; and export those names."
+  `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+
+(defmacro defmm- (names args &rest body)
+  "Like DEFMM, but do not export NAMES."
+  `(%defm ,names ,args ,@body))

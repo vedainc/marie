@@ -66,11 +66,13 @@
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
+#-lispworks
 (def true (&rest args)
   "Return true for anything."
   (declare (ignore args))
   t)
 
+#-lispworks
 (def false (&rest args)
   "Return false for anything."
   (declare (ignore args))
@@ -195,5 +197,11 @@
   (format *error-output* string)
   (finish-output *error-output*))
 
-(define-modify-macro maxf (&rest numbers) max)
-(define-modify-macro minf (&rest numbers) min)
+(defmm appendf (&rest lists) append
+  "Set the value of the first argument to the result of applying APPEND to LISTS.")
+
+(defmm maxf (&rest numbers) max
+  "Set the value of the first argument to the result of applying MAX to NUMBERS.")
+
+(defmm minf (&rest numbers) min
+  "Set the value of the first argument to the result of applying MIN to NUMBERS.")
