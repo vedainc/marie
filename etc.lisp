@@ -92,21 +92,21 @@
      ,@body
      ,@args))
 
-(def (hyphenate-string hyphenate) (&rest names)
-  "Return a new symbol from the hyphen concatenation of NAMES."
+(def hyphenate-to-string (&rest names)
+  "Return a new string from the hyphenated concatenation of NAMES."
   (format nil "~{~A~^-~}"
           (mapcar (λ (name)
                     (string-upcase (string* name)))
                   names)))
 
-(def hyphenate-intern (package &rest names)
+(def hyphenate-to-symbol (&rest names)
+  "Apply HYPHENATE to NAMES then return it as a symbol."
+  (read-from-string (apply #'hyphenate-to-string names)))
+
+(def hyphenate-to-interned-symbol (package &rest names)
   "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
   (let ((pkg (if (null package) *package* package)))
-    (intern (apply #'hyphenate-string names) (find-package pkg))))
-
-(def hyphenate-symbol (&rest names)
-  "Apply hyphenate to names then return it as a symbol."
-  (read-from-string (apply #'hyphenate-string names)))
+    (intern (apply #'hyphenate-to-string names) (find-package pkg))))
 
 (def show-table (table)
   "Print the contents of hash table TABLE."
