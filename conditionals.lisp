@@ -3,7 +3,8 @@
 
 (uiop:define-package #:marie/conditionals
   (:use #:cl
-        #:marie/definitions)
+        #:marie/definitions
+        #:marie/symbols)
   (:export #:it))
 
 (in-package #:marie/conditionals)
@@ -115,3 +116,11 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   'MARIE/CONDITIONALS::IT)
 
 (set-macro-character #\α #'alpha-reader)
+
+(defm (simple-if sif) (test-form then-form)
+  "Call IF such that (SIF X Y) = (IF X X Y)"
+  (with-gensyms (value)
+    `(let ((,value ,test-form))
+       (if ,value
+           ,value
+           ,then-form))))

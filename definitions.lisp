@@ -37,7 +37,9 @@
   (defvar *docstring*
     ", and conditionally export NAMES.
 
-NAMES is either a single symbol, or a list of symbols where the first element is the name of the function and the rest are aliases. export NAMES if T is present in NAMES."
+NAMES is either a single symbol, or a list of symbols where the first element is
+the name of the function and the rest are aliases. export NAMES if T is present
+in NAMES."
     "The common docstring in the definers.")
 
   (defun compose-docstring (text)
@@ -112,7 +114,8 @@ The forms
     (defv *grault* nil \"The grault.\")
     (defv (*garply* *waldo*) nil \"Like grault.\")
 
-define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
+names."
   `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defv- (names &rest body)
@@ -137,7 +140,8 @@ The forms
     (defp *grault* nil \"The grault.\")
     (defp (*garply* *waldo*) nil \"Like grault.\")
 
-define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those names."
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
+names."
   `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
 
 (defmacro defp- (names &rest body)
@@ -251,7 +255,8 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
           (read-from-string (format nil "~{~A~^-~}P" split)))))
 
   (defun compose-name (predicate &rest names)
-    "Compose a hyphenated symbol from NAMES. Return a symbol for predicate use if PREDICATE is true."
+    "Compose a hyphenated symbol from NAMES. Return a symbol for predicate use
+if PREDICATE is true."
     (let ((val (read-from-string
                 (format nil "~{~A~^-~}"
                         (mapcar (lambda (name)
@@ -311,7 +316,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 (defmacro defc (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS.
 
-The expression
+The form
 
     (defc (unit blank) (frame)
       ((id :initarg :id
@@ -324,9 +329,13 @@ The expression
              :documentation \"The name of the hole.\"))
       (:documentation \"An empty frame.\"))
 
-defines the classes UNIT and BLANK whose superclass is FRAME. In addition to that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and UNITP—predicate to test if an object is an instance of UNIT. The same is also created for BLANK. Those symbols are exported along with the names of the classes.
+defines the classes UNIT and BLANK whose superclass is FRAME. In addition to
+that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and
+UNITP—predicate to test if an object is an instance of UNIT. The same is also
+created for BLANK. Those symbols are exported along with the names of the
+classes.
 "
-  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses,slot-specs ,class-option))
+  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses ,slot-specs ,class-option))
 
 (defmacro defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Like DEFC, but do not export NAMES."
