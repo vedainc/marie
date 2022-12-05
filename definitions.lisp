@@ -359,8 +359,8 @@ The forms
     ...
 
 define the modify macros ...; and export those names."
-  `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+  `(%defmm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
 
 (defmacro defmm- (names args &rest body)
   "Like DEFMM, but do not export NAMES."
-  `(%defm ,names ,args ,@body))
+  `(%defmm ,names ,args ,@body))
