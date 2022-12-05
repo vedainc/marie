@@ -1,5 +1,5 @@
 ;;;; conditionals.lisp
-;;;; Utilities for handling conditional expressions
+;;;; utilities for handling conditional expressions
 
 (uiop:define-package #:marie/conditionals
   (:use #:cl
@@ -117,7 +117,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 
 (set-macro-character #\α #'alpha-reader)
 
-(defm (simple-if sif) (test-form then-form)
+(defm (special-if sif) (test-form then-form)
   "Call IF such that (SIF X Y) = (IF X X Y)"
   (with-gensyms (value)
     `(let ((,value ,test-form))

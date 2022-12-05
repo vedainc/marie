@@ -1,5 +1,5 @@
 ;;;; reader.lisp
-;;;; Minor tweaks to the Lisp reader
+;;;; minor tweaks to the lisp reader
 
 (uiop:define-package #:marie/reader
     (:use #:cl

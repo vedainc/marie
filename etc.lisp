@@ -1,5 +1,5 @@
 ;;;; etc.lisp
-;;;; Utilities that don't fit elsewhere
+;;;; utilities that don't fit elsewhere
 
 (uiop:define-package #:marie/etc
     (:use #:cl

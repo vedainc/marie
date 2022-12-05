@@ -1,4 +1,5 @@
 ;;;; symbols.lisp
+;;;; utilities for dealing with symbols
 
 (uiop:define-package #:marie/symbols
   (:use #:cl

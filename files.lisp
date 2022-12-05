@@ -1,5 +1,5 @@
 ;;;; files.lisp
-;;;; Utilities for dealing with disk files
+;;;; utilities for dealing with disk files
 
 (uiop:define-package #:marie/files
   (:use #:cl

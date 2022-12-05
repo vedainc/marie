@@ -1,5 +1,5 @@
-;;;; defs.lisp
-;;;; Exporting replacements for functions and macros that create definitions and bindings
+;;;; definitions.lisp
+;;;; exporting replacements for functions and macros
 
 (uiop:define-package #:marie/definitions
     (:use #:cl)
