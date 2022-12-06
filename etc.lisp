@@ -46,6 +46,17 @@
           :do (setf (gethash key table) value)
           :finally (return table))))
 
+(def table-to-alist (hash-table &key sort key)
+  "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
+be used by SORT with KEY being the key that will be used for sorting."
+  (let ((alist))
+    (maphash #'(lambda (key val)
+                 (push `(,key . ,val) alist))
+             hash-table)
+    (if sort
+        (sort alist sort :key key)
+        alist)))
+
 (def (home ~) (path)
   "Return a path relative to the home directory."
   (uiop:subpathname (user-homedir-pathname) path))
