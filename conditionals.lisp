@@ -116,11 +116,3 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   'MARIE/CONDITIONALS::IT)
 
 (set-macro-character #\α #'alpha-reader)
-
-(defm (special-if sif) (test-form then-form)
-  "Call IF such that (SIF X Y) = (IF X X Y)"
-  (with-gensyms (value)
-    `(let ((,value ,test-form))
-       (if ,value
-           ,value
-           ,then-form))))
