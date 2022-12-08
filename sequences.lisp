@@ -342,3 +342,8 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
 (define-modify-macro delete-from-plistf (&rest keys)
   delete-from-plist
   "Modify macro for DELETE-FROM-PLIST.")
+
+(def make-empty-list (object)
+  "Return an empty list from OBJECT."
+  (let ((length (length object)))
+    (make-list length :initial-element nil)))
