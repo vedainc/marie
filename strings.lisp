@@ -13,34 +13,34 @@
   "Return true if STRING is of length zero."
   (zerop (length string)))
 
-(def string* (value)
-  "Return VALUE as a string."
-  (etypecase value
-    (number (format nil "~A" value))
-    (cons (format nil "(~{~A~^ ~})" value))
-    (string value)
-    (t (string value))))
+(def string* (object)
+  "Return OBJECT as a string."
+  (etypecase object
+    (number (format nil "~A" object))
+    (cons (format nil "(~{~A~^ ~})" object))
+    (string object)
+    (t (string object))))
 
-(def cat (&rest args)
+(def (concat cat) (&rest args)
   "Concatenate ARGS to a string."
   (let ((value (loop :for arg :in args :collect (string* arg))))
     (apply #'concatenate 'string value)))
 
-(def red-cat (&rest args)
-  "Reduce ARGS with CAT."
+(def (reduce-concat red-cat) (&rest args)
+  "Reduce ARGS with CONCAT."
   (flet ((fn (arg)
-             (reduce #'cat arg)))
+             (reduce #'concat arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
 
-(def cat-intern (package &rest args)
+(def (intern-concat int-cat) (package &rest args)
   "Concatenate ARGS to a string then intern it to the current package."
   (let ((p (if (null package) *package* package)))
-    (intern (apply #'cat args) (find-package p))))
+    (intern (apply #'concat args) (find-package p))))
 
 (def string-list (string)
-  "Create a list from STRiNG."
+  "Create a list from STRING."
   (loop :for char :across string :collect char))
 
 (def normalize-strings (list &key (character #\_))
