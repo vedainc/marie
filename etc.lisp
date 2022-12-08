@@ -35,7 +35,7 @@
   "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
-(def copy-table (hash-table)
+(def (copy-table copyhash) (hash-table)
   "Return a new hash table from HASH-TABLE."
   (let ((table (make-hash-table :test (hash-table-test hash-table)
                                 :rehash-size (hash-table-rehash-size hash-table)
@@ -46,14 +46,14 @@
           :do (setf (gethash key table) value)
           :finally (return table))))
 
-(def table-to-alist (hash-table &key sort key)
+(def (list-table listhash) (hash-table &key sort key)
   "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
 be used by SORT with KEY being the key that will be used for sorting."
   (let ((alist))
     (maphash #'(lambda (key val)
                  (push `(,key . ,val) alist))
              hash-table)
-    (if sort
+    (if (and sort key)
         (sort alist sort :key key)
         alist)))
 
@@ -214,3 +214,10 @@ be used by SORT with KEY being the key that will be used for sorting."
 
 (defmm minf (&rest numbers) min
   "Set the value of the first argument to the result of applying MIN to NUMBERS.")
+
+(defm defselectors (prefix count)
+  "Define list selectors prefixed with PREFIX that will act as sequence accessors."
+  `(progn
+     ,@(loop :for n :from 0 :to count
+             :for name = (read-from-string (concat prefix (write-to-string n)))
+             :collect `(def ,name (list) (elt list ,n)))))
