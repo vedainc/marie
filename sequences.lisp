@@ -318,7 +318,7 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
         :unless (member key keys :test #'eq)
         :collect key :and :collect (first rest)))
 
-(define-modify-macro remove-from-plistf (&rest keys)
+(defmm remove-from-plistf (&rest keys)
   remove-from-plist
   "Modify macro for REMOVE-FROM-PLIST.")
 
@@ -339,7 +339,7 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
                 (setf tail rest))
         :finally (return head)))
 
-(define-modify-macro delete-from-plistf (&rest keys)
+(defmm delete-from-plistf (&rest keys)
   delete-from-plist
   "Modify macro for DELETE-FROM-PLIST.")
 
