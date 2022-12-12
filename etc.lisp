@@ -2,10 +2,10 @@
 ;;;; utilities that don't fit elsewhere
 
 (uiop:define-package #:marie/etc
-    (:use #:cl
-          #:marie/definitions
-          #:marie/sequences
-          #:marie/strings))
+  (:use #:cl
+        #:marie/definitions
+        #:marie/sequences
+        #:marie/strings))
 
 (in-package #:marie/etc)
 
