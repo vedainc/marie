@@ -2,7 +2,7 @@
 ;;;; exporting replacements for functions, macros, and other things
 
 (uiop:define-package #:marie/definitions
-    (:use #:cl)
+  (:use #:cl)
   (:export #:defm #:defm-))
 
 (in-package #:marie/definitions)

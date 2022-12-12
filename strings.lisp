@@ -2,10 +2,10 @@
 ;;;; utilities for dealing with strings
 
 (uiop:define-package #:marie/strings
-    (:use #:cl
-          #:marie/definitions
-          #:marie/sequences
-          #:marie/conditionals))
+  (:use #:cl
+        #:marie/definitions
+        #:marie/sequences
+        #:marie/conditionals))
 
 (in-package #:marie/strings)
 
