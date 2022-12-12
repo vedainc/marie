@@ -2,9 +2,9 @@
 ;;;; utilities for dealing with sequences
 
 (uiop:define-package #:marie/sequences
-    (:use #:cl
-          #:marie/definitions
-          #:marie/conditionals))
+  (:use #:cl
+        #:marie/definitions
+        #:marie/conditionals))
 
 (in-package #:marie/sequences)
 
