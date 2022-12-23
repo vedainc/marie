@@ -184,14 +184,22 @@ and the length of each list as the value."
   "Apply APPEND to the result of applying FN to sequence1 and sequence2."
   (append (mapcar fn sequence1) (mapcar fn sequence2)))
 
-(def map-nappend (fn sequence1 sequence2)
+(def map-nconc (fn sequence1 sequence2)
   "Apply NCONC to the result of applying FN to sequence1 and sequence2."
   (nconc (mapcar fn sequence1) (mapcar fn sequence2)))
 
-(def red-append (&rest args)
+(def (reduce-append red-append) (&rest args)
   "Reduce ARGS with APPEND."
   (flet ((fn (arg)
              (reduce #'append arg)))
+    (if (length= args 1)
+        (fn (car args))
+        (fn args))))
+
+(def (reduce-nconc red-nconc) (&rest args)
+  "Reduce ARGS with NCONC."
+  (flet ((fn (arg)
+             (reduce #'nconc arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
