@@ -1,5 +1,5 @@
-;;;; sequences.lisp
-;;;; utilities for dealing with sequences
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; sequences.lisp: utilities for dealing with sequences
 
 (uiop:define-package #:marie/sequences
   (:use #:cl

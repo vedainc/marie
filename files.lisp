@@ -1,5 +1,5 @@
-;;;; files.lisp
-;;;; utilities for dealing with disk files
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; files.lisp: utilities for dealing with disk files
 
 (uiop:define-package #:marie/files
   (:use #:cl

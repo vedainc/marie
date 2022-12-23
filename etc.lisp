@@ -1,5 +1,5 @@
-;;;; etc.lisp
-;;;; utilities that don't fit elsewhere
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; etc.lisp:  utilities that don’t fit elsewhere
 
 (uiop:define-package #:marie/etc
   (:use #:cl
