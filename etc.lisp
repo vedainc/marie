@@ -221,3 +221,15 @@ be used by SORT with KEY being the key that will be used for sorting."
      ,@(loop :for n :from 0 :to count
              :for name = (read-from-string (concat prefix (write-to-string n)))
              :collect `(def ,name (list) (elt list ,n)))))
+
+(defm debug! ()
+  "Enable compiler options for maximum debug settings."
+  (declaim (optimize (debug 3) (safety 0) (speed 0))))
+
+(defm safety! ()
+  "Enable compiler options for maximum safety options."
+  (declaim (optimize (debug 0) (safety 3) (speed 0))))
+
+(defm speed! ()
+  "Enable compiler options for maximum safety options."
+  (declaim (optimize (debug 0) (safety 0) (speed 3))))
