@@ -346,3 +346,8 @@ define the modify macros ...; and export those names."
 (defm defmm- (names args &rest body)
   "Like DEFMM, but do not export NAMES."
   `(%defmm ,names ,args ,@body))
+
+(defm let1 ((name value) &rest body)
+  "Like LET but for single values only."
+  `(let ((,name ,value))
+     ,@body))
