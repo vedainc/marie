@@ -231,5 +231,5 @@ be used by SORT with KEY being the key that will be used for sorting."
   (declaim (optimize (debug 0) (safety 3) (speed 0))))
 
 (defm speed! ()
-  "Enable compiler options for maximum safety options."
+  "Enable compiler options for maximum speed options."
   (declaim (optimize (debug 0) (safety 0) (speed 3))))
