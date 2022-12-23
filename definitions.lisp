@@ -1,5 +1,5 @@
-;;;; definitions.lisp
-;;;; exporting replacements for functions, macros, and other things
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; definitions.lisp: exporting replacements for functions, macros, and other things
 
 (uiop:define-package #:marie/definitions
   (:use #:cl)

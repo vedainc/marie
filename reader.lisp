@@ -1,5 +1,5 @@
-;;;; reader.lisp
-;;;; minor tweaks to the lisp reader
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; reader.lisp: minor tweaks to the lisp reader
 
 (uiop:define-package #:marie/reader
   (:use #:cl
