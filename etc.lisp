@@ -222,14 +222,18 @@ be used by SORT with KEY being the key that will be used for sorting."
              :for name = (read-from-string (concat prefix (write-to-string n)))
              :collect `(def ,name (list) (elt list ,n)))))
 
-(defm debug! ()
-  "Enable compiler options for maximum debug settings."
-  (declaim (optimize (debug 3) (safety 0) (speed 0))))
-
-(defm safety! ()
+(defm optimize-safety ()
   "Enable compiler options for maximum safety options."
-  (declaim (optimize (debug 0) (safety 3) (speed 0))))
+  (declaim (optimize (safety 3) (debug 3) (speed 0))))
 
-(defm speed! ()
+(defm optimize-speed ()
   "Enable compiler options for maximum speed options."
-  (declaim (optimize (debug 0) (safety 0) (speed 3))))
+  (declaim (optimize (safety 1) (debug 3) (speed 3) )))
+
+(defm optimize-speed-unsafe ()
+  "Enable compiler options for maximum speed options."
+  (declaim (optimize (safety 0) (debug 3) (speed 3))))
+
+(defm optimize-debug ()
+  "Enable compiler options for maximum debug settings."
+  (declaim (optimize (speed 1) (debug 3) (safety 1))))
