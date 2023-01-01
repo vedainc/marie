@@ -110,3 +110,13 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
                (let ((it ,symbol)) ,@(cdr clause))
                (acond ,@(cdr clauses)))))))
 
+(def- alpha-reader (stream char)
+  "Define the reader for α, so that it can be used to refer to the anaphora."
+  (declare (ignore stream char))
+  'MARIE/CONDITIONALS::IT)
+
+(def- use-alpha-reader ()
+  "Put the alpha reader into effect."
+  (set-macro-character #\α #'alpha-reader))
+
+(use-alpha-reader)
