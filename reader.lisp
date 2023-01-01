@@ -47,7 +47,9 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (declare (ignore stream char))
   'LAMBDA)
 
-(set-macro-character #\λ #'lambda-reader)
+(def- use-lambda-reader ()
+  "Put the lambda reader into effect."
+  (set-macro-character #\λ #'lambda-reader))
 
 (def- dollar-reader (stream char)
   (declare (ignore char))
@@ -56,3 +58,5 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
 (def use-dollar-reader ()
   "Put the dollar reader into effect."
   (set-macro-character #\$ #'dollar-reader))
+
+(use-lambda-reader)
