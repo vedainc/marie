@@ -29,17 +29,17 @@
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
 
-(defm (logical-and ∧) (&body body)
+(defm logical-and◆∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
   `(when (and ,@body)
      t))
 
-(defm (logical-or ∨) (&body body)
+(defm logical-or◆∨ (&body body)
   "Return true if at least one form in BODY evaluates to true."
   `(when (or ,@body)
      t))
 
-(defm (negation neg ¬) (arg)
+(defm negation◆neg◆¬ (arg)
   "Return the negation of ARG."
   (let ((value (gensym)))
     `(let ((,value ,arg))
