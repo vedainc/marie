@@ -11,9 +11,8 @@
   (defvar *docstring*
     ", and conditionally export NAMES.
 
-NAMES is either a single symbol, or a list of symbols where the first element is
-the name of the function and the rest are aliases. export NAMES if T is present
-in NAMES."
+NAMES are symbols separated by ◆, where the first element is the name of the
+function and the rest are aliases. Export NAMES if T is present in NAMES."
     "The common docstring in the definers.")
 
   (defvar *name-separator*
@@ -65,7 +64,7 @@ in NAMES."
 The forms
 
     (defm qux (op) `(progn (,op 1)))
-    (defm (quux corge) (op) `(progn (,op 2)))
+    (defm quux◆corge (op) `(progn (,op 2)))
 
 define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(tack-t names) ,args ,@body))
@@ -320,7 +319,7 @@ if PREDICATE is true."
 
 The form
 
-    (defc unitxblank (frame)
+    (defc unit◆blank (frame)
       ((id :initarg :id
            :initform -1
            :reader id
