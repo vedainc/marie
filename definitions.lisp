@@ -16,9 +16,30 @@ the name of the function and the rest are aliases. export NAMES if T is present
 in NAMES."
     "The common docstring in the definers.")
 
+  (defvar *name-separator*
+    '(#\◆)
+    "The list of characters used to separate names and aliases in definitions.")
+
   (defun compose-docstring (text)
     "Return a docstring suitable for a definer."
-    (format nil "~A~A" text *docstring*)))
+    (format nil "~A~A" text *docstring*))
+
+  (defun string-empty-p (string)
+    "Return true if STRING is empty."
+    (= (length string) 0))
+
+  (defun split-names (names)
+    "Split NAMES by delimiters."
+    (let* ((string (string names))
+           (split (uiop:split-string string :separator *name-separator*))
+           (strings (remove-if #'string-empty-p split)))
+      (mapcar #'read-from-string strings)))
+
+  (defun tack-t (names)
+    "Concatename `◆t' to names."
+    (let ((separator (string (first *name-separator*)))
+          (string (string names)))
+      (read-from-string (uiop:strcat string separator "t")))))
 
 (defmacro export-names (name aliases)
   "Return a stub for exporting names in definers."
@@ -26,12 +47,12 @@ in NAMES."
      (progn
        (export ',name)
        ,@(loop :for alias :in (remove t aliases)
-               :collect `(export ',alias))))  )
+               :collect `(export ',alias)))))
 
 (defmacro %defm (names args &rest body)
   #.(compose-docstring "Define macros")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (defmacro ,name ,args ,@body)
        ,@(loop :for alias :in (remove t aliases)
@@ -47,7 +68,7 @@ The forms
     (defm (quux corge) (op) `(progn (,op 2)))
 
 define the macros QUX, QUUX, and CORGE; and export those names."
-  `(%defm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+  `(%defm ,(tack-t names) ,args ,@body))
 
 (defmacro defm- (names args &rest body)
   "Like DEFM, but do not export NAMES."
@@ -56,7 +77,7 @@ define the macros QUX, QUUX, and CORGE; and export those names."
 (defm- %def (names args &rest body)
   #.(compose-docstring "Define functions")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (defun ,name ,args ,@body)
        ,@(loop :for alias :in (remove t aliases)
@@ -69,10 +90,10 @@ define the macros QUX, QUUX, and CORGE; and export those names."
 The forms
 
     (def foo (n) (1- n))
-    (def (bar baz) (n) (+ n 1))
+    (def bar◆baz (n) (+ n 1))
 
 define the functions FOO, BAR, and BAZ; and export those names."
-  `(%def ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+  `(%def ,(tack-t names) ,args ,@body))
 
 (defm def- (names args &rest body)
   "Like DEF, but do not export NAMES."
@@ -81,7 +102,7 @@ define the functions FOO, BAR, and BAZ; and export those names."
 (defm- %defv (names &rest body)
   #.(compose-docstring "Define special variables with DEFVAR")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (defvar ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
@@ -94,11 +115,11 @@ define the functions FOO, BAR, and BAZ; and export those names."
 The forms
 
     (defv *grault* nil \"The grault.\")
-    (defv (*garply* *waldo*) nil \"Like grault.\")
+    (defv *garply*◆*waldo* nil \"Like grault.\")
 
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
 names."
-  `(%defv ,(append (uiop:ensure-list names) (list t)) ,@body))
+  `(%defv ,(tack-t names) ,@body))
 
 (defm defv- (names &rest body)
   "Like DEFV, but do not export NAMES."
@@ -107,7 +128,7 @@ names."
 (defm- %defp (names &rest body)
   #.(compose-docstring "Define special variables with DEFPARAMETER")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (defparameter ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
@@ -120,11 +141,11 @@ names."
 The forms
 
     (defp *grault* nil \"The grault.\")
-    (defp (*garply* *waldo*) nil \"Like grault.\")
+    (defp *garply*◆*waldo* nil \"Like grault.\")
 
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
 names."
-  `(%defp ,(append (uiop:ensure-list names) (list t)) ,@body))
+  `(%defp ,(tack-t names) ,@body))
 
 (defm defp- (names &rest body)
   "Like DEFP, but do not export NAMES."
@@ -132,16 +153,15 @@ names."
 
 (defm- %defk (names &rest body)
   #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
-  (let ((id (if (consp names) names (list names))))
-    (destructuring-bind (name &rest aliases)
-        id
-      `(handler-bind
-           #+sbcl ((sb-ext:defconstant-uneql #'continue))
-         #-sbcl ((simple-error #'continue))
-         (defconstant ,name ,@body)
-         ,@(loop :for alias :in (remove t aliases)
-                 :collect `(defconstant ,alias ,@body))
-         (export-names ,name ,aliases)))))
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    `(handler-bind
+         #+sbcl ((sb-ext:defconstant-uneql #'continue))
+       #-sbcl ((simple-error #'continue))
+       (defconstant ,name ,@body)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(defconstant ,alias ,@body))
+       (export-names ,name ,aliases))))
 
 (defm defk (names &rest body)
   "Define constants with %DEFK.
@@ -149,10 +169,10 @@ names."
 The forms
 
     (defk +fred+ nil \"The Fred constant.\")
-    (defk (+plugh+ +xyzzy+) nil \"Like Fred.\")
+    (defk +plugh+◆+xyzzy+ nil \"Like Fred.\")
 
 define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
-  `(%defk ,(append (uiop:ensure-list names) (list t)) ,@body))
+  `(%defk ,(tack-t names) ,@body))
 
 (defm defk- (names &rest body)
   "Like DEFK, but do not export NAMES."
@@ -161,7 +181,7 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
 (defm- %defg (names (&rest parameters) &body body)
   #.(compose-docstring "Define generic functions")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (defgeneric ,name (,@parameters) ,@body)
        ,@(loop :for alias :in (remove t aliases)
@@ -176,11 +196,11 @@ The forms
     (defg delete (volume registry)
       (:documentation \"Delete VOLUME in REGISTRY.\"))
 
-    (defg (create update) (volume registry)
+    (defg create◆update (volume registry)
       (:documentation \"Update VOLUME in REGISTRY.\"))
 
 define the generic functions DELETE, CREATE, and UPDATE; and export those names."
-  `(%defg ,(append (uiop:ensure-list names) (list t)) ,parameters ,@body))
+  `(%defg ,(tack-t names) ,parameters ,@body))
 
 (defm defg- (names (&rest parameters) &rest body)
   "Like DEFG, but do not export NAMES."
@@ -189,7 +209,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
 (defm- %deft (names &body body)
   #.(compose-docstring "Define methods with DEFMETHOD")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     (let ((aliases-1 (remove t aliases)))
       (if (keywordp (first body))
           (destructuring-bind (type (&rest parameters) &body content)
@@ -216,12 +236,12 @@ The forms
       \"Return T on null objects\"
       t)
 
-    (deft (prev next) ((o null))
+    (deft prev◆next ((o null))
       \"Return NIL on null objects.\"
       nil)
 
 define the methods CURRENT, PREV, and NEXT; and export those names."
-  `(%deft ,(append (uiop:ensure-list names) (list t)) ,@body))
+  `(%deft ,(tack-t names) ,@body))
 
 (defm deft- (names &rest body)
   "Like DEFT, but do not export NAMES."
@@ -274,7 +294,7 @@ if PREDICATE is true."
                  (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     (let ((exports (mapcan (lambda (spec)
                              (let ((name (or (getf (cdr spec) :accessor)
                                              (getf (cdr spec) :reader)
@@ -300,7 +320,7 @@ if PREDICATE is true."
 
 The form
 
-    (defc (unit blank) (frame)
+    (defc unitxblank (frame)
       ((id :initarg :id
            :initform -1
            :reader id
@@ -312,12 +332,12 @@ The form
       (:documentation \"An empty frame.\"))
 
 defines the classes UNIT and BLANK whose superclass is FRAME. In addition to
-that, it creates MAKE-UNIT—instantiator for UNIT much like with DEFSTRUCT; and
-UNITP—predicate to test if an object is an instance of UNIT. The same is also
+that, it creates MAKE-UNIT◆instantiator for UNIT much like with DEFSTRUCT; and
+UNITP◆predicate to test if an object is an instance of UNIT. The same is also
 created for BLANK. Those symbols are exported along with the names of the
 classes.
 "
-  `(%defc ,(append (uiop:ensure-list names) (list t)) ,superclasses ,slot-specs ,class-option))
+  `(%defc ,(tack-t names) ,superclasses ,slot-specs ,class-option))
 
 (defm defc- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Like DEFC, but do not export NAMES."
@@ -326,7 +346,7 @@ classes.
 (defmacro %defmm (names args function &optional doc)
   #.(compose-docstring "Define modify macros")
   (destructuring-bind (name &rest aliases)
-      (uiop:ensure-list names)
+      (split-names names)
     `(progn
        (define-modify-macro ,name ,args ,function ,doc)
        ,@(loop :for alias :in (remove t aliases)
@@ -341,13 +361,13 @@ The forms
     ...
 
 define the modify macros ...; and export those names."
-  `(%defmm ,(append (uiop:ensure-list names) (list t)) ,args ,@body))
+  `(%defmm ,(tack-t names) ,args ,@body))
 
 (defm defmm- (names args &rest body)
   "Like DEFMM, but do not export NAMES."
   `(%defmm ,names ,args ,@body))
 
-(defm (with-binding let1) ((name value) &rest body)
+(defm with-binding◆let1 ((name value) &rest body)
   "Like LET but for single values only."
   `(let ((,name ,value))
      ,@body))
