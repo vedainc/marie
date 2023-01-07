@@ -7,29 +7,29 @@
 
 (in-package #:marie/reader)
 
-(def- bracket-reader (stream char)
-  "Use [+ _ 1] as a shorthand for #'(lambda (_) (+ _ 1))
+(def- brace-reader (stream char)
+  "Use {+ _ 1} as a shorthand for #'(lambda (_) (+ _ 1))
 See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
   (declare (ignore char))
   `(lambda (,(intern "_") &optional ,(intern "__"))
      (declare (ignorable ,(intern "__")))
-     ,(read-delimited-list #\] stream t)))
-
-(def use-bracket-reader ()
-  "Put the bracket reader into effect."
-  (set-macro-character #\[ #'bracket-reader)
-  (set-macro-character #\] (get-macro-character #\) nil)))
-
-(def- brace-reader (stream char)
-  "Use {foo 5} as a shorthand for (funcall foo 5)
-See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
-  (declare (ignore char))
-  `(funcall ,@(read-delimited-list #\} stream t)))
+     ,(read-delimited-list #\} stream t)))
 
 (def use-brace-reader ()
   "Put the brace reader into effect."
   (set-macro-character #\{ #'brace-reader)
   (set-macro-character #\} (get-macro-character #\) nil)))
+
+(def- bracket-reader (stream char)
+  "Use {foo 5} as a shorthand for (funcall foo 5)
+See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
+  (declare (ignore char))
+  `(funcall ,@(read-delimited-list #\] stream t)))
+
+(def use-bracket-reader ()
+  "Put the bracket reader into effect."
+  (set-macro-character #\[ #'bracket-reader)
+  (set-macro-character #\] (get-macro-character #\) nil)))
 
 (defm with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."
@@ -59,14 +59,5 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   "Put the dollar reader into effect."
   (set-macro-character #\$ #'dollar-reader))
 
-(def- alpha-reader (stream char)
-  "Define the reader for α, so that it can be used to refer to the anaphora."
-  (declare (ignore stream char))
-  'MARIE/CONDITIONALS::IT)
-
-(def- use-alpha-reader ()
-  "Put the alpha reader into effect."
-  (set-macro-character #\α #'alpha-reader))
-
 (use-lambda-reader)
-(use-alpha-reader)
+(use-bracket-reader)
