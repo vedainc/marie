@@ -59,4 +59,14 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   "Put the dollar reader into effect."
   (set-macro-character #\$ #'dollar-reader))
 
+(def- alpha-reader (stream char)
+  "Define the reader for α, so that it can be used to refer to the anaphora."
+  (declare (ignore stream char))
+  'MARIE/CONDITIONALS::IT)
+
+(def- use-alpha-reader ()
+  "Put the alpha reader into effect."
+  (set-macro-character #\α #'alpha-reader))
+
 (use-lambda-reader)
+(use-alpha-reader)
