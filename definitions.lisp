@@ -331,8 +331,8 @@ The form
       (:documentation \"An empty frame.\"))
 
 defines the classes UNIT and BLANK whose superclass is FRAME. In addition to
-that, it creates MAKE-UNIT◆instantiator for UNIT much like with DEFSTRUCT; and
-UNITP◆predicate to test if an object is an instance of UNIT. The same is also
+that, it creates MAKE-UNIT instantiator for UNIT much like with DEFSTRUCT; and
+UNITP predicate to test if an object is an instance of UNIT. The same is also
 created for BLANK. Those symbols are exported along with the names of the
 classes.
 "
@@ -342,7 +342,7 @@ classes.
   "Like DEFC, but do not export NAMES."
   `(%defc ,names ,superclasses ,slot-specs ,class-option))
 
-(defmacro %defmm (names args function &optional doc)
+(defm %defmm (names args function &optional doc)
   #.(compose-docstring "Define modify macros")
   (destructuring-bind (name &rest aliases)
       (split-names names)
