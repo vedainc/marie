@@ -1,6 +1,8 @@
-# ignore files
-
-*.*fas*
-
-.DS_Store
 *~
+*.*fas*
+*.html
+*.pdf
+*.org
+*.org*
+.DS_Store
+/scratch.lisp

@@ -330,11 +330,8 @@ The form
              :documentation \"The name of the hole.\"))
       (:documentation \"An empty frame.\"))
 
-defines the classes UNIT and BLANK whose superclass is FRAME. In addition to
-that, it creates MAKE-UNIT instantiator for UNIT much like with DEFSTRUCT; and
-UNITP predicate to test if an object is an instance of UNIT. The same is also
-created for BLANK. Those symbols are exported along with the names of the
-classes.
+defines the classes UNIT and BLANK whose superclasses are FRAME. Those symbols are
+exported along with the names of the classes.
 "
   `(%defc ,(tack-t names) ,superclasses ,slot-specs ,class-option))
 
@@ -370,3 +367,24 @@ define the modify macros ...; and export those names."
   "Like LET but for single values only."
   `(let ((,name ,value))
      ,@body))
+
+(defm defn (names (&rest superclasses) (&rest slot-specs) &optional class-option)
+  "Define condition classes with DEFINE-CONDITION.
+
+The form
+
+    (defn foo-error◆bar-error (error)
+      ((name :initarg :name
+             :initform \"\"
+             :reader name
+             :documentation \"The name of the error.\"))
+      (:documentation \"A simple error.\"))
+
+defines the condition classes foo-error and bar-error superclasses is ERROR.
+Those symbols are exported along with the names of the classes.
+"
+  `(%defc ,(tack-t names) ,superclasses ,slot-specs ,class-option))
+
+(defm defn- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
+  "Like DEFN, but do not export NAMES."
+  `(%defc ,names ,superclasses ,slot-specs ,class-option))
