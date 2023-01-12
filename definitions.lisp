@@ -365,6 +365,30 @@ define the modify macros ...; and export those names."
   "Like DEFMM, but do not export NAMES."
   `(%defmm ,names ,args ,@body))
 
+(defm %defsm (names expansion)
+  #.(compose-docstring "Define symbol macros")
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    `(progn
+       (define-symbol-macro ,name ,expansion)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(define-symbol-macro ,alias ,expansion))
+       (export-names ,name ,aliases))))
+
+(defm defsm (names expansion)
+  "Define symbol macros with DEFINE-SYMBOL-MACRO.
+
+The forms
+
+    ...
+
+define the symbol macros ...; and export those names."
+  `(%defsm ,(tack-t names) ,expansion))
+
+(defm defsm- (names expansion)
+  "Like DEFSM, but do not export NAMES."
+  `(%defsm ,names ,expansion))
+
 (defm with-binding◆let1 ((name value) &rest body)
   "Like LET but for single values only."
   `(let ((,name ,value))
@@ -415,3 +439,28 @@ Those symbols are exported along with the names of the classes.
 (defm defn- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Like DEFN, but do not export NAMES."
   `(%defn ,names ,superclasses ,slot-specs ,class-option))
+
+(defm- %defy (names args &rest body)
+  #.(compose-docstring "Define types")
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    `(progn
+       (deftype ,name ,args ,@body)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(deftype ,alias ,args ,@body))
+       (export-names ,name ,aliases))))
+
+(defm defy (names args &rest body)
+  "Define types with DEFTYPE.
+
+The forms
+
+    (defy foo (type size) `(and (array ,type (,size ,size))))
+    (defm bar◆baz (type size) `(and (array ,type (,size ,size))))
+
+define the types FOO, BAR, and BAZ; and exports those names."
+  `(%defy ,(tack-t names) ,args ,@body))
+
+(defm defy- (names args &rest body)
+  "Like DEFY, but do not export NAMES."
+  `(%defy ,names ,args ,@body))
