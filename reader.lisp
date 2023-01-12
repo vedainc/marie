@@ -60,4 +60,3 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (set-macro-character #\$ #'dollar-reader))
 
 (use-lambda-reader)
-(use-bracket-reader)
