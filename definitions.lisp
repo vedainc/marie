@@ -267,10 +267,11 @@ if PREDICATE is true."
           (p-symbol val)
           val))))
 
-(defm- compose-definitions (name superclasses slot-specs &optional class-option)
+(defm- compose-definitions (type name superclasses slot-specs
+                            &optional class-option)
   "Compose the forms for creating a class."
   `(progn
-     (defclass ,name (,@superclasses)
+     (,type ,name (,@superclasses)
        ,@(append (list slot-specs)
           (when class-option
             (list class-option))))
@@ -301,10 +302,11 @@ if PREDICATE is true."
                                (when name (list name))))
                            slot-specs)))
       `(progn
-         (compose-definitions ,name ,superclasses
+         (compose-definitions defclass ,name ,superclasses
                               ,slot-specs ,class-option)
          ,@(loop :for alias :in (remove t aliases)
-                 :collect `(compose-definitions ,alias ,superclasses
+                 :collect `(compose-definitions defclass
+                                                ,alias ,superclasses
                                                 ,slot-specs ,class-option))
          (when (member t ',aliases)
            (progn
@@ -368,8 +370,33 @@ define the modify macros ...; and export those names."
   `(let ((,name ,value))
      ,@body))
 
+(defm- %defn (names (&rest superclasses)
+                 (&rest slot-specs) &optional class-option)
+  "Define conditions with DEFINE-CONDITION."
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    (let ((exports (mapcan (lambda (spec)
+                             (let ((name (or (getf (cdr spec) :accessor)
+                                             (getf (cdr spec) :reader))))
+                               (when name (list name))))
+                           slot-specs)))
+      `(progn
+         (compose-definitions define-condition ,name ,superclasses
+                              ,slot-specs ,class-option)
+         ,@(loop :for alias :in (remove t aliases)
+                 :collect `(compose-definitions define-condition
+                                                ,alias ,superclasses
+                                                ,slot-specs ,class-option))
+         (when (member t ',aliases)
+           (progn
+             ,@(mapcar (lambda (name) `(export ',name))
+                       exports)
+             (compose-exports ,name)
+             ,@(loop :for alias :in (remove t aliases)
+                     :collect `(compose-exports ,alias))))))))
+
 (defm defn (names (&rest superclasses) (&rest slot-specs) &optional class-option)
-  "Define condition classes with DEFINE-CONDITION.
+  "Define conditions with DEFINE-CONDITION.
 
 The form
 
@@ -380,11 +407,11 @@ The form
              :documentation \"The name of the error.\"))
       (:documentation \"A simple error.\"))
 
-defines the condition classes foo-error and bar-error superclasses is ERROR.
+defines the conditions FOO-ERROR and BAR-ERROR, whose superclasses is ERROR.
 Those symbols are exported along with the names of the classes.
 "
-  `(%defc ,(tack-t names) ,superclasses ,slot-specs ,class-option))
+  `(%defn ,(tack-t names) ,superclasses ,slot-specs ,class-option))
 
 (defm defn- (names (&rest superclasses) (&rest slot-specs) &optional class-option)
   "Like DEFN, but do not export NAMES."
-  `(%defc ,names ,superclasses ,slot-specs ,class-option))
+  `(%defn ,names ,superclasses ,slot-specs ,class-option))
