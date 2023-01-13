@@ -354,11 +354,11 @@ exported along with the names of the classes.
 (defm defmm (names args &rest body)
   "Define modify macros with DEFINE-MODIFY-MACRO.
 
-The forms
+The form
 
-    ...
+  (defmm appendf (&rest lists) append)
 
-define the modify macros ...; and export those names."
+define the modify macro APPENDF; and export that names."
   `(%defmm ,(tack-t names) ,args ,@body))
 
 (defm defmm- (names args &rest body)
@@ -378,11 +378,11 @@ define the modify macros ...; and export those names."
 (defm defsm (names expansion)
   "Define symbol macros with DEFINE-SYMBOL-MACRO.
 
-The forms
+The form
 
-    ...
+  (defsm %bin-directory% (merge-pathnames #P"bin/" (user-homedir-pathname)))
 
-define the symbol macros ...; and export those names."
+define the symbol macro APPENDF; and export that name."
   `(%defsm ,(tack-t names) ,expansion))
 
 (defm defsm- (names expansion)
