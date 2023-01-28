@@ -35,7 +35,7 @@
   "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
-(def copy-table◆copyhash (hash-table)
+(def copy-table$copyhash (hash-table)
   "Return a new hash table from HASH-TABLE."
   (let ((table (make-hash-table :test (hash-table-test hash-table)
                                 :rehash-size (hash-table-rehash-size hash-table)
@@ -46,7 +46,7 @@
           :do (setf (gethash key table) value)
           :finally (return table))))
 
-(def list-table◆listhash (hash-table &key sort key)
+(def list-table$listhash (hash-table &key sort key)
   "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
 be used by SORT with KEY being the key that will be used for sorting."
   (let ((alist))
@@ -57,7 +57,7 @@ be used by SORT with KEY being the key that will be used for sorting."
         (sort alist sort :key key)
         alist)))
 
-(def home◆~ (path)
+(def home$~ (path)
   "Return a path relative to the home directory."
   (uiop:subpathname (user-homedir-pathname) path))
 
