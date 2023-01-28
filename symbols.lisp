@@ -29,7 +29,7 @@
   "Return the present symbols in PACKAGE."
   (symbols package :present-symbols))
 
-(def pretty-print-symbols◆pps (package &optional (type :external-symbols) (sort #'string<))
+(def pretty-print-symbols$pps (package &optional (type :external-symbols) (sort #'string<))
   "Display the external smbols in PACKAGE in the order that they were declared as dependencies."
   (let ((dependencies (asdf:system-depends-on (asdf:find-system package))))
     (loop :for dependency :in dependencies
@@ -42,7 +42,7 @@
   `(let ,(loop :for name :in names :collect `(,name (gensym)))
      ,@body))
 
-(defm macro-expand◆mx (form)
+(defm macro-expand$mx (form)
   "Pretty print the macro expansion of FORM."
   `(let* ((text "MACROEXPAND")
           (value-1 (macroexpand-1 ,form))
@@ -53,7 +53,7 @@
               (format t "~&~A:~%~S" text value-2)))
      (values)))
 
-(defm macro-apply◆mapply (macro &rest args)
+(defm macro-apply$mapply (macro &rest args)
   "Invoke the macro MACRO to each item in ARGS."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))

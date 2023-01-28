@@ -22,12 +22,12 @@
     (t (string object))))
 
 ;; NOTE: superseded by UIOP:STRCAT
-(def concat◆cat (&rest args)
+(def concat$cat (&rest args)
   "Concatenate ARGS to a string."
   (let ((value (loop :for arg :in args :collect (string* arg))))
     (apply #'concatenate 'string value)))
 
-(def reduce-concat◆red-cat (&rest args)
+(def reduce-concat$red-cat (&rest args)
   "Reduce ARGS with CONCAT."
   (flet ((fn (arg)
              (reduce #'concat arg)))
@@ -35,7 +35,7 @@
         (fn (car args))
         (fn args))))
 
-(def intern-concat◆int-cat (package &rest args)
+(def intern-concat$int-cat (package &rest args)
   "Concatenate ARGS to a string then intern it to the current package."
   (let ((p (if (null package) *package* package)))
     (intern (apply #'concat args) (find-package p))))
