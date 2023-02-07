@@ -237,3 +237,9 @@ be used by SORT with KEY being the key that will be used for sorting."
 (defm optimize-debug ()
   "Enable compiler options for maximum debug settings."
   (declaim (optimize (speed 1) (debug 3) (safety 1))))
+
+(defm fns (fn1 &rest args)
+  "Return a function that applies FN1 and ARGS to OBJ that returns multiple values."
+  `(lambda (obj)
+     (list (funcall ,fn1 obj)
+           ,@(loop :for arg :in args :collect `(funcall ,arg obj)))))

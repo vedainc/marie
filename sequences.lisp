@@ -355,3 +355,30 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
   "Return an empty list from OBJECT."
   (let ((length (length object)))
     (make-list length :initial-element nil)))
+
+(def groups (list &optional count)
+  "Return decreasing order of groups from LIST.
+
+  (groups '(a b c))
+
+would return
+
+  ((a b c) (b c) (c))"
+  (maplist #'identity list))
+
+(def pairs (list)
+  "Return pairs of lists from LIST.
+
+  (pairs '(a b c))
+
+would return
+
+  ((a b) (b c))"
+  (labels ((fn (list &optional acc)
+               (cond ((¬ list) (nreverse acc))
+                     ((length= list 1) (nreverse acc))
+                     (t (fn (cdr list)
+                            (cons (list (first list)
+                                        (second list))
+                                  acc))))))
+    (fn list)))
