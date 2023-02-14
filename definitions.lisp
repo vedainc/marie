@@ -11,12 +11,12 @@
   (defvar *docstring*
     ", and conditionally export NAMES.
 
-NAMES are symbols separated by $, where the first element is the name of the
+NAMES are symbols separated by ·, where the first element is the name of the
 function and the rest are aliases. Export NAMES if T is present in NAMES."
     "The common docstring in the definers.")
 
   (defvar *name-separator*
-    '(#\$)
+    '(#\·)
     "The list of characters used to separate names and aliases in definitions.")
 
   (defun compose-docstring (text)
@@ -35,7 +35,7 @@ function and the rest are aliases. Export NAMES if T is present in NAMES."
       (mapcar #'read-from-string strings)))
 
   (defun tack-t (names)
-    "Concatename `$t' to names."
+    "Concatename `·t' to names."
     (let ((separator (string (first *name-separator*)))
           (string (string names)))
       (read-from-string (uiop:strcat string separator "t")))))
@@ -64,7 +64,7 @@ function and the rest are aliases. Export NAMES if T is present in NAMES."
 The forms
 
     (defm qux (op) `(progn (,op 1)))
-    (defm quux$corge (op) `(progn (,op 2)))
+    (defm quux·corge (op) `(progn (,op 2)))
 
 define the macros QUX, QUUX, and CORGE; and export those names."
   `(%defm ,(tack-t names) ,args ,@body))
@@ -89,7 +89,7 @@ define the macros QUX, QUUX, and CORGE; and export those names."
 The forms
 
     (def foo (n) (1- n))
-    (def bar$baz (n) (+ n 1))
+    (def bar·baz (n) (+ n 1))
 
 define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,(tack-t names) ,args ,@body))
@@ -114,7 +114,7 @@ define the functions FOO, BAR, and BAZ; and export those names."
 The forms
 
     (defv *grault* nil \"The grault.\")
-    (defv *garply*$*waldo* nil \"Like grault.\")
+    (defv *garply*·*waldo* nil \"Like grault.\")
 
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
 names."
@@ -140,7 +140,7 @@ names."
 The forms
 
     (defp *grault* nil \"The grault.\")
-    (defp *garply*$*waldo* nil \"Like grault.\")
+    (defp *garply*·*waldo* nil \"Like grault.\")
 
 define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
 names."
@@ -168,7 +168,7 @@ names."
 The forms
 
     (defk +fred+ nil \"The Fred constant.\")
-    (defk +plugh+$+xyzzy+ nil \"Like Fred.\")
+    (defk +plugh+·+xyzzy+ nil \"Like Fred.\")
 
 define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   `(%defk ,(tack-t names) ,@body))
@@ -195,7 +195,7 @@ The forms
     (defg delete (volume registry)
       (:documentation \"Delete VOLUME in REGISTRY.\"))
 
-    (defg create$update (volume registry)
+    (defg create·update (volume registry)
       (:documentation \"Update VOLUME in REGISTRY.\"))
 
 define the generic functions DELETE, CREATE, and UPDATE; and export those names."
@@ -235,7 +235,7 @@ The forms
       \"Return T on null objects\"
       t)
 
-    (deft prev$next ((o null))
+    (deft prev·next ((o null))
       \"Return NIL on null objects.\"
       nil)
 
@@ -321,7 +321,7 @@ if PREDICATE is true."
 
 The form
 
-    (defc unit$blank (frame)
+    (defc unit·blank (frame)
       ((id :initarg :id
            :initform -1
            :reader id
@@ -389,7 +389,7 @@ define the symbol macro APPENDF; and export that name."
   "Like DEFSM, but do not export NAMES."
   `(%defsm ,names ,expansion))
 
-(defm with-binding$let1 ((name value) &rest body)
+(defm with-binding·let1 ((name value) &rest body)
   "Like LET but for single values only."
   `(let ((,name ,value))
      ,@body))
@@ -424,7 +424,7 @@ define the symbol macro APPENDF; and export that name."
 
 The form
 
-    (defn foo-error$bar-error (error)
+    (defn foo-error·bar-error (error)
       ((name :initarg :name
              :initform \"\"
              :reader name
@@ -456,7 +456,7 @@ Those symbols are exported along with the names of the classes.
 The forms
 
     (defy foo (type size) `(and (array ,type (,size ,size))))
-    (defm bar$baz (type size) `(and (array ,type (,size ,size))))
+    (defm bar·baz (type size) `(and (array ,type (,size ,size))))
 
 define the types FOO, BAR, and BAZ; and exports those names."
   `(%defy ,(tack-t names) ,args ,@body))
