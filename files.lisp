@@ -13,7 +13,7 @@
   (append (uiop:subdirectories directory)
           (uiop:directory-files directory)))
 
-(def entries$files (list)
+(def entries·files (list)
   "Return all files for every directory found under LIST expansion."
   (cond ((or (not (listp list))
              (endp list))
