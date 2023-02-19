@@ -15,7 +15,7 @@ NAMES are symbols separated by ·, where the first element is the name of the
 function and the rest are aliases. Export NAMES if T is present in NAMES."
     "The common docstring in the definers.")
 
-  (defvar *name-separator*
+  (defvar *name-separators*
     '(#\·)
     "The list of characters used to separate names and aliases in definitions.")
 
@@ -30,13 +30,13 @@ function and the rest are aliases. Export NAMES if T is present in NAMES."
   (defun split-names (names)
     "Split NAMES by delimiters."
     (let* ((string (string names))
-           (split (uiop:split-string string :separator *name-separator*))
+           (split (uiop:split-string string :separator *name-separators*))
            (strings (remove-if #'string-empty-p split)))
       (mapcar #'read-from-string strings)))
 
   (defun tack-t (names)
     "Concatename `·t' to names."
-    (let ((separator (string (first *name-separator*)))
+    (let ((separator (string (first *name-separators*)))
           (string (string names)))
       (read-from-string (uiop:strcat string separator "t")))))
 
@@ -97,6 +97,19 @@ define the functions FOO, BAR, and BAZ; and export those names."
 (defm def- (names args &rest body)
   "Like DEF, but do not export NAMES."
   `(%def ,names ,args ,@body))
+
+(defm def! (names args &rest body)
+  "Like DEF, but optimize for speed."
+  `(def ,names ,args (optimize speed (safety 1)) ,@body))
+(defm def@ (names args &rest body)
+  "Like DEF, but optimize for safety."
+  `(def ,names ,args (optimize (speed 0) safety debug) ,@body))
+(defm def!- (names args &rest body)
+  "Like DEF-, but optimize for speed."
+  `(def- ,names ,args (optimize speed (safety 1)) ,@body))
+(defm def@- (names args &rest body)
+  "Like DEF-, but optimize for safety."
+  `(def- ,names ,args (optimize (speed 0) safety debug) ,@body))
 
 (defm- %defv (names &rest body)
   #.(compose-docstring "Define special variables with DEFVAR")
@@ -205,6 +218,19 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
   "Like DEFG, but do not export NAMES."
   `(%defg ,names ,parameters ,@body))
 
+(defm defg! (names args &rest body)
+  "Like DEFG, but optimize for speed."
+  `(defg ,names ,args (optimize speed (safety 1)) ,@body))
+(defm defg@ (names args &rest body)
+  "Like DEFG, but optimize for safety."
+  `(defg ,names ,args (optimize (speed 0) safety debug) ,@body))
+(defm defg!- (names args &rest body)
+  "Like DEFG-, but optimize for speed."
+  `(defg- ,names ,args (optimize speed (safety 1)) ,@body))
+(defm defg@- (names args &rest body)
+  "Like DEFG-, but optimize for safety."
+  `(defg- ,names ,args (optimize (speed 0) safety debug) ,@body))
+
 (defm- %deft (names &body body)
   #.(compose-docstring "Define methods with DEFMETHOD")
   (destructuring-bind (name &rest aliases)
@@ -245,6 +271,19 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 (defm deft- (names &rest body)
   "Like DEFT, but do not export NAMES."
   `(%deft ,names ,@body))
+
+(defm deft! (names args &rest body)
+  "Like DEFT, but optimize for speed."
+  `(deft ,names ,args (optimize speed (safety 1)) ,@body))
+(defm deft@ (names args &rest body)
+  "Like DEFT, but optimize for safety."
+  `(deft ,names ,args (optimize (speed 0) safety debug) ,@body))
+(defm deft!- (names args &rest body)
+  "Like DEFT-, but optimize for speed."
+  `(deft- ,names ,args (optimize speed (safety 1)) ,@body))
+(defm deft@- (names args &rest body)
+  "Like DEFT-, but optimize for safety."
+  `(deft- ,names ,args (optimize (speed 0) safety debug) ,@body))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun p-symbol (symbol)
