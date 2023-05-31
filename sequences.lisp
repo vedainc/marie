@@ -188,7 +188,7 @@ and the length of each list as the value."
   "Apply NCONC to the result of applying FN to sequence1 and sequence2."
   (nconc (mapcar fn sequence1) (mapcar fn sequence2)))
 
-(def reduce-append·red-append (&rest args)
+(def reduce-append^red-append (&rest args)
   "Reduce ARGS with APPEND."
   (flet ((fn (arg)
              (reduce #'append arg)))
@@ -196,7 +196,7 @@ and the length of each list as the value."
         (fn (car args))
         (fn args))))
 
-(def reduce-nconc·red-nconc (&rest args)
+(def reduce-nconc^red-nconc (&rest args)
   "Reduce ARGS with NCONC."
   (flet ((fn (arg)
              (reduce #'nconc arg)))
@@ -382,3 +382,16 @@ would return
                                         (second list))
                                   acc))))))
     (fn list)))
+
+(def array-to-list (array)
+  "Return a list from ARRAY."
+  (let* ((dimensions (array-dimensions array))
+         (depth (1- (length dimensions)))
+         (indices (make-list (1+ depth) :initial-element 0)))
+    (labels ((fn (n)
+                 (loop :for j :below (nth n dimensions)
+                       :do (setf (nth n indices) j)
+                       :collect (if (= n depth)
+                                    (apply #'aref array indices)
+                                    (fn (1+ n))))))
+      (fn 0))))
