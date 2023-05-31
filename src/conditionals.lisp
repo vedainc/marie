@@ -1,13 +1,13 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; conditionals.lisp: utilities for handling conditional expressions
 
-(uiop:define-package #:marie/conditionals
+(uiop:define-package #:marie/src/conditionals
   (:use #:cl
-        #:marie/definitions
-        #:marie/symbols)
+        #:marie/src/definitions
+        #:marie/src/symbols)
   (:export #:it))
 
-(in-package #:marie/conditionals)
+(in-package #:marie/src/conditionals)
 
 (defm map-and (fn &rest args)
   "Return true if FN returns true for all items in ARGS."
@@ -113,7 +113,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 (def- alpha-reader (stream char)
   "Define the reader for α, so that it can be used to refer to the anaphora."
   (declare (ignore stream char))
-  'MARIE/CONDITIONALS::IT)
+  'MARIE/SRC/CONDITIONALS::IT)
 
 (def- use-alpha-reader ()
   "Put the alpha reader into effect."

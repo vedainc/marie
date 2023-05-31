@@ -1,12 +1,12 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; files.lisp: utilities for dealing with disk files
 
-(uiop:define-package #:marie/files
+(uiop:define-package #:marie/src/files
   (:use #:cl
-        #:marie/definitions
-        #:marie/sequences))
+        #:marie/src/definitions
+        #:marie/src/sequences))
 
-(in-package #:marie/files)
+(in-package #:marie/src/files)
 
 (def directory-entries (directory)
   "Return top-level files and directories under DIRECTORY."

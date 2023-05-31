@@ -1,11 +1,11 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; symbols.lisp: utilities for dealing with symbols
 
-(uiop:define-package #:marie/symbols
+(uiop:define-package #:marie/src/symbols
   (:use #:cl
-        #:marie/definitions))
+        #:marie/src/definitions))
 
-(in-package #:marie/symbols)
+(in-package #:marie/src/symbols)
 
 (def symbols (package &key (type :external-symbols) sort)
   "Return the symbols in PACKAGE denoted by TYPE."

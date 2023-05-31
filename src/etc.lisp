@@ -1,13 +1,13 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; etc.lisp:  utilities that don’t fit elsewhere
 
-(uiop:define-package #:marie/etc
+(uiop:define-package #:marie/src/etc
   (:use #:cl
-        #:marie/definitions
-        #:marie/sequences
-        #:marie/strings))
+        #:marie/src/definitions
+        #:marie/src/sequences
+        #:marie/src/strings))
 
-(in-package #:marie/etc)
+(in-package #:marie/src/etc)
 
 (def apropos* (&rest args)
   "Display sorted matching symbols from ARGS with CL:APROPOS."

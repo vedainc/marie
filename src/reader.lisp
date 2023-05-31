@@ -1,11 +1,11 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; reader.lisp: minor tweaks to the lisp reader
 
-(uiop:define-package #:marie/reader
+(uiop:define-package #:marie/src/reader
   (:use #:cl
-        #:marie/definitions))
+        #:marie/src/definitions))
 
-(in-package #:marie/reader)
+(in-package #:marie/src/reader)
 
 (def- brace-reader (stream char)
   "Use {+ _ 1} as a shorthand for #'(lambda (_) (+ _ 1))

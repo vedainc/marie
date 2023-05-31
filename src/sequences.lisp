@@ -1,12 +1,12 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; sequences.lisp: utilities for dealing with sequences
 
-(uiop:define-package #:marie/sequences
+(uiop:define-package #:marie/src/sequences
   (:use #:cl
-        #:marie/definitions
-        #:marie/conditionals))
+        #:marie/src/definitions
+        #:marie/src/conditionals))
 
-(in-package #:marie/sequences)
+(in-package #:marie/src/sequences)
 
 (def end (seq)
   "Return the last element of SEQ."
