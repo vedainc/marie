@@ -1,13 +1,13 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; strings.lisp: utilities for dealing with strings
 
-(uiop:define-package #:marie/strings
+(uiop:define-package #:marie/src/strings
   (:use #:cl
-        #:marie/definitions
-        #:marie/sequences
-        #:marie/conditionals))
+        #:marie/src/definitions
+        #:marie/src/sequences
+        #:marie/src/conditionals))
 
-(in-package #:marie/strings)
+(in-package #:marie/src/strings)
 
 (def empty-string-p (string)
   "Return true if STRING is of length zero."

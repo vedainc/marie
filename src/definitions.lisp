@@ -1,11 +1,11 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; definitions.lisp: exporting replacements for functions, macros, and other things
 
-(uiop:define-package #:marie/definitions
+(uiop:define-package #:marie/src/definitions
   (:use #:cl)
   (:export #:defm #:defm-))
 
-(in-package #:marie/definitions)
+(in-package #:marie/src/definitions)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *docstring*
