@@ -8,7 +8,7 @@
 (in-package #:marie/src/symbols)
 
 (def symbols (package &key (type :external-symbols) sort)
-  "Return the symbols in PACKAGE denoted by TYPE."
+  "Return the symbols interned in PACKAGE by TYPE."
   (let ((symbols '()))
     (macrolet ((mac (fn)
                  `(,fn (symbol (find-package package))
@@ -20,6 +20,11 @@
       (if sort
           (mapcar #'read-from-string (sort (mapcar #'string symbols) sort))
           symbols))))
+
+(def symbols* (package &key (type :external-symbols) (sort #'string<))
+  "Print the symbols interned in PACKAGE by TYPE."
+  (let ((symbols (symbols package :type type :sort sort)))
+    (format t "~{~A~%~}" symbols)))
 
 (def external-symbols (package &key sort)
   "Return the external symbols in PACKAGE."
