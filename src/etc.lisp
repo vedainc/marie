@@ -243,3 +243,9 @@ be used by SORT with KEY being the key that will be used for sorting."
   `(lambda (obj)
      (list (funcall ,fn1 obj)
            ,@(loop :for arg :in args :collect `(funcall ,arg obj)))))
+
+(defm with-suppresed-output^mute (&body body)
+  "Evaluate BODY but with output suppressed."
+  `(let ((*standard-output* (make-broadcast-stream))
+         (*debug-io* (make-broadcast-stream)))
+     ,@body))
