@@ -247,5 +247,6 @@ be used by SORT with KEY being the key that will be used for sorting."
 (defm with-suppresed-output^mute (&body body)
   "Evaluate BODY but with output suppressed."
   `(let ((*standard-output* (make-broadcast-stream))
-         (*debug-io* (make-broadcast-stream)))
+         (*debug-io* (make-broadcast-stream))
+         (*error-output* (make-broadcast-stream)))
      ,@body))
