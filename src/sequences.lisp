@@ -395,3 +395,17 @@ would return
                                     (apply #'aref array indices)
                                     (fn (1+ n))))))
       (fn 0))))
+
+(def permutations^perms (list)
+  "Return the permutations of LIST."
+  (cond ((null list) nil)
+        ((null (cdr list)) (list list))
+        (t (loop :for element :in list
+                 :append (mapcar (λ (l)
+                                   (cons element l))
+                                 (permutations (remove element list)))))))
+
+(def show-list^ls (list &key (output *standard-output*) (fn #'identity))
+  "Display the items in LIST."
+  (loop :for item :in list
+        :do (format output "~S~%" (funcall fn item))))

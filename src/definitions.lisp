@@ -119,7 +119,8 @@ define the functions FOO, BAR, and BAZ; and export those names."
        (defvar ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defvar ,alias ,@body))
-       (export-names ,name ,aliases))))
+       (export-names ,name ,aliases)
+       )))
 
 (defm defv (names &rest body)
   "Define special variables with DEFVAR.
