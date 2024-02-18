@@ -120,3 +120,9 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   (set-macro-character #\α #'alpha-reader))
 
 (use-alpha-reader)
+
+(defm nif (test-form then-form &optional else-form)
+  "Not IF."
+  `(if (not ,test-form)
+       ,then-form
+       ,else-form))
