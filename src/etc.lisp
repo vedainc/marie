@@ -42,7 +42,7 @@
                                 :rehash-threshold (hash-table-rehash-threshold hash-table)
                                 :size (hash-table-size hash-table))))
     (loop :for key :being each hash-key :of hash-table
-          :using (hash-value value)
+            :using (hash-value value)
           :do (setf (gethash key table) value)
           :finally (return table))))
 
@@ -250,3 +250,7 @@ be used by SORT with KEY being the key that will be used for sorting."
          (*debug-io* (make-broadcast-stream))
          (*error-output* (make-broadcast-stream)))
      ,@body))
+
+(defm mulf (var num)
+  "Set a new value for VAR by multiplying itself by a number."
+  `(setf ,var (* ,var ,num)))
