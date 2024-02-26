@@ -294,14 +294,14 @@ and the length of each list as the value."
         :for val = (funcall fn s)
         :for n = 0 :then (if val (1+ n) n)
         :when (and val (> count 0) (< n (1+ count)))
-        :collect s))
+          :collect s))
 
 (def drop (seq count)
   "Return items from SEQ without the first COUNT items."
   (loop :for s :in seq
         :for n = 1 :then (1+ n)
         :when (>= count n)
-        :collect s))
+          :collect s))
 
 (def drop-if (fn seq count)
   "Return items from SEQ without the first COUNT items that satisfy FN."
@@ -309,7 +309,7 @@ and the length of each list as the value."
         :for val = (funcall fn s)
         :for n = 0 :then (if val (1+ n) n)
         :unless (and val (> count 0) (< n (1+ count)))
-        :collect s))
+          :collect s))
 
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."
@@ -324,7 +324,7 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
   (loop :for (key . rest) :on plist :by #'cddr
         :do (assert rest () "Expected a proper plist, got ~S" plist)
         :unless (member key keys :test #'eq)
-        :collect key :and :collect (first rest)))
+          :collect key :and :collect (first rest)))
 
 (defmm remove-from-plistf (&rest keys)
   remove-from-plist
@@ -409,3 +409,16 @@ would return
   "Display the items in LIST."
   (loop :for item :in list
         :do (format output "~S~%" (funcall fn item))))
+
+;; from https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
+(deft scramble ((sequence array))
+  (loop :with len = (length sequence)
+        :for i :from 0 :below len
+        :do (rotatef (aref sequence i)
+                     (aref sequence (+ (random (- len i)) i))))
+  sequence)
+
+(deft scramble ((sequence list))
+  (coerce (scramble
+           (make-array (length sequence) :initial-contents sequence))
+          'list))
