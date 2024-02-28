@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; files.lisp: utilities for dealing with disk files
+;;;; files.lisp --- utilities for dealing with disk files
 
 (uiop:define-package #:marie/src/files
   (:use #:cl
@@ -38,7 +38,7 @@
 (defm with-output-file ((var path) &body body)
   "A thin wrapper over WITH-OPEN-FILE."
   `(with-open-file (,var ,path
-		                     :direction :output
-		                     :if-exists :supersede
-		                     :if-does-not-exist :create)
+                         :direction :output
+                         :if-exists :supersede
+                         :if-does-not-exist :create)
      ,@body))

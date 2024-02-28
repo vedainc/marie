@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; symbols.lisp: utilities for dealing with symbols
+;;;; symbols.lisp --- utilities for dealing with symbols
 
 (uiop:define-package #:marie/src/symbols
   (:use #:cl

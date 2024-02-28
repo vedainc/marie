@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; strings.lisp: utilities for dealing with strings
+;;;; strings.lisp --- utilities for dealing with strings
 
 (uiop:define-package #:marie/src/strings
   (:use #:cl
@@ -51,8 +51,8 @@
     (loop :for item :in list
           :for length = (length item)
           :if (= length max) :collect item
-          :else
-          :collect (cat item (make-string (- max length) :initial-element character)))))
+            :else
+              :collect (cat item (make-string (- max length) :initial-element character)))))
 
 (def fmt (&rest args)
   "Simply return a string with FORMAT."
