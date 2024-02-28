@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; definitions.lisp: exporting replacements for functions, macros, and other things
+;;;; definitions.lisp --- exporting replacements for functions, macros, and other things
 
 (uiop:define-package #:marie/src/definitions
   (:use #:cl)
@@ -312,9 +312,9 @@ if PREDICATE is true."
   "Compose the forms for creating a class."
   `(progn
      (,type ,name (,@superclasses)
-       ,@(append (list slot-specs)
-          (when class-option
-            (list class-option))))
+            ,@(append (list slot-specs)
+                      (when class-option
+                        (list class-option))))
      (defun ,(compose-name nil 'make name) (&rest args)
        ,(format nil "Return a new instance of ~A." name)
        (apply #'make-instance ',name args))
@@ -331,7 +331,7 @@ if PREDICATE is true."
      (export ',(compose-name t name))))
 
 (defm- %defc (names (&rest superclasses)
-                 (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -346,8 +346,8 @@ if PREDICATE is true."
                               ,slot-specs ,class-option)
          ,@(loop :for alias :in (remove t aliases)
                  :collect `(compose-definitions defclass
-                                                ,alias ,superclasses
-                                                ,slot-specs ,class-option))
+                            ,alias ,superclasses
+                            ,slot-specs ,class-option))
          (when (member t ',aliases)
            (progn
              ,@(mapcar (lambda (name) `(export ',name))
@@ -435,7 +435,7 @@ define the symbol macro APPENDF; and export that name."
      ,@body))
 
 (defm- %defn (names (&rest superclasses)
-                 (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define conditions with DEFINE-CONDITION."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -449,8 +449,8 @@ define the symbol macro APPENDF; and export that name."
                               ,slot-specs ,class-option)
          ,@(loop :for alias :in (remove t aliases)
                  :collect `(compose-definitions define-condition
-                                                ,alias ,superclasses
-                                                ,slot-specs ,class-option))
+                            ,alias ,superclasses
+                            ,slot-specs ,class-option))
          (when (member t ',aliases)
            (progn
              ,@(mapcar (lambda (name) `(export ',name))

@@ -1,5 +1,5 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; conditionals.lisp: utilities for handling conditional expressions
+;;;; conditionals.lisp --- utilities for handling conditional expressions
 
 (uiop:define-package #:marie/src/conditionals
   (:use #:cl
@@ -91,7 +91,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 (defm awhen (test-form &body then-form)
   "Anaphoric WHEN."
   `(aif ,test-form
-        (progn ,@then-form)))
+    (progn ,@then-form)))
 
 (defm aand (&rest args)
   "Anaphoric AND."
