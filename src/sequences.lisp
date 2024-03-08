@@ -422,3 +422,7 @@ would return
   (coerce (scramble
            (make-array (length sequence) :initial-contents sequence))
           'list))
+
+(def transpose (list)
+  "Return a matrix transposition of `list'."
+  (apply #'mapcar #'list list))
