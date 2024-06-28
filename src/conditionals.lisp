@@ -29,12 +29,12 @@
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
 
-(defm logical-and^∧ (&body body)
+(defm logical-and^land^∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
   `(when (and ,@body)
      t))
 
-(defm logical-or^∨ (&body body)
+(defm logical-or^lor^∨ (&body body)
   "Return true if at least one form in BODY evaluates to true."
   `(when (or ,@body)
      t))
