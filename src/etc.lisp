@@ -106,7 +106,7 @@ be used by SORT with KEY being the key that will be used for sorting."
 (def hyphenate-to-string (&rest names)
   "Return a new string from the hyphenated concatenation of NAMES."
   (format nil "~{~A~^-~}"
-          (mapcar (λ (name)
+          (mapcar (lambda (name)
                     (string-upcase (string* name)))
                   names)))
 
@@ -121,7 +121,7 @@ be used by SORT with KEY being the key that will be used for sorting."
 
 (def show-table (table)
   "Print the contents of hash table TABLE."
-  (maphash (λ (k v)
+  (maphash (lambda (k v)
              (format t "~S => ~S~%" k v)
              (force-output *standard-output*))
            table))
@@ -254,3 +254,11 @@ be used by SORT with KEY being the key that will be used for sorting."
 (defm mulf (var num)
   "Set a new value for VAR by multiplying itself by a number."
   `(setf ,var (* ,var ,num)))
+
+(def prn (object)
+  "Print OBJECT according to its type."
+  (cond
+    ((typep object 'hash-table) (show-table* object))
+    ((typep object 'vector) (loop :for item :across object :do (format t "~S~%" item)))
+    ((typep object 'cons) (format t "~{~S~%~}" object))
+    (t (format t "~A~%" object))))

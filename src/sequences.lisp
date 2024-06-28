@@ -313,8 +313,8 @@ and the length of each list as the value."
 
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."
-  (∧ (listp object)
-     (every #'listp object)))
+  (land (listp object)
+        (every #'listp object)))
 
 (def remove-from-plist (plist &rest keys)
   "Returns a property-list with same keys and values as PLIST, except that keys in the list designated
@@ -375,7 +375,7 @@ would return
 
   ((a b) (b c))"
   (labels ((fn (list &optional acc)
-               (cond ((¬ list) (nreverse acc))
+               (cond ((neg list) (nreverse acc))
                      ((length= list 1) (nreverse acc))
                      (t (fn (cdr list)
                             (cons (list (first list)
@@ -401,7 +401,7 @@ would return
   (cond ((null list) nil)
         ((null (cdr list)) (list list))
         (t (loop :for element :in list
-                 :append (mapcar (λ (l)
+                 :append (mapcar (lambda (l)
                                    (cons element l))
                                  (permutations (remove element list)))))))
 

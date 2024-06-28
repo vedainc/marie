@@ -73,6 +73,12 @@ define the macros QUX, QUUX, and CORGE; and export those names."
   "Like DEFM, but do not export NAMES."
   `(%defm ,names ,args ,@body))
 
+;; (defun setf-expr-p (expr)
+;;   "Return true if EXPR is a SETF expression."
+;;   (and (listp expr)
+;;        (= (length expr) 2)
+;;        (car expr 'setf)))
+
 (defm- %def (names args &rest body)
   #.(compose-docstring "Define functions")
   (destructuring-bind (name &rest aliases)

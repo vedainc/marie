@@ -89,13 +89,13 @@
 
 (def strict-substring-p (x y)
   "Return true if X is part of Y, and that X is found from the start of Y."
-  (∧ (not (= (length x)
-             (length y)))
-     (let ((val (search x y)))
-       (awhen val
-         (zerop it)))))
+  (land (not (= (length x)
+                (length y)))
+        (let ((val (search x y)))
+          (awhen val
+            (zerop it)))))
 
 (def every-string-p (object)
   "Return true if OBJECT is a list and all members are strings."
-  (∧ (listp object)
-     (every #'stringp object)))
+  (land (listp object)
+        (every #'stringp object)))
