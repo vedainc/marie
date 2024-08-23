@@ -35,10 +35,10 @@
   (symbols package :present-symbols))
 
 (def pretty-print-symbols^pps (package &optional (type :external-symbols) (sort #'string<))
-  "Display the external smbols in PACKAGE in the order that they were declared as dependencies."
+  "Display the external symbols in PACKAGE in the order that they were declared as dependencies."
   (let ((dependencies (asdf:system-depends-on (asdf:find-system package))))
     (loop :for dependency :in dependencies
-          :do (let* ((symbols (symbols (read-from-string dependency) type))
+          :do (let* ((symbols (symbols (read-from-string dependency) :type type))
                      (sorted-symbols (sort symbols sort)))
                 (format t "~&~%** ~A~%~{~A~^~%~}" dependency sorted-symbols)))))
 
