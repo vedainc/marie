@@ -100,3 +100,20 @@
 (defm flet* (&rest body)
   "Evaluate BODY in LABELS."
   `(labels ,@body))
+
+(defm unbind (symbol)
+  "Remove the bindings of SYMBOL."
+  `(progn
+     (when (boundp ',symbol) (makunbound ',symbol))
+     (when (fboundp ',symbol) (fmakunbound ',symbol))))
+
+(defm rename-macro (name-1 name-2)
+  "Rename macro from NAME-1 to NAME-2."
+  (with-gensyms (definition)
+    `(when (macro-function ',name-1)
+       (let ((,definition (macro-function ',name-1)))
+         (unbind ,name-1)
+         (unbind ,name-2)
+         (setf (macro-function ',name-2)
+               ,definition)
+         (values)))))
