@@ -49,7 +49,7 @@
 
 (defm logical-and-not^∧¬ (arg1 arg2)
   "Return true if ARG1 is true and ARG1 is not true."
-  `(when (and ,arg1 (not arg2))
+  `(when (and ,arg1 (not ,arg2))
      t))
 
 (defm logical-not-and^¬∧ (arg1 arg2)
