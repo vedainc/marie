@@ -44,7 +44,33 @@
   (let ((value (gensym)))
     `(let ((,value ,arg))
        (cond ((integerp ,value) (- ,value))
+             ((functionp ,value) (complement ,value))
              (t (not ,value))))))
+
+(defm logical-and-not^∧¬ (arg1 arg2)
+  "Return true if ARG1 is true and ARG1 is not true."
+  `(when (and ,arg1 (not arg2))
+     t))
+
+(defm logical-not-and^¬∧ (arg1 arg2)
+  "Return true if ARG1 is not true and ARG2 is true."
+  `(when (and (not ,arg1) ,arg2)
+     t))
+
+(defm logical-or-not^∨¬ (arg1 arg2)
+  "Return true if ARG1 is true or ARG2 is not true."
+  `(when (or ,arg1 (not ,arg2))
+     t))
+
+(defm logical-or-not^¬∨ (arg1 arg2)
+  "Return true if ARG1 is not true or ARG2 is true."
+  `(when (or (not ,arg1) ,arg2)
+     t))
+
+(defm logical-not-not^¬¬ (arg1 arg2)
+  "Return ture if ARG1 is not true and ARG2 is not true."
+  `(when (and (not ,arg1) (not ,arg2))
+     t))
 
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
