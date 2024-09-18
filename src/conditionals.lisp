@@ -9,6 +9,11 @@
 
 (in-package #:marie/src/conditionals)
 
+(defm true-when^ω (condition)
+  "Return T when CONDITION evaluates as true."
+  `(when ,condition
+     t))
+
 (defm map-and (fn &rest args)
   "Return true if FN returns true for all items in ARGS."
   `(and ,@(loop :for arg :in args :collect `(funcall ,fn ,arg))
@@ -31,13 +36,11 @@
 
 (defm logical-and^land^∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
-  `(when (and ,@body)
-     t))
+  `(ω (and ,@body)))
 
 (defm logical-or^lor^∨ (&body body)
   "Return true if at least one form in BODY evaluates to true."
-  `(when (or ,@body)
-     t))
+  `(ω (or ,@body)))
 
 (defm negation^neg^¬ (arg)
   "Return the negation of ARG."
@@ -49,28 +52,23 @@
 
 (defm logical-and-not^∧¬ (arg1 arg2)
   "Return true if ARG1 is true and ARG1 is not true."
-  `(when (and ,arg1 (not ,arg2))
-     t))
+  `(ω (and ,arg1 (not ,arg2))))
 
 (defm logical-not-and^¬∧ (arg1 arg2)
   "Return true if ARG1 is not true and ARG2 is true."
-  `(when (and (not ,arg1) ,arg2)
-     t))
+  `(ω (and (not ,arg1) ,arg2)))
 
 (defm logical-or-not^∨¬ (arg1 arg2)
   "Return true if ARG1 is true or ARG2 is not true."
-  `(when (or ,arg1 (not ,arg2))
-     t))
+  `(ω (or ,arg1 (not ,arg2))))
 
 (defm logical-or-not^¬∨ (arg1 arg2)
   "Return true if ARG1 is not true or ARG2 is true."
-  `(when (or (not ,arg1) ,arg2)
-     t))
+  `(ω (or (not ,arg1) ,arg2)))
 
 (defm logical-not-not^¬¬ (arg1 arg2)
   "Return ture if ARG1 is not true and ARG2 is not true."
-  `(when (and (not ,arg1) (not ,arg2))
-     t))
+  `(ω (and (not ,arg1) (not ,arg2))))
 
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
