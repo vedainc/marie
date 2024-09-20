@@ -109,8 +109,8 @@
   (prune-if (complement fn) tree))
 
 (def locate-if (fn list)
-  "Find element in list satisfying FN. When found, return the car of LIST and the result of applying
-FN, as values. Otherwise, return false."
+  "Find element in list satisfying FN. When found, return the car of LIST and
+the result of applying FN, as values. Otherwise, return false."
   (unless (null list)
     (let ((val (funcall fn (car list))))
       (if val
@@ -136,8 +136,9 @@ FN, as values. Otherwise, return false."
   (member x (cdr (member x list :test test)) :test test))
 
 (def split-if (fn list)
-  "Return two lists wherein the first list contains everything that satisfies FN, until it
-doesn't, and another list that starts where FN returns true,as values."
+  "Return two lists wherein the first list contains everything that satisfies
+FN, until it doesn't, and another list that starts where FN returns true,as
+values."
   (let ((acc nil))
     (do ((source list (cdr source)))
         ((or (null source) (funcall fn (car source)))
@@ -173,8 +174,8 @@ doesn't, and another list that starts where FN returns true,as values."
     (fn list nil)))
 
 (def build-length-index (groups)
-  "Return a hash table from a list of lists, with the first member of each list as the key
-and the length of each list as the value."
+  "Return a hash table from a list of lists, with the first member of each list
+as the key and the length of each list as the value."
   (let ((table (make-hash-table :test #'equal)))
     (loop :for group :in groups
           :do (setf (gethash (first group) table) (length group)))
@@ -233,7 +234,8 @@ and the length of each list as the value."
     t))
 
 (def mem* (elems list &key (test #'equal))
-  "Return true if all items ELEMS are members of LIST using TEST as the equality function."
+  "Return true if all items ELEMS are members of LIST using TEST as the equality
+function."
   (labels ((fn (args)
                (cond ((null args) t)
                      ((member (car args) list :test test) (fn (cdr args)))
@@ -317,9 +319,10 @@ and the length of each list as the value."
         (every #'listp object)))
 
 (def remove-from-plist (plist &rest keys)
-  "Returns a property-list with same keys and values as PLIST, except that keys in the list designated
-by KEYS and values corresponding to them are removed.  The returned property-list may share
-structure with the PLIST, but PLIST is not destructively modified. Keys are compared using EQ."
+  "Returns a property-list with same keys and values as PLIST, except that keys
+in the list designated by KEYS and values corresponding to them are removed.
+The returned property-list may share structure with the PLIST, but PLIST is not
+destructively modified. Keys are compared using EQ."
   (declare (optimize speed))
   (loop :for (key . rest) :on plist :by #'cddr
         :do (assert rest () "Expected a proper plist, got ~S" plist)
@@ -331,7 +334,8 @@ structure with the PLIST, but PLIST is not destructively modified. Keys are comp
   "Modify macro for REMOVE-FROM-PLIST.")
 
 (def delete-from-plist (plist &rest keys)
-  "Just like REMOVE-FROM-PLIST, but this version may destructively modify the provided PLIST."
+  "Just like REMOVE-FROM-PLIST, but this version may destructively modify the
+provided PLIST."
   (declare (optimize speed))
   (loop :with head = plist
         :with tail = nil                ; a nil tail means an empty result so far
@@ -406,12 +410,13 @@ would return
                                  (permutations (remove element list)))))))
 
 (def show-list^ls (list &key (output *standard-output*) (fn #'identity))
-  "Display the items in LIST."
+  "Display the items in LIST according to FN."
   (loop :for item :in list
         :do (format output "~S~%" (funcall fn item))))
 
 ;; from https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
 (deft scramble ((sequence array))
+  "Return a randomized array from SEQUENCE."
   (loop :with len = (length sequence)
         :for i :from 0 :below len
         :do (rotatef (aref sequence i)
@@ -419,6 +424,7 @@ would return
   sequence)
 
 (deft scramble ((sequence list))
+  "Return a randomized list from SEQUENCE."
   (coerce (scramble
            (make-array (length sequence) :initial-contents sequence))
           'list))
