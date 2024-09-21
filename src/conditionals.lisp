@@ -62,7 +62,7 @@
   "Return true if ARG1 is true or ARG2 is not true."
   `(ω (or ,arg1 (not ,arg2))))
 
-(defm logical-or-not^¬∨ (arg1 arg2)
+(defm logical-not-or^¬∨ (arg1 arg2)
   "Return true if ARG1 is not true or ARG2 is true."
   `(ω (or (not ,arg1) ,arg2)))
 
