@@ -410,7 +410,7 @@ would return
                                  (permutations (remove element list)))))))
 
 (def show-list^ls (list &key (output *standard-output*) (fn #'identity))
-  "Display the items in LIST according to FN."
+  "Display the items in LIST according to FN, separated by newlines."
   (loop :for item :in list
         :do (format output "~S~%" (funcall fn item))))
 
@@ -430,5 +430,5 @@ would return
           'list))
 
 (def transpose (list)
-  "Return a matrix transposition of `list'."
+  "Return a matrix transposition of LIST."
   (apply #'mapcar #'list list))

@@ -46,6 +46,14 @@
           :do (setf (gethash key table) value)
           :finally (return table))))
 
+(def hash-table-keys (hash-table)
+  "Return the keys of HASH-TABLE."
+  (maphash #'(λ (k v) (declare (ignore v)) k) hash-table))
+
+(def hash-table-values (hash-table)
+  "Return the values of HASH-TABLE."
+  (maphash #'(λ (k v) (declare (ignore k)) v) hash-table))
+
 (def list-table^listhash (hash-table &key sort key)
   "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
 be used by SORT with KEY being the key that will be used for sorting."
