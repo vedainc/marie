@@ -67,7 +67,7 @@
   `(ω (or (not ,arg1) ,arg2)))
 
 (defm logical-not-not^¬¬ (arg1 arg2)
-  "Return ture if ARG1 is not true and ARG2 is not true."
+  "Return true if ARG1 is not true and ARG2 is not true."
   `(ω (and (not ,arg1) (not ,arg2))))
 
 (defm when-let (bindings &body forms)
