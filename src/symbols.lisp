@@ -12,7 +12,7 @@
   (let ((symbols '()))
     (macrolet ((mac (fn)
                  `(,fn (symbol (find-package package))
-                      (push symbol symbols))))
+                   (push symbol symbols))))
       (ecase type
         ((:symbols) (mac do-symbols))
         ((:external-symbols) (mac do-external-symbols))
@@ -32,7 +32,7 @@
 
 (def present-symbols (package)
   "Return the present symbols in PACKAGE."
-  (symbols package :present-symbols))
+  (symbols package :type :present-symbols))
 
 (def pretty-print-symbols^pps (package &optional (type :external-symbols) (sort #'string<))
   "Display the external symbols in PACKAGE in the order that they were declared as dependencies."
