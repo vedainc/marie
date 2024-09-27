@@ -232,19 +232,19 @@ be used by SORT with KEY being the key that will be used for sorting."
 
 (defm optimize-safety ()
   "Enable compiler options for maximum safety options."
-  (declaim (optimize (safety 3) (debug 3) (speed 0))))
+  `(declaim (optimize (safety 3) (debug 3) (speed 0))))
 
 (defm optimize-speed ()
   "Enable compiler options for maximum speed options."
-  (declaim (optimize (safety 1) (debug 3) (speed 3) )))
+  `(declaim (optimize (safety 1) (debug 3) (speed 3) )))
 
 (defm optimize-speed-unsafe ()
   "Enable compiler options for maximum speed options."
-  (declaim (optimize (safety 0) (debug 3) (speed 3))))
+  `(declaim (optimize (safety 0) (debug 3) (speed 3))))
 
 (defm optimize-debug ()
   "Enable compiler options for maximum debug settings."
-  (declaim (optimize (speed 1) (debug 3) (safety 1))))
+  `(declaim (optimize (speed 1) (debug 3) (safety 1))))
 
 (defm fns (fn1 &rest args)
   "Return a function that applies FN1 and ARGS to OBJ that returns multiple values."
