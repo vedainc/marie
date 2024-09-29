@@ -12,7 +12,7 @@
   (let ((symbols '()))
     (macrolet ((mac (fn)
                  `(,fn (symbol (find-package package))
-                   (push symbol symbols))))
+                      (push symbol symbols))))
       (ecase type
         ((:symbols) (mac do-symbols))
         ((:external-symbols) (mac do-external-symbols))
