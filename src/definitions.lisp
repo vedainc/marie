@@ -510,3 +510,43 @@ define the types FOO, BAR, and BAZ; and exports those names."
 (defm defy- (names args &rest body)
   "Like DEFY, but do not export NAMES."
   `(%defy ,names ,args ,@body))
+
+(def special-variable-p (symbol)
+  "Return true if SYMBOL denotes a special variable."
+  #+lispworks
+  (eql (hcl:variable-information symbol) :special)
+  #+sbcl
+  (eql (sb-cltl2:variable-information symbol) :special)
+  #-(or lispworks sbcl)
+  (error "Not implemented."))
+
+(defm- %setv (names args &rest body)
+  #.(compose-docstring "Define NAMES as special variables. If NAMES are already
+bound as special variables, set a new value via SETF.")
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    `(progn
+       (if (special-variable-p ',name)
+           (setf ,name @body)
+           (defvar ,name ,@body))
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(if (special-variable-p ',alias)
+                             (setf ,alias ,@body)
+                             (defvar ,alias ,@body)))
+       (export-names ,name ,aliases))))
+
+(defm setv (names &rest body)
+  "Define special variables with DEFVAR; bind new value if they're already defined.
+
+The forms
+
+    (setv *grault* nil \"The grault.\")
+    (setv *garply*^*waldo* nil \"Like grault.\")
+
+define the special variables *GRAULTY*, *GARPY*, and *WALDO*; and export those
+names."
+  `(%setv ,(tack-t names) ,@body))
+
+(defm setv- (names &rest body)
+  "Like SETV, but do not export NAMES."
+  `(%setv ,names ,@body))
