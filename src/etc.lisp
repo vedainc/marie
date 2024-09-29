@@ -111,6 +111,12 @@ be used by SORT with KEY being the key that will be used for sorting."
      ,@body
      ,@args))
 
+(defm dbg1 (arg &body body)
+  "Apply DBG to ARG, then evaluate ARGS."
+  `(progn
+     (dbg ,arg)
+     ,@body))
+
 (def hyphenate-to-string (&rest names)
   "Return a new string from the hyphenated concatenation of NAMES."
   (format nil "~{~A~^-~}"

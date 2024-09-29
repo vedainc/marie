@@ -520,14 +520,14 @@ define the types FOO, BAR, and BAZ; and exports those names."
   #-(or lispworks sbcl)
   (error "Not implemented."))
 
-(defm- %setv (names args &rest body)
+(defm- %setv (names &rest body)
   #.(compose-docstring "Define NAMES as special variables. If NAMES are already
 bound as special variables, set a new value via SETF.")
   (destructuring-bind (name &rest aliases)
       (split-names names)
     `(progn
        (if (special-variable-p ',name)
-           (setf ,name @body)
+           (setf ,name ,@body)
            (defvar ,name ,@body))
        ,@(loop :for alias :in (remove t aliases)
                :collect `(if (special-variable-p ',alias)
