@@ -51,6 +51,15 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   "Put the lambda reader into effect."
   (set-macro-character #\λ #'lambda-reader))
 
+(def- phi-reader (stream char)
+  "Define the reader for phi."
+  (declare (ignore stream char))
+  'PROGN)
+
+(def- use-phi-reader ()
+  "Put the phi reader into effect."
+  (set-macro-character #\φ #'phi-reader))
+
 (def- dollar-reader (stream char)
   (declare (ignore char))
   (list (quote function) (read stream t nil t)))
@@ -60,3 +69,4 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
   (set-macro-character #\$ #'dollar-reader))
 
 (use-lambda-reader)
+(use-phi-reader)
