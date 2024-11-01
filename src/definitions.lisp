@@ -550,3 +550,7 @@ names."
 (defm setv- (names &rest body)
   "Like SETV, but do not export NAMES."
   `(%setv ,names ,@body))
+
+(defm mvb (&rest args)
+  "Pass ARGS to MULTIPLE-VALUE-BIND."
+  `(multiple-value-bind ,@args))

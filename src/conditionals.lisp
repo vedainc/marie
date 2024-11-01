@@ -51,7 +51,7 @@
              (t (not ,value))))))
 
 (defm logical-and-not^∧¬ (arg1 arg2)
-  "Return true if ARG1 is true and ARG1 is not true."
+  "Return true if ARG1 is true and ARG2 is not true."
   `(ω (and ,arg1 (not ,arg2))))
 
 (defm logical-not-and^¬∧ (arg1 arg2)
