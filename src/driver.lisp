@@ -11,6 +11,7 @@
                  #:marie/src/conditionals
                  #:marie/src/strings
                  #:marie/src/etc
+		 #:marie/src/hash
                  #:marie/src/files))
 
 (provide "marie")
