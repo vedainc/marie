@@ -197,11 +197,23 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   "Like DEFK, but do not export NAMES."
   `(%defk ,names ,@body))
 
+(defun generic-function-p (symbol)
+  "Return true if SYMBOL names a generic function."
+  (eql (type-of (fdefinition symbol))
+       'standard-generic-function))
+
+(defun unbind-function (name)
+  "Remove the function binding in NAME."
+  (when (and (fboundp name)
+             (not (generic-function-p name)))
+    (fmakunbound name)))
+
 (defm- %defg (names (&rest parameters) &body body)
   #.(compose-docstring "Define generic functions")
   (destructuring-bind (name &rest aliases)
       (split-names names)
     `(progn
+       (unbind-function ',name)
        (defgeneric ,name (,@parameters) ,@body)
        ,@(loop :for alias :in (remove t aliases)
                :collect `(defgeneric ,alias (,@parameters) ,@body))
@@ -247,6 +259,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
           (destructuring-bind (type (&rest parameters) &body content)
               body
             `(progn
+               (unbind-function ',name)
                (defmethod ,name ,type (,@parameters) ,@content)
                ,@(loop :for alias :in aliases-1
                        :collect `(defmethod ,alias ,type (,@parameters) ,@content))
@@ -254,6 +267,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
           (destructuring-bind ((&rest parameters) &body content)
               body
             `(progn
+               (unbind-function ',name)
                (defmethod ,name (,@parameters) ,@content)
                ,@(loop :for alias :in aliases-1
                        :collect `(defmethod ,alias (,@parameters) ,@content))
