@@ -527,10 +527,10 @@ define the types FOO, BAR, and BAZ; and exports those names."
 
 (def special-variable-p (symbol)
   "Return true if SYMBOL denotes a special variable."
-  #+lispworks
-  (eql (hcl:variable-information symbol) :special)
-  #+sbcl
-  (eql (sb-cltl2:variable-information symbol) :special)
+  (eql (#+lispworks hcl:variable-information
+        #+sbcl sb-cltl2:variable-information
+        symbol)
+       :special)
   #-(or lispworks sbcl)
   (error "Not implemented."))
 
