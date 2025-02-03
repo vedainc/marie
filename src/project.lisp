@@ -51,10 +51,10 @@
                          (invoke-restart 'return-empty-string))))
       (%cmd-output command)))
 
-  (defv- *git-user-name* (cmd-output "cd && git config user.name")
+  (defv- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
     "Preload the Git username")
 
-  (defv- *git-user-email* (cmd-output "cd && git config user.email")
+  (defv- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
     "Preload the Git user email"))
 
 
