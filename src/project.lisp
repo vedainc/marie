@@ -28,14 +28,6 @@
   #P"t"
   "The main tests directory.")
 
-(defv- *version-components*
-  '("version" "version-tests")
-  "File components for program versions.")
-
-(defv- *code-components*
-  '("core" "driver" "user")
-  "File components for source code.")
-
 (eval-always
   (def- %cmd-output (command)
     "Run command around RESTART-CASE."
@@ -353,7 +345,7 @@
 
 (def- &make-project (&rest args)
   (restart-case (apply #'%make-project args)
-    (bail-out ()
+    (return-nil ()
       nil)))
 
 (def make-project^mk (&rest args)
@@ -362,5 +354,5 @@
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
                   (lambda (c)
-                    (invoke-restart 'bail-out))))
+                    (invoke-restart 'return-nil))))
     (apply #'&make-project args)))
