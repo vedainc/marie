@@ -85,11 +85,13 @@ be used by SORT with KEY being the key that will be used for sorting."
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
+#-lispworks
 (def true (&rest args)
   "Return true for anything."
   (declare (ignore args))
   t)
 
+#-lispworks
 (def false (&rest args)
   "Return false for anything."
   (declare (ignore args))
@@ -220,6 +222,7 @@ be used by SORT with KEY being the key that will be used for sorting."
   (format *error-output* string)
   (finish-output *error-output*))
 
+#-lispworks
 (defmm appendf (&rest lists) append
   "Set the value of the first argument to the result of applying APPEND to LISTS.")
 
@@ -276,3 +279,22 @@ be used by SORT with KEY being the key that will be used for sorting."
     ((typep object 'vector) (loop :for item :across object :do (format t "~S~%" item)))
     ((typep object 'cons) (format t "~{~S~%~}" object))
     (t (format t "~A~%" object))))
+
+(def system-object^sys-object (name)
+  "Return the system object for the current system."
+  (asdf:find-system name))
+
+(def system-path^sys-path (system)
+  "Return the ASDF file path for the current system."
+  (let ((object (system-object system)))
+    (uiop:merge-pathnames* (cat system ".asd")
+                           (asdf:system-source-directory object))))
+
+(def system-directory^sys-directory (system)
+  "Return the top-level directory of a system."
+  (let ((path (sys-path system)))
+    nil))
+
+(def system-version^sys-version (name)
+  "Return the version number extracted from the system resources."
+  (asdf:system-version (sys-object name)))
