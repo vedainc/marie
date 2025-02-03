@@ -37,7 +37,7 @@
   "File components for source code.")
 
 (eval-always
-  (def- run-command (command)
+  (def- %cmd-output (command)
     "Run command around RESTART-CASE."
     (restart-case (string-trim '(#\newline #\tab #\space)
                                (uiop:run-program command :output :string))
@@ -49,7 +49,7 @@
     (handler-bind ((uiop/run-program:subprocess-error
                      #'(lambda (c)
                          (invoke-restart 'return-empty-string))))
-      (run-command command)))
+      (%cmd-output command)))
 
   (defv- *git-user-name* (cmd-output "cd && git config user.name")
     "Preload the Git username")
@@ -140,13 +140,6 @@
   (with-open-file (out path :direction :output :if-exists :supersede)
     (format out contents)))
 
-(def- make-file (dir name &key (type "lisp") alt)
-  "Output the contents of the stub creator, relative to DIR and NAME."
-  (let ((stub-name (read-from-string (cat "make" #\- dir #\- name #\- "stub")))
-        (out-name (if alt (cat name #\- alt) name)))
-    (out-file (make-pathname :name out-name :type type)
-              (funcall stub-name))))
-
 (def- normalize-name (name)
   "Return a new string from NAME suitable as a project name."
   (string-downcase (string name)))
@@ -220,6 +213,10 @@
         #:marie))
 
 (in-package #:${project}/src/core)
+
+(def hello ()
+  \"Display a greeting.\"
+  (format t \"Hello, world!~%\"))
 "))
 
 (def- make-src-driver-stub ()
