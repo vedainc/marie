@@ -36,6 +36,26 @@
   '("core" "driver" "user")
   "File components for source code.")
 
+(eval-always
+  (def- run-command (command)
+    (restart-case (string-trim '(#\newline #\tab #\space)
+                               (uiop:run-program command :output :string))
+      (return-empty-string ()
+        "")))
+
+  (def- cmd-output (command)
+    "Return the output of running COMMAND as a string."
+    (handler-bind ((error
+                     #'(lambda (c)
+                         (invoke-restart 'return-empty-string))))
+      (run-command command)))
+
+  (defv- *git-user-name* (cmd-output "cd && git config user.name")
+    "Preload the Git username")
+
+  (defv- *git-user-email* (cmd-output "cd && git config user.email")
+    "Preload the Git user email"))
+
 
 ;;; functions
 
@@ -67,10 +87,10 @@
           :while pos)))
 
 (defv- *rep-table*
-  '(("<>" . nil)
-    ("><" . string-upcase)
-    ("${author}" . git-user-name)
-    ("${email}" . git-user-email))
+  '(("${project}" . nil)
+    ("${PROJECT}" . string-upcase)
+    ("${author}"  . git-user-name)
+    ("${email}"   . git-user-email))
   "An alist of string substitution where the car is the string to match and the
   cdr is the function to apply.")
 
@@ -78,26 +98,13 @@
   ((text :initarg :text :reader text))
   (:documentation "Condition for subprocess errors."))
 
-(def- run-command (command)
-  (restart-case (string-trim '(#\newline #\tab #\space)
-                             (uiop:run-program command :output :string))
-    (return-empty-string ()
-      "")))
-
-(def- cmd-output (command)
-  "Return the output of running COMMAND as a string."
-  (handler-bind ((error
-                   #'(lambda (c)
-                       (invoke-restart 'return-empty-string))))
-    (run-command command)))
-
 (def- git-user-name (&rest args)
   "Return the git user name."
-  (cmd-output "cd && git config user.name"))
+  *git-user-name*)
 
 (def- git-user-email (&rest args)
   "Return the git email address."
-  (cmd-output "cd && git config user.email"))
+  *git-user-email*)
 
 (def- rep-get (string)
   "Return the transformation function for STRING."
@@ -120,10 +127,12 @@
           :for str := (rep string marker subst) :then (rep str marker subst)
           :finally (return str))))
 
-(def- rep-fmt (string &optional project)
+(def- rep-fmt (string &key project no-header)
   "Return a string with pre-defined substitutions."
-  (rep-all (fmt "~A
-~A" +file-header+ string) (or project *project*)))
+  (rep-all (if no-header
+               (fmt "~A" string)
+               (fmt "~A~%~A" +file-header+ string))
+           (or project *project*)))
 
 (def- out-file (path contents)
   "Generate file in PATH and populate with CONTENTS."
@@ -146,11 +155,10 @@
 
 (def- make-readme-stub ()
   "Generate `/README.org'."
-  (rep-fmt "#+title: <>
+  (rep-fmt "#+title: ${project}
 #+author: ${author}
 #+email: ${email}
-
-"))
+" :no-header t))
 
 (def- make-src-version-stub ()
   "Generate `/version.sexp'."
@@ -158,11 +166,11 @@
 
 (def- make-src-asdf-stub ()
   "Generate the main ASDF stub."
-  (rep-fmt ";;;; <>.asd --- top-level ASDF file for <>
+  (rep-fmt ";;;; ${project}.asd --- top-level ASDF file for ${project}
 
-(defsystem #:<>
-    :name \"<>\"
-    :long-name \"<>\"
+(defsystem #:${project}
+    :name \"${project}\"
+    :long-name \"${project}\"
     :description \"\"
     :long-description \"\"
     :version (:read-file-form #P\"version.sexp\")
@@ -174,69 +182,69 @@
     :source-control \"\"
     :class :package-inferred-system
     :depends-on (#:marie
-                 #:<>/src/core
-                 #:<>/src/driver
-                 #:<>/src/user)
-    :in-order-to ((test-op (test-op \"<>-tests\"))))
+                 #:${project}/src/core
+                 #:${project}/src/driver
+                 #:${project}/src/user)
+    :in-order-to ((test-op (test-op \"${project}-tests\"))))
 "))
 
 (def- make-src-specials-stub ()
   "Generate `/src/specials.lisp'."
   (rep-fmt ";;;; specials.lisp --- special variables
 
-(uiop:define-package #:<>/src/specials
+(uiop:define-package #:${project}/src/specials
   (:use #:cl
         #:marie))
 
-(in-package #:<>/src/specials)
+(in-package #:${project}/src/specials)
 "))
 
 (def- make-src-utilities-stub ()
   "Generate `/src/utilities.lisp'."
   (rep-fmt ";;;; utilities.lisp --- common utilities
 
-(uiop:define-package #:<>/src/utilities
+(uiop:define-package #:${project}/src/utilities
   (:use #:cl
         #:marie))
 
-(in-package #:<>/src/utilities)
+(in-package #:${project}/src/utilities)
 "))
 
 (def- make-src-core-stub ()
   "Generate `/src/core.lisp'."
   (rep-fmt ";;;; core.lisp --- core functions
 
-(uiop:define-package #:<>/src/core
+(uiop:define-package #:${project}/src/core
   (:use #:cl
         #:marie))
 
-(in-package #:<>/src/core)
+(in-package #:${project}/src/core)
 "))
 
 (def- make-src-driver-stub ()
   "Generate `/src/driver.lisp'."
   (rep-fmt ";;;; driver.lisp --- symbol driver
 
-(uiop:define-package #:<>/src/driver
-  (:nicknames #:<>)
+(uiop:define-package #:${project}/src/driver
+  (:nicknames #:${project})
   (:use #:uiop/common-lisp)
-  (:use-reexport #:<>/src/core))
+  (:use-reexport #:${project}/src/core))
 
-(provide \"<>\")
-(provide \"><\")
+(provide \"${project}\")
+(provide \"${PROJECT}\")
 "))
 
 (def- make-src-user-stub ()
   "Generate `/src/user.lisp'."
   (rep-fmt ";;;; user.lisp --- user sandbox
 
-(uiop:define-package #:<>/src/user
-  (:nicknames #:<>-user)
+(uiop:define-package #:${project}/src/user
+  (:nicknames #:${project}-user)
   (:use #:cl
         #:marie
-        #:<>/src/driver))
+        #:${project}/src/driver))
 
-(in-package #:<>-user)
+(in-package #:${project}-user)
 "))
 
 
@@ -248,11 +256,11 @@
 
 (def- make-t-asdf-stub ()
   "Generate the test ASDF stub."
-  (rep-fmt "<>-tests.asd --- test ASDF file for <>
+  (rep-fmt "${project}-tests.asd --- test ASDF file for ${project}
 
-(defsystem #:<>-tests
-    :name \"<>-tests\"
-    :long-name \"<>\"
+(defsystem #:${project}-tests
+    :name \"${project}-tests\"
+    :long-name \"${project}\"
     :description \"\"
     :long-description \"\"
     :version (:read-file-form #P\"version-tests.sexp\")
@@ -265,23 +273,23 @@
     :class :package-inferred-system
     :depends-on (#:fiveam
                  #:marie
-                 #:<>
-                 #:<>/t/core-tests
-                 #:<>/t/driver-tests
-                 #:<>/t/user-tests)
-    :perform (test-op (o c) (uiop:symbol-call :<>/t/core-tests :run-tests)))
+                 #:${project}
+                 #:${project}/t/core-tests
+                 #:${project}/t/driver-tests
+                 #:${project}/t/user-tests)
+    :perform (test-op (o c) (uiop:symbol-call :${project}/t/core-tests :run-tests)))
 "))
 
 (def- make-t-core-stub ()
   "Generate `/t/core-tests.lisp'."
   (rep-fmt ";;;; core-tests.lisp -- core functions tests
 
-(uiop:define-package #:<>/t/core-tests
+(uiop:define-package #:${project}/t/core-tests
   (:use #:cl #:marie
         #:fiveam
-        #:<>))
+        #:${project}))
 
-(in-package #:<>/t/core-tests)
+(in-package #:${project}/t/core-tests)
 
 (def run-tests ()
   \"Run all the tests defined in the suite.\"
@@ -293,26 +301,26 @@
   "Generate `/t/driver-tests.lisp'."
   (rep-fmt ";;;; driver-tests.lisp --- symbol driver tests
 
-(uiop:define-package :<>/t/driver-tests
-  (:nicknames #:<>/t)
+(uiop:define-package :${project}/t/driver-tests
+  (:nicknames #:${project}/t)
   (:use #:uiop/common-lisp
         #:marie)
-  (:use-reexport #:<>/t/core-tests))
+  (:use-reexport #:${project}/t/core-tests))
 
-(provide \"<>/t\")
-(provide \"></T\")
+(provide \"${project}/t\")
+(provide \"${PROJECT}/T\")
 "))
 
 (def- make-t-user-stub ()
   "Generate `/t/user-tests.lisp'."
   (rep-fmt ";;;; user-tests.lisp --- user sandbox tests
 
-(uiop:define-package :<>/t/user-tests
-  (:nicknames #:<>-tests-user)
+(uiop:define-package :${project}/t/user-tests
+  (:nicknames #:${project}-tests-user)
   (:use #:cl #:marie
-        #:<>/t/driver-tests))
+        #:${project}/t/driver-tests))
 
-(in-package #:<>-tests-user)
+(in-package #:${project}-tests-user)
 "))
 
 
