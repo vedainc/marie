@@ -38,6 +38,7 @@
 
 (eval-always
   (def- run-command (command)
+    "Run command around RESTART-CASE."
     (restart-case (string-trim '(#\newline #\tab #\space)
                                (uiop:run-program command :output :string))
       (return-empty-string ()
@@ -351,9 +352,10 @@
           (uiop:with-current-directory (project-tests-dir)
             (out-file (path "core-tests" "lisp") (make-t-core-stub))
             (out-file (path "driver-tests" "lisp") (make-t-driver-stub))
-            (out-file (path "user-tests" "lisp") (make-t-user-stub)))))
+            (out-file (path "user-tests" "lisp") (make-t-user-stub)))
+          (uiop:ensure-directory-pathname project-dir)))
     (bail-out ()
-      (uiop:quit))))
+      nil)))
 
 (def make-project^mk (&rest args)
   "Create a project skeleton named PROJECT in TARGET."
