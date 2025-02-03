@@ -25,7 +25,7 @@
   #P"t"
   "The main tests directory.")
 
-(defk- *file-header*
+(defk- +file-header+
   ";;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-")
 
 
@@ -38,7 +38,7 @@
           :for path := (uiop:merge-pathnames* dir target)
           :do (uiop:ensure-all-directories-exist path))))
 
-(def- replace-all (string part replacement &key (test #'char=))
+(def replace-all (string part replacement &key (test #'char=))
   "Return a new string from STRING in which all the occurences of PART
 is replaced with REPLACEMENT."
   (with-output-to-string (out)
@@ -141,10 +141,16 @@ is replaced with REPLACEMENT."
 
 (defsystem #:<>
     :name \"<>\"
-    :version (:read-file-form #P\"version.sexp\")
+    :long-name \"<>\"
     :description \"\"
     :long-description \"\"
+    :version (:read-file-form #P\"version.sexp\")
     :author \"\"
+    :maintainer \"\"
+    :license \"\"
+    :homepage \"\"
+    :bug-tracker \"\"
+    :source-control \"\"
     :class :package-inferred-system
     :depends-on (#:marie
                  #:<>/src/core
@@ -159,9 +165,16 @@ is replaced with REPLACEMENT."
 
 (defsystem #:<>-tests
     :name \"<>-tests\"
-    :version (:read-file-form #P\"version-tests.sexp\")
+    :long-name \"<>\"
     :description \"\"
+    :long-description \"\"
+    :version (:read-file-form #P\"version-tests.sexp\")
     :author \"\"
+    :maintainer \"\"
+    :license \"\"
+    :homepage \"\"
+    :bug-tracker \"\"
+    :source-control \"\"
     :class :package-inferred-system
     :depends-on (#:fiveam
                  #:marie
