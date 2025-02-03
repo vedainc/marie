@@ -46,7 +46,7 @@
 
   (def- cmd-output (command)
     "Return the output of running COMMAND as a string."
-    (handler-bind ((error
+    (handler-bind ((uiop/run-program:subprocess-error
                      #'(lambda (c)
                          (invoke-restart 'return-empty-string))))
       (run-command command)))
