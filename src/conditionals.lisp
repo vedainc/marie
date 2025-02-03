@@ -70,6 +70,7 @@
   "Return true if ARG1 is not true and ARG2 is not true."
   `(ω (and (not ,arg1) (not ,arg2))))
 
+#-lispworks
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
 true value. This is ALEXANDRIA:WHEN-LET."
@@ -81,6 +82,7 @@ true value. This is ALEXANDRIA:WHEN-LET."
        (when (and ,@variables)
          ,@forms))))
 
+#-lispworks
 (defm when-let* (bindings &body body)
   "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
 a true value. This is ALEXANDRIA:WHEN-LET*."
