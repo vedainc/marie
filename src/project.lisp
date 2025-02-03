@@ -43,10 +43,10 @@
                          (invoke-restart 'return-empty-string))))
       (%cmd-output command)))
 
-  (defv- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
+  ;; allow reloading
+  (defp- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
     "Preload the Git username")
-
-  (defv- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
+  (defp- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
     "Preload the Git user email"))
 
 
@@ -321,6 +321,7 @@
   (make-pathname :name name :type type))
 
 (def- %make-project (project &optional (target (home "common-lisp")))
+  "Create a project skeleton named PROJECT in TARGET."
   (let* ((project (normalize-name project))
          (project-dir (build-path project target))
          (project-source-dir (build-path +source-directory+ project-dir))
@@ -344,15 +345,16 @@
       (uiop:ensure-directory-pathname project-dir))))
 
 (def- &make-project (&rest args)
+  "See %MAKE-PROJECT."
   (restart-case (apply #'%make-project args)
     (return-nil ()
       nil)))
 
 (def make-project^mk (&rest args)
-  "Create a project skeleton named PROJECT in TARGET."
+  "See %MAKE-PROJECT."
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
-                  (lambda (c)
-                    (invoke-restart 'return-nil))))
+                  #'(lambda (c)
+                      (invoke-restart 'return-nil))))
     (apply #'&make-project args)))
