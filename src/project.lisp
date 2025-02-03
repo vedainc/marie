@@ -174,8 +174,8 @@
     :description \"\"
     :long-description \"\"
     :version (:read-file-form #P\"version.sexp\")
-    :author \"\"
-    :maintainer \"\"
+    :author \"${author} <${email}>\"
+    :maintainer \"${author} <${email}>\"
     :license \"\"
     :homepage \"\"
     :bug-tracker \"\"
@@ -264,8 +264,8 @@
     :description \"\"
     :long-description \"\"
     :version (:read-file-form #P\"version-tests.sexp\")
-    :author \"\"
-    :maintainer \"\"
+    :author \"${author} <${email}>\"
+    :maintainer \"${author} <${email}>\"
     :license \"\"
     :homepage \"\"
     :bug-tracker \"\"
@@ -326,31 +326,40 @@
 
 ;;;  entrypoints
 
-(def make-project^mk (project &optional (target (home "common-lisp")))
+(def- path (name type)
+  "Return a pathname from NAME and TYPE."
+  (make-pathname :name name :type type))
+
+(def- %make-project (project &optional (target (home "common-lisp")))
+  (restart-case
+      (let* ((project (normalize-name project))
+             (project-dir (build-path project target))
+             (project-source-dir (build-path +source-directory+ project-dir))
+             (project-tests-dir (build-path +tests-directory+ project-dir)))
+        (let ((*project* project))
+          (create-directory-structure project-dir)
+          (uiop:with-current-directory (project-dir)
+            (out-file (path "README" "org") (make-readme-stub))
+            (out-file (path project "asd") (make-src-asdf-stub))
+            (out-file (path (cat project #\- "tests") "asd") (make-t-asdf-stub))
+            (out-file (path "version" "sexp") (make-src-version-stub))
+            (out-file (path "version-tests" "sexp") (make-t-version-stub)))
+          (uiop:with-current-directory (project-source-dir)
+            (out-file (path "core" "lisp") (make-src-core-stub))
+            (out-file (path "driver" "lisp") (make-src-driver-stub))
+            (out-file (path "user" "lisp") (make-src-user-stub)))
+          (uiop:with-current-directory (project-tests-dir)
+            (out-file (path "core-tests" "lisp") (make-t-core-stub))
+            (out-file (path "driver-tests" "lisp") (make-t-driver-stub))
+            (out-file (path "user-tests" "lisp") (make-t-user-stub)))))
+    (bail-out ()
+      (uiop:quit))))
+
+(def make-project^mk (&rest args)
   "Create a project skeleton named PROJECT in TARGET."
-  (let* ((project (normalize-name project))
-         (project-dir (build-path project target))
-         (project-source-dir (build-path +source-directory+ project-dir))
-         (project-tests-dir (build-path +tests-directory+ project-dir)))
-    (handler-bind ((#+sbcl sb-int:simple-file-error
-                    #+lispworks conditions:file-operation-error
-                    #-(or sbcl lispworks) error
-                    (lambda (c)
-                      (format t "Filesystem error: ~A~%" c)
-                      (uiop:quit))))
-      (let ((*project* project))
-        (create-directory-structure project-dir)
-        (uiop:with-current-directory (project-dir)
-          (out-file (make-pathname :name "README" :type "org") (make-readme-stub))
-          (out-file (make-pathname :name project :type "asd") (make-src-asdf-stub))
-          (out-file (make-pathname :name (cat project #\- "tests") :type "asd") (make-t-asdf-stub))
-          (make-file "src" "version" :type "sexp")
-          (make-file "t" "version" :type "sexp" :alt "tests"))
-        (uiop:with-current-directory (project-source-dir)
-          (make-file "src" "core")
-          (make-file "src" "driver")
-          (make-file "src" "user"))
-        (uiop:with-current-directory (project-tests-dir)
-          (make-file "t" "core" :alt "tests")
-          (make-file "t" "driver" :alt "tests")
-          (make-file "t" "user" :alt "tests"))))))
+  (handler-bind ((#+sbcl sb-int:simple-file-error
+                  #+lispworks conditions:file-operation-error
+                  #-(or sbcl lispworks) error
+                  (lambda (c)
+                    (invoke-restart 'bail-out))))
+    (apply #'%make-project args)))
