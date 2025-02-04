@@ -322,7 +322,7 @@
   (with-open-file (out path :direction :output :if-exists :supersede)
     (format out contents)))
 
-(def- out-files (project project-dir target)
+(def- out-files (project project-dir)
   "Write the project files in PROJECT-DIR."
   (let ((project-source-dir (build-path +source-directory+ project-dir))
         (project-tests-dir (build-path +tests-directory+ project-dir)))
@@ -356,7 +356,7 @@
       (let ((project-dir (build-path project target))
             (*project* project))
         (create-directory-structure project-dir)
-        (out-files project project-dir target)
+        (out-files project project-dir)
         (enroll-system project-dir)))))
 
 (def- &make-project (&rest args)
