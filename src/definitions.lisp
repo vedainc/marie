@@ -142,6 +142,7 @@ define the functions FOO, BAR, and BAZ; and export those names."
   "Like DEF, but do not export NAMES."
   `(%def ,names ,args ,@body))
 
+;; Defun optimization hints
 (defm def! (names args &rest body)
   "Like DEF, but optimize for speed."
   `(def ,names ,args (optimize speed (safety 1)) ,@body))
@@ -244,6 +245,9 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   "Like DEFK, but do not export NAMES."
   `(%defk ,names ,@body))
 
+
+;;; Defgeneric
+
 (defun generic-function-p (symbol)
   "Return true if SYMBOL names a generic function."
   (eql (type-of (fdefinition symbol))
@@ -254,9 +258,6 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   (when (and (fboundp name)
              (not (generic-function-p name)))
     (fmakunbound name)))
-
-
-;;; Defgeneric
 
 (defm- %defg (names (&rest parameters) &body body)
   #.(compose-docstring "Define generic functions")
@@ -287,6 +288,7 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
   "Like DEFG, but do not export NAMES."
   `(%defg ,names ,parameters ,@body))
 
+;; Defgeneric optimization hints
 (defm defg! (names args &rest body)
   "Like DEFG, but optimize for speed."
   `(defg ,names ,args (optimize speed (safety 1)) ,@body))
@@ -346,6 +348,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
   "Like DEFT, but do not export NAMES."
   `(%deft ,names ,@body))
 
+;; Defmethod optimization hints
 (defm deft! (names args &rest body)
   "Like DEFT, but optimize for speed."
   `(deft ,names ,args (optimize speed (safety 1)) ,@body))
