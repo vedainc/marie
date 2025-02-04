@@ -129,15 +129,64 @@
                (fmt "~A~%~A" +file-header+ string))
            (or project *project*)))
 
+(def- rep-fmt* (&rest args)
+  "Like, REP-FMT, but without HEADERS."
+  (apply #'rep-fmt (append args (list :no-header t))))
+
 
 ;;; src
 
 (def- make-readme-stub ()
   "Generate `/README.org'."
-  (rep-fmt "#+title: ${project}
+  (rep-fmt* "#+title: ${project}
 #+author: ${author}
 #+email: ${email}
-" :no-header t))
+"))
+
+(def- make-gitignore-stub ()
+  "Generate `/.gitignore'."
+  (rep-fmt* "*.fasl
+*.64yfasl
+*.lisp-temp
+*.dfsl
+*.pfsl
+*.d64fsl
+*.p64fsl
+*.lx64fsl
+*.lx32fsl
+*.dx64fsl
+*.dx32fsl
+*.fx64fsl
+*.fx32fsl
+*.sx64fsl
+*.sx32fsl
+*.wx64fsl
+*.wx32fsl
+"))
+
+(def- make-flake-nix-stub ()
+  "Generate `flake.nix'."
+  (rep-fmt* "{
+  description = \"A flake\";
+  inputs = {
+    nixpkgs.url = \"github:nixos/nixpkgs/nixpkgs-unstable\";
+    flake-utils.url = \"github:numtide/flake-utils\";
+  };
+  outputs = { nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let pkgs = nixpkgs.legacyPackages.system;
+      in { devShells = import ./shells.nix { inherit nixpkgs pkgs; }; });
+}
+"))
+
+(def- make-shells-nix-stub ()
+  "Generate `shells.nix'."
+  (rep-fmt* "{ nixpkgs, pkgs, ... }:
+with pkgs; rec {
+  lisp = mkShell { buildInputs = [ sbcl ecl ]; };
+  default = lisp;
+}
+"))
 
 (def- make-src-version-stub ()
   "Generate `/version.sexp'."
@@ -161,10 +210,15 @@
     :source-control \"\"
     :class :package-inferred-system
     :depends-on (#:marie
+                 #:clingon
                  #:${project}/src/core
                  #:${project}/src/driver
-                 #:${project}/src/user)
+                 #:${project}/src/user
+                 #:${project}/src/cli)
     :in-order-to ((test-op (test-op \"${project}-tests\"))))
+    :build-operation \"program-op\"
+    :build-pathname \"${project}\"
+    :entry-point \"${project}/src/core:main\"
 "))
 
 (def- make-src-specials-stub ()
@@ -199,7 +253,7 @@
 
 (in-package #:${project}/src/core)
 
-(def hello ()
+(def main^hello ()
   \"Display a greeting.\"
   (format t \"Hello, world!~%\"))
 "))
@@ -228,6 +282,74 @@
         #:${project}/src/driver))
 
 (in-package #:${project}-user)
+"))
+
+(def- make-src-cli-stub ()
+  "Generate `/src/cli.lisp'."
+  (rep-fmt ";;;; cli.lisp --- command line interface
+
+(uiop:define-package #:${project}/src/cli
+  (:use #:cl
+        #:marie
+        #:${project}/src/driver))
+
+(in-package #:${project}/src/cli)
+
+(def- cli-opts ()
+  \"Return the list of options.\"
+  (list
+   (clingon:make-option
+    :flag
+    :description \"Display usage\"
+    :short-name #\\h
+    :long-name \"help\"
+    :key :help)
+   (clingon:make-option
+    :string
+    :description \"Foo\"
+    :short-name #\\f
+    :long-name \"foo\"
+    :initial-value \"foo-bar-baz\"
+    :key :foo)))
+
+(def- cli-handler (cmd)
+  \"The top-level handler function.\"
+  (let ((args (clingon:command-arguments cmd))
+        (foo (clingon:getopt cmd :foo)))
+    (princ foo)
+    (princ (lisp-implementation-type))
+    (princ (lisp-implementation-version))))
+
+(def- cli-command ()
+  \"A command to ${project}.\"
+  (clingon:make-command
+   :name \"${project}\"
+   :description \"${project}\"
+   :version (:read-file-form #P\"version.sexp\")
+   :authors '(\"${author} <${email}>\")
+   :license \"\"
+   :options (cli-opts)
+   :handler #'cli-handler))
+
+(def main ()
+  \"The main blah blah blah.\"
+  (clingon:run (cli-command)))
+"))
+
+(def- make-src-build-stub ()
+  "Generate `/src/build.lisp'."
+  (rep-fmt "(require 'asdf)
+(defun cwd-name ()
+  (multiple-value-bind (type list &rest rest)
+      (uiop:split-unix-namestring-directory-components
+       (namestring (uiop:getcwd)))
+    (car (last list))))
+(defun cwd-keyword () (intern (cwd-name) (find-package :keyword)))
+(defun home (path) (merge-pathnames path (user-homedir-pathname)))
+#-quicklisp (load (home \"quicklisp/setup.lisp\"))
+(push (uiop:getcwd) asdf:*central-registry*)
+(ql:quickload (cwd-keyword))
+(asdf:make (cwd-keyword))
 "))
 
 
@@ -309,7 +431,7 @@
 
 ;;;  helpers
 
-(def- path (name type)
+(def- path (name &optional type)
   "Return a pathname from NAME and TYPE."
   (make-pathname :name name :type type))
 
@@ -328,6 +450,9 @@
         (project-tests-dir (build-path +tests-directory+ project-dir)))
     (uiop:with-current-directory (project-dir)
       (out-file (path "README" "org") (make-readme-stub))
+      (out-file (path ".gitignore") (make-gitignore-stub))
+      (out-file (path "flake" "nix") (make-flake-nix-stub))
+      (out-file (path "shells" "nix") (make-shells-nix-stub))
       (out-file (path project "asd") (make-src-asdf-stub))
       (out-file (path (cat project #\- "tests") "asd") (make-t-asdf-stub))
       (out-file (path "version" "sexp") (make-src-version-stub))
@@ -335,7 +460,9 @@
     (uiop:with-current-directory (project-source-dir)
       (out-file (path "core" "lisp") (make-src-core-stub))
       (out-file (path "driver" "lisp") (make-src-driver-stub))
-      (out-file (path "user" "lisp") (make-src-user-stub)))
+      (out-file (path "user" "lisp") (make-src-user-stub))
+      (out-file (path "cli" "lisp") (make-src-cli-stub))
+      (out-file (path "build" "lisp") (make-src-build-stub)))
     (uiop:with-current-directory (project-tests-dir)
       (out-file (path "core-tests" "lisp") (make-t-core-stub))
       (out-file (path "driver-tests" "lisp") (make-t-driver-stub))
