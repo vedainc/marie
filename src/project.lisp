@@ -58,7 +58,7 @@
 
 (def- build-path (path1 path2)
   "Return a new path ensuring that PATH2 is a directory."
-  (merge-pathnames path1 (uiop:ensure-directory-pathname path2)))
+  (uiop:merge-pathnames* path1 (uiop:ensure-directory-pathname path2)))
 
 (def- create-directory-structure (target)
   "Create the directory structure of the new project under TARGET."
@@ -532,7 +532,7 @@ with pkgs; rec {
 
 (def make-project^mk (&rest args)
   "See %MAKE-PROJECT.
-   Use, (mk \"foo\")"
+  (mk \"foo\")"
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
