@@ -41,6 +41,7 @@
   "Return the output of running COMMAND as a string."
   (handler-bind ((uiop/run-program:subprocess-error
                    #'(lambda (c)
+                       (declare (ignore c))
                        (invoke-restart 'return-empty-string))))
     (&cmd-output command)))
 
@@ -82,23 +83,25 @@
           :while pos)))
 
 (defv- *rep-table*
-  '(("${project}" . nil)
-    ("${PROJECT}" . string-upcase)
-    ("${author}"  . git-user-name)
-    ("${email}"   . git-user-email))
+    '(("${project}" . nil)
+      ("${PROJECT}" . string-upcase)
+      ("${author}"  . git-user-name)
+      ("${email}"   . git-user-email))
   "An alist of string substitution where the car is the string to match and the
   cdr is the function to apply.")
 
 (defn- sub-process-error (error)
-  ((text :initarg :text :reader text))
-  (:documentation "Condition for subprocess errors."))
+    ((text :initarg :text :reader text))
+    (:documentation "Condition for subprocess errors."))
 
 (def- git-user-name (&rest args)
   "Return the git user name."
+  (declare (ignore args))
   *git-user-name*)
 
 (def- git-user-email (&rest args)
   "Return the git email address."
+  (declare (ignore args))
   *git-user-email*)
 
 (def- rep-get (string)
@@ -455,6 +458,12 @@ with pkgs; rec {
 
 ;;;  helpers
 
+(defm- with-out-files (dir &body file-specs)
+  "Define macro helper to avoid out-file repetition."
+  `(uiop:with-current-directory (,dir)
+     ,@(loop :for (fname contents) :in file-specs
+             :collect `(out-file (path ,@fname) ,contents))))
+
 (def- path (name &optional type)
   "Return a pathname from NAME and TYPE."
   (make-pathname :name name :type type))
@@ -472,26 +481,29 @@ with pkgs; rec {
   "Write the project files in PROJECT-DIR."
   (let ((project-source-dir (build-path +source-directory+ project-dir))
         (project-tests-dir (build-path +tests-directory+ project-dir)))
-    (uiop:with-current-directory (project-dir)
-      (out-file (path "README" "org") (make-readme-stub))
-      (out-file (path "makefile") (make-makefile-stub))
-      (out-file (path ".gitignore") (make-gitignore-stub))
-      (out-file (path "flake" "nix") (make-flake-nix-stub))
-      (out-file (path "shells" "nix") (make-shells-nix-stub))
-      (out-file (path project "asd") (make-src-asdf-stub))
-      (out-file (path (cat project #\- "tests") "asd") (make-t-asdf-stub))
-      (out-file (path "version" "sexp") (make-src-version-stub))
-      (out-file (path "version-tests" "sexp") (make-t-version-stub)))
-    (uiop:with-current-directory (project-source-dir)
-      (out-file (path "core" "lisp") (make-src-core-stub))
-      (out-file (path "driver" "lisp") (make-src-driver-stub))
-      (out-file (path "user" "lisp") (make-src-user-stub))
-      (out-file (path "cli" "lisp") (make-src-cli-stub))
-      (out-file (path "build" "lisp") (make-src-build-stub)))
-    (uiop:with-current-directory (project-tests-dir)
-      (out-file (path "core-tests" "lisp") (make-t-core-stub))
-      (out-file (path "driver-tests" "lisp") (make-t-driver-stub))
-      (out-file (path "user-tests" "lisp") (make-t-user-stub))) ))
+    ;; Root files
+    (with-out-files project-dir
+      (("README" "org") (make-readme-stub))
+      (("makefile") (make-makefile-stub))
+      ((".gitignore") (make-gitignore-stub))
+      (("flake" "nix") (make-flake-nix-stub))
+      (("shells" "nix") (make-shells-nix-stub))
+      ((project "asd") (make-src-asdf-stub))
+      (((cat project #\- "tests") "asd") (make-t-asdf-stub))
+      (("version" "sexp") (make-src-version-stub))
+      (("version-tests" "sexp") (make-t-version-stub)))
+    ;; src files
+    (with-out-files project-source-dir
+      (("core" "lisp") (make-src-core-stub))
+      (("driver" "lisp") (make-src-driver-stub))
+      (("user" "lisp") (make-src-user-stub))
+      (("cli" "lisp") (make-src-cli-stub))
+      (("build" "lisp") (make-src-build-stub)))
+    ;; test files
+    (with-out-files project-tests-dir
+      (("core-tests" "lisp") (make-t-core-stub))
+      (("driver-tests" "lisp") (make-t-driver-stub))
+      (("user-tests" "lisp") (make-t-user-stub)))))
 
 (def- enroll-system (project-dir)
   "Make the system indicated by PROJECT-DIR immediately accessible by ASDF."
@@ -523,5 +535,6 @@ with pkgs; rec {
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
                   #'(lambda (c)
+                      (declare (ignore c))
                       (invoke-restart 'return-nil))))
     (apply #'&make-project args)))
