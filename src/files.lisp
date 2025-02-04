@@ -8,6 +8,9 @@
 
 (in-package #:marie/src/files)
 
+
+;;; File directory related fns
+
 (def directory-entries (directory)
   "Return top-level files and directories under DIRECTORY."
   (append (uiop:subdirectories directory)
@@ -42,3 +45,36 @@
                          :if-exists :supersede
                          :if-does-not-exist :create)
      ,@body))
+
+(def home^~ (path)
+  "Return a path relative to the home directory."
+  (uiop:subpathname (user-homedir-pathname) path))
+
+(def expand-pathname (path)
+  "Return a path while performing tilde expansion."
+  (let ((home (uiop:pathname-parent-directory-pathname (user-homedir-pathname)))
+        (pathstring (uiop:native-namestring path)))
+    (cond ((and (char-equal (elt pathstring 0) #\~)
+                (char-equal (elt pathstring 1) #\/))
+           (home (subseq pathstring 2)))
+          ((and (char-equal (elt pathstring 0) #\~)
+                (not (char-equal (elt pathstring 1) #\/)))
+           (uiop:subpathname home (subseq pathstring 1)))
+          (t (uiop:ensure-absolute-pathname pathstring)))))
+
+(def read-integer (string)
+  "Return integer from STRING."
+  (parse-integer string :junk-allowed t))
+
+(def read-integer-line (file)
+  "Return integer from a line in FILE."
+  (read-integer (read-line file nil)))
+
+(def display-file (file)
+  "Display the contents of FILE."
+  (let ((in (open file :if-does-not-exist nil)))
+    (when in
+      (loop :for line = (read-line in nil)
+            :while line
+            :do (format t "~A~%" line))
+      (close in))))

@@ -7,8 +7,14 @@
 
 (in-package #:marie/src/symbols)
 
+
+;;; Show symbols
+
 (def symbols (package &key (type :external-symbols) sort)
-  "Return the symbols interned in PACKAGE by TYPE."
+  "Return the symbols interned in PACKAGE by TYPE.
+  (symbols :package-name :sort #'string<)
+  (symbols :pacakage-name :type :symbols)
+  (symbols :package-name)"
   (let ((symbols '()))
     (macrolet ((mac (fn)
                  `(,fn (symbol (find-package package))
@@ -22,30 +28,32 @@
           symbols))))
 
 (def symbols*^syms (package &key (type :external-symbols) (sort #'string<))
-  "Print the symbols interned in PACKAGE by TYPE."
+  "Print the symbols in interned in PACKAGE by TYPE."
+  (declare (optimize (speed 3) (safety 0)))
   (let ((symbols (symbols package :type type :sort sort)))
     (format t "~{~A~%~}" symbols)))
 
 (def external-symbols (package &key sort)
   "Return the external symbols in PACKAGE."
+  (declare (optimize (speed 3) (safety 0)))
   (symbols package :type :external-symbols :sort sort))
 
 (def present-symbols (package)
   "Return the present symbols in PACKAGE."
+  (declare (optimize (speed 3) (safety 0)))
   (symbols package :type :present-symbols))
 
 (def pretty-print-symbols^pps (package &optional (type :external-symbols) (sort #'string<))
-  "Display the external symbols in PACKAGE in the order that they were declared as dependencies."
+  "Display the external symbols in PACKAGE in the order that they were declared
+as dependencies."
   (let ((dependencies (asdf:system-depends-on (asdf:find-system package))))
     (loop :for dependency :in dependencies
           :do (let* ((symbols (symbols (read-from-string dependency) :type type))
                      (sorted-symbols (sort symbols sort)))
-                (format t "~&~%#:~A~%~{~A~^~%~}" dependency sorted-symbols)))))
+                (format t "~&~%** ~A~%~{~A~^~%~}" dependency sorted-symbols)))))
 
-(defm with-gensyms ((&rest names) &body body)
-  "Evaluate BODY where NAMES are unique symbols."
-  `(let ,(loop :for name :in names :collect `(,name (gensym)))
-     ,@body))
+
+;;; Modified print expansion
 
 (defm macro-expand^mx (form)
   "Pretty print the macro expansion of FORM."
@@ -58,10 +66,25 @@
               (format t "~&~A:~%~S" text value-2)))
      (values)))
 
+
+;;; Common utils
+
+(defm with-gensyms ((&rest names) &body body)
+  "Evaluate BODY where NAMES are unique symbols."
+  `(let ,(loop :for name :in names :collect `(,name (gensym)))
+     ,@body))
+
 (defm macro-apply^mapply (macro &rest args)
   "Invoke the macro MACRO to each item in ARGS."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
+
+(defm flet* (&rest body)
+  "Evaluate BODY in LABELS."
+  `(labels ,@body))
+
+
+;;; Symbol manipulation
 
 (defm free (arg-1 &optional arg-2)
   "Unbind ARG-1; if ARG-2 is present, free ARG-2 in instance of ARG-1."
@@ -74,6 +97,23 @@
        (slot-makunbound ',arg-1 ',arg-2))
      (unintern ',arg-1)
      (values)))
+
+(defm unbind (symbol)
+  "Remove the bindings of SYMBOL."
+  `(progn
+     (when (boundp ',symbol) (makunbound ',symbol))
+     (when (fboundp ',symbol) (fmakunbound ',symbol))))
+
+(defm rename-macro (name-1 name-2)
+  "Rename macro from NAME-1 to NAME-2."
+  (with-gensyms (definition)
+    `(when (macro-function ',name-1)
+       (let ((,definition (macro-function ',name-1)))
+         (unbind ,name-1)
+         (unbind ,name-2)
+         (setf (macro-function ',name-2)
+               ,definition)
+         (values)))))
 
 (defm rename-special-variable (name-1 name-2)
   "Rename the special variable NAME-1 to NAME-2."
@@ -95,25 +135,4 @@
        (let ((,temp ,name-1))
          (setf (symbol-value ',name-1) ,name-2)
          (setf (symbol-value ',name-2) ,temp)
-         (values)))))
-
-(defm flet* (&rest body)
-  "Evaluate BODY in LABELS."
-  `(labels ,@body))
-
-(defm unbind (symbol)
-  "Remove the bindings of SYMBOL."
-  `(progn
-     (when (boundp ',symbol) (makunbound ',symbol))
-     (when (fboundp ',symbol) (fmakunbound ',symbol))))
-
-(defm rename-macro (name-1 name-2)
-  "Rename macro from NAME-1 to NAME-2."
-  (with-gensyms (definition)
-    `(when (macro-function ',name-1)
-       (let ((,definition (macro-function ',name-1)))
-         (unbind ,name-1)
-         (unbind ,name-2)
-         (setf (macro-function ',name-2)
-               ,definition)
          (values)))))

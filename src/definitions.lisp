@@ -7,6 +7,44 @@
 
 (in-package #:marie/src/definitions)
 
+#|
+This component provides a set of macros and utility functions that extend Common-Lisp's definition capabilities,
+- Simplified definition of functions, macros, methods, classes, conditions, types and etc.
+- Support for multiple name/alias definitions
+- Performance optimization hints (defun, defgeneric, defmethod)
+
+([Export symbols (without '-')  | Without exporting symbols (with '-')])
+DEFMACRO                  defm  |  defm-     : Define a macro
+DEFUN                     def   |  def-      : Define a function
+DEFVAR                    defv  |  defv-     : Define a special variable
+DEFPARAMETER              defp  |  defp-     : Define a dynamic parameter
+DEFCONSTANT               defk  |  defk-     : Define a constant
+DEFGENERIC                defg  |  defg-     : Define a generic function
+DEFMETHOD                 deft  |  deft-     : Define a method
+DEFCLASS                  defc  |  defc-     : Define a class
+DEFINE-CONDITION          defn  |  defn-     : Define an error condition
+DEFINE-MODIFY-MACRO       defmm |  defmm-    : Define a modify macro
+DEFINE-SYMBOL-MACRO       defsm |  defsm-    : Define a symbol macro
+DEFTYPE                   defy  |  defy-     : Define a type
+SET-VARIABLE              setv  |  setv-     : Custom variable setting
+MVB                            mvb           ; multiple-value-bind
+
+Utilities:
+- COMPOSE-DEFINITION: Create classes with an instant instantiation and predicate
+- COMPOSE-EXPORT: Generate export forms
+
+Features:
+- Use "^" or "·" as name separators for aliases
+- Append "^t" or "tack-t" to force export of defined names/symbols
+- Optimization variants like "def!" (speed) and "def@" (safety)
+
+Example:
+(def foo^bar (x) (1+ x))  ; Defines FOO and BAR functions, exports both
+|#
+
+
+;;; Utilities
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *docstring*
     ", and conditionally export NAMES.
@@ -48,6 +86,9 @@ function and the rest are aliases. Export NAMES if T is present in NAMES."
        ,@(loop :for alias :in (remove t aliases)
                :collect `(export ',alias)))))
 
+
+;;; Defmacro
+
 (defmacro %defm (names args &rest body)
   #.(compose-docstring "Define macros")
   (destructuring-bind (name &rest aliases)
@@ -78,6 +119,8 @@ define the macros QUX, QUUX, and CORGE; and export those names."
 ;;   (and (listp expr)
 ;;        (= (length expr) 2)
 ;;        (car expr 'setf)))
+
+;;; Defun
 
 (defm- %def (names args &rest body)
   #.(compose-docstring "Define functions")
@@ -117,6 +160,9 @@ define the functions FOO, BAR, and BAZ; and export those names."
   "Like DEF-, but optimize for safety."
   `(def- ,names ,args (optimize (speed 0) safety debug) ,@body))
 
+
+;;; Defvar
+
 (defm- %defv (names &rest body)
   #.(compose-docstring "Define special variables with DEFVAR")
   (destructuring-bind (name &rest aliases)
@@ -144,6 +190,9 @@ names."
   "Like DEFV, but do not export NAMES."
   `(%defv ,names ,@body))
 
+
+;;; Defparameter
+
 (defm- %defp (names &rest body)
   #.(compose-docstring "Define special variables with DEFPARAMETER")
   (destructuring-bind (name &rest aliases)
@@ -169,6 +218,9 @@ names."
 (defm defp- (names &rest body)
   "Like DEFP, but do not export NAMES."
   `(%defp ,names ,@body))
+
+
+;;; Defconstant
 
 (defm- %defk (names &rest body)
   #.(compose-docstring "Define constants with DEFCONSTANT but allow the definitions to change on subsequent calls")
@@ -207,6 +259,9 @@ define the constants +FRED+, +PLUGH+, +XYZZY+; and export those names."
   (when (and (fboundp name)
              (not (generic-function-p name)))
     (fmakunbound name)))
+
+
+;;; Defgeneric
 
 (defm- %defg (names (&rest parameters) &body body)
   #.(compose-docstring "Define generic functions")
@@ -249,6 +304,9 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
 (defm defg@- (names args &rest body)
   "Like DEFG-, but optimize for safety."
   `(defg- ,names ,args (optimize (speed 0) safety debug) ,@body))
+
+
+;;; Defmethod
 
 (defm- %deft (names &body body)
   #.(compose-docstring "Define methods with DEFMETHOD")
@@ -306,7 +364,11 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
   "Like DEFT-, but optimize for safety."
   `(deft- ,names ,args (optimize (speed 0) safety debug) ,@body))
 
+
+;;; Define class with instant instantiation (Custom)
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
+
   (defun p-symbol (symbol)
     "Return a conditionally hyphenated predicate symbol."
     (let* ((string (prin1-to-string symbol))
@@ -317,7 +379,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 
   (defun compose-name (predicate &rest names)
     "Compose a hyphenated symbol from NAMES. Return a symbol for predicate use
-if PREDICATE is true."
+    if PREDICATE is true."
     (let ((val (read-from-string
                 (format nil "~{~A~^-~}"
                         (mapcar (lambda (name)
@@ -328,7 +390,7 @@ if PREDICATE is true."
           val))))
 
 (defm- compose-definitions (type name superclasses slot-specs
-                            &optional class-option)
+                                 &optional class-option)
   "Compose the forms for creating a class."
   `(progn
      (,type ,name (,@superclasses)
@@ -350,8 +412,11 @@ if PREDICATE is true."
      (export ',name)
      (export ',(compose-name t name))))
 
+
+;;; Defclass
+
 (defm- %defc (names (&rest superclasses)
-              (&rest slot-specs) &optional class-option)
+                    (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -411,6 +476,9 @@ exported along with the names of the classes.
                :collect `(define-modify-macro ,alias ,args ,function ,doc))
        (export-names ,name ,aliases))))
 
+
+;;; Define-modify-macro
+
 (defm defmm (names args &rest body)
   "Define modify macros with DEFINE-MODIFY-MACRO.
 
@@ -435,6 +503,9 @@ define the modify macro APPENDF; and export that names."
                :collect `(define-symbol-macro ,alias ,expansion))
        (export-names ,name ,aliases))))
 
+
+;;; Define-symbol-macro
+
 (defm defsm (names expansion)
   "Define symbol macros with DEFINE-SYMBOL-MACRO.
 
@@ -454,8 +525,11 @@ define the symbol macro APPENDF; and export that name."
   `(let ((,name ,value))
      ,@body))
 
+
+;;; Define-condition
+
 (defm- %defn (names (&rest superclasses)
-              (&rest slot-specs) &optional class-option)
+                    (&rest slot-specs) &optional class-option)
   "Define conditions with DEFINE-CONDITION."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -500,6 +574,9 @@ Those symbols are exported along with the names of the classes.
   "Like DEFN, but do not export NAMES."
   `(%defn ,names ,superclasses ,slot-specs ,class-option))
 
+
+;;; DEFTYPE
+
 (defm- %defy (names args &rest body)
   #.(compose-docstring "Define types")
   (destructuring-bind (name &rest aliases)
@@ -533,6 +610,9 @@ define the types FOO, BAR, and BAZ; and exports those names."
        :special)
   #-(or lispworks sbcl)
   (error "Not implemented."))
+
+
+;;; Set variable
 
 (defm- %setv (names &rest body)
   #.(compose-docstring "Define NAMES as special variables. If NAMES are already
