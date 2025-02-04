@@ -1,12 +1,12 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
-;;;; files.lisp --- utilities for dealing with disk files
+;;;; filesystem.lisp --- utilities for dealing with disk files and filesystem
 
 (uiop:define-package #:marie/src/filesystem
   (:use #:cl
         #:marie/src/definitions
         #:marie/src/sequences))
 
-(in-package #:marie/src/files)
+(in-package #:marie/src/filesystem)
 
 
 ;;; File directory related fns
