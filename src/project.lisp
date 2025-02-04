@@ -7,7 +7,7 @@
         #:marie/src/sequences
         #:marie/src/strings
         #:marie/src/etc
-        #:marie/src/files))
+        #:marie/src/filesystem))
 
 (in-package #:marie/src/project)
 

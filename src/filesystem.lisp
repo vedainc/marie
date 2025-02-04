@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
 ;;;; files.lisp --- utilities for dealing with disk files
 
-(uiop:define-package #:marie/src/files
+(uiop:define-package #:marie/src/file
   (:use #:cl
         #:marie/src/definitions
         #:marie/src/sequences))
@@ -48,7 +48,10 @@
 
 (def home^~ (path)
   "Return a path relative to the home directory."
-  (uiop:subpathname (user-homedir-pathname) path))
+  ;; (uiop:merge-pathnames* path (user-homedir-pathname))
+  ;; (merge-pathnames path (user-homedir-pathname))
+  (uiop:subpathname (user-homedir-pathname) path)
+  )
 
 (def expand-pathname (path)
   "Return a path while performing tilde expansion."
