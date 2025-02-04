@@ -50,8 +50,7 @@
   "Return a path relative to the home directory."
   ;; (uiop:merge-pathnames* path (user-homedir-pathname))
   ;; (merge-pathnames path (user-homedir-pathname))
-  (uiop:subpathname (user-homedir-pathname) path)
-  )
+  (uiop:subpathname (user-homedir-pathname) path))
 
 (def expand-pathname (path)
   "Return a path while performing tilde expansion."
