@@ -176,10 +176,6 @@
         #:marie))
 
 (in-package #:${project}/src/specials)
-
-
-;;;
-
 "))
 
 (def- make-src-utilities-stub ()
@@ -191,10 +187,6 @@
         #:marie))
 
 (in-package #:${project}/src/utilities)
-
-
-;;;
-
 "))
 
 (def- make-src-core-stub ()
@@ -206,10 +198,6 @@
         #:marie))
 
 (in-package #:${project}/src/core)
-
-
-
-;;;
 
 (def hello ()
   \"Display a greeting.\"
@@ -240,10 +228,6 @@
         #:${project}/src/driver))
 
 (in-package #:${project}-user)
-
-
-;;;
-
 "))
 
 
@@ -290,9 +274,6 @@
 
 (in-package #:${project}/t/core-tests)
 
-
-;;;
-
 (def run-tests ()
   \"Run all the tests defined in the suite.\"
   (run-all-tests))
@@ -323,10 +304,6 @@
         #:${project}/t/driver-tests))
 
 (in-package #:${project}-tests-user)
-
-
-;;;
-
 "))
 
 
