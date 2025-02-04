@@ -12,7 +12,7 @@
                  #:marie/src/strings
                  #:marie/src/etc
                  #:marie/src/hash
-                 #:marie/src/files
+                 #:marie/src/filesystem
                  #:marie/src/project))
 
 (provide "marie")
