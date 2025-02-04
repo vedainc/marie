@@ -11,13 +11,12 @@
 (in-package #:marie/src/project)
 
 
-;;; variables
+;;; t
 
 (defk- +file-header+
   ";;;; -*- mode: lisp; syntax: common-lisp; base: 10; -*-")
 
-(defv- *project*
-  "project"
+(defv- *project* "project"
   "The default project name.")
 
 (defk- +source-directory+
@@ -28,26 +27,29 @@
   #P"t"
   "The main tests directory.")
 
-(eval-always
-  (def- %cmd-output (command)
-    "Run command around RESTART-CASE."
-    (restart-case (string-trim '(#\newline #\tab #\space)
-                               (uiop:run-program command :output :string))
-      (return-empty-string ()
-        "")))
+(def- run-trim (command)
+  "Run COMMAND and remove trailing whitespace."
+  (string-trim '(#\newline #\tab #\space) (uiop:run-program command :output :string)))
 
-  (def- cmd-output (command)
-    "Return the output of running COMMAND as a string."
-    (handler-bind ((uiop/run-program:subprocess-error
-                     #'(lambda (c)
-                         (invoke-restart 'return-empty-string))))
-      (%cmd-output command)))
+(def- &cmd-output (command)
+  "Run command around RESTART-CASE."
+  (restart-case (run-trim command)
+    (return-empty-string ()
+      "")))
 
-  ;; allow reloading
-  (defp- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
-    "Preload the Git username")
-  (defp- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
-    "Preload the Git user email"))
+(def- cmd-output (command)
+  "Return the output of running COMMAND as a string."
+  (handler-bind ((uiop/run-program:subprocess-error
+                   #'(lambda (c)
+                       (invoke-restart 'return-empty-string))))
+    (&cmd-output command)))
+
+;; allow reloading
+(defp- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
+  "Preload the Git username")
+
+(defp- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
+  "Preload the Git user email")
 
 
 ;;; functions
@@ -174,6 +176,10 @@
         #:marie))
 
 (in-package #:${project}/src/specials)
+
+
+;;;
+
 "))
 
 (def- make-src-utilities-stub ()
@@ -185,6 +191,10 @@
         #:marie))
 
 (in-package #:${project}/src/utilities)
+
+
+;;;
+
 "))
 
 (def- make-src-core-stub ()
@@ -196,6 +206,10 @@
         #:marie))
 
 (in-package #:${project}/src/core)
+
+
+
+;;;
 
 (def hello ()
   \"Display a greeting.\"
@@ -226,6 +240,10 @@
         #:${project}/src/driver))
 
 (in-package #:${project}-user)
+
+
+;;;
+
 "))
 
 
@@ -272,6 +290,9 @@
 
 (in-package #:${project}/t/core-tests)
 
+
+;;;
+
 (def run-tests ()
   \"Run all the tests defined in the suite.\"
   (run-all-tests))
@@ -302,6 +323,10 @@
         #:${project}/t/driver-tests))
 
 (in-package #:${project}-tests-user)
+
+
+;;;
+
 "))
 
 
@@ -347,7 +372,7 @@
 
 ;;; entrypoints
 
-(def- %make-project (project &optional (target (home "common-lisp")))
+(def- %make-project (project &key (target (home "common-lisp")))
   "Create a project skeleton named PROJECT in TARGET."
   (let ((project (normalize-name project)))
     (unless (empty-string-p project)
