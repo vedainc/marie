@@ -164,6 +164,30 @@
 *.wx32fsl
 "))
 
+(def- make-makefile-stub ()
+  "Generate `/makefile'."
+  (rep-fmt* "SHELL := bash
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
+
+.ONESHELL:
+.SHELLFLAGS := -eu -o pipefail -c
+.DELETE_ON_ERROR:
+
+NAME = ${project}
+LISP := sbcl
+
+.PHONY: all $(NAME) clean
+
+all: $(NAME)
+
+$(NAME):
+	@(LISP) --eval '(ql:quickload :${project})' --eval '(asdf:make :${project})' --eval '(uiop:quit)'
+
+clean:
+	@rm -f $(NAME)
+"))
+
 (def- make-flake-nix-stub ()
   "Generate `flake.nix'."
   (rep-fmt* "{
@@ -450,6 +474,7 @@ with pkgs; rec {
         (project-tests-dir (build-path +tests-directory+ project-dir)))
     (uiop:with-current-directory (project-dir)
       (out-file (path "README" "org") (make-readme-stub))
+      (out-file (path "makefile") (make-makefile-stub))
       (out-file (path ".gitignore") (make-gitignore-stub))
       (out-file (path "flake" "nix") (make-flake-nix-stub))
       (out-file (path "shells" "nix") (make-shells-nix-stub))
