@@ -107,28 +107,6 @@
       (every #'null value)))
 
 
-;;; System fns
-
-(def system-object^sys-object (name)
-  "Return the system object for the current system."
-  (asdf:find-system name))
-
-(def system-path^sys-path (system)
-  "Return the ASDF file path for the current system."
-  (let ((object (system-object system)))
-    (uiop:merge-pathnames* (cat system ".asd")
-                           (asdf:system-source-directory object))))
-
-(def system-directory^sys-directory (system)
-  "Return the top-level directory of a system."
-  (let ((path (sys-path system)))
-    nil))
-
-(def system-version^sys-version (name)
-  "Return the version number extracted from the system resources."
-  (asdf:system-version (sys-object name)))
-
-
 ;;;  Miscellaneous fns
 
 (defm with-time ((&optional) &body body)
