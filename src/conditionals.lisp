@@ -9,10 +9,8 @@
 
 (in-package #:marie/src/conditionals)
 
-(defm true-when^ω (condition)
-  "Return T when CONDITION evaluates as true."
-  `(when ,condition
-     t))
+
+;;; Mapping fns
 
 (defm map-and (fn &rest args)
   "Return true if FN returns true for all items in ARGS."
@@ -33,6 +31,9 @@
   "Return true if at least one function in FNS return true for VALUE."
   `(or ,@(loop :for fn :in fns :collect `(funcall ,fn ,value))
        nil))
+
+
+;;; Logical operator variants
 
 (defm logical-and^land^∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
@@ -70,7 +71,10 @@
   "Return true if ARG1 is not true and ARG2 is not true."
   `(ω (and (not ,arg1) (not ,arg2))))
 
-#-lispworks
+
+;;; When macro bindings
+
+
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
 true value. This is ALEXANDRIA:WHEN-LET."
@@ -82,7 +86,6 @@ true value. This is ALEXANDRIA:WHEN-LET."
        (when (and ,@variables)
          ,@forms))))
 
-#-lispworks
 (defm when-let* (bindings &body body)
   "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
 a true value. This is ALEXANDRIA:WHEN-LET*."
@@ -97,16 +100,27 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
                    `(progn ,@body))))
       (bind binding-list body))))
 
+
+;;; Boolean logic helpers
+
+(defm true-when^ω (condition)
+  "Return T when CONDITION evaluates as true."
+  `(when ,condition
+     t))
+
 (def true-false-p (x y)
   "Return true if X is true and Y is false."
+  (declare (type boolean x y))
   (if (and x (null y)) t nil))
 
 (def false-true-p (x y)
   "Return true if X is false and Y is true."
+  (declare (type boolean x y))
   (true-false-p y x))
 
 (def true-true-p (x y)
   "Return true if X is true and Y is true."
+  (declare (type boolean x y))
   (and x y t))
 
 (defm aif (test-form then-form &optional else-form)
@@ -117,7 +131,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 (defm awhen (test-form &body then-form)
   "Anaphoric WHEN."
   `(aif ,test-form
-    (progn ,@then-form)))
+        (progn ,@then-form)))
 
 (defm aand (&rest args)
   "Anaphoric AND."
@@ -136,6 +150,12 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
                (let ((it ,symbol)) ,@(cdr clause))
                (acond ,@(cdr clauses)))))))
 
+(defm nif (test-form then-form &optional else-form)
+  "Not IF."
+  `(if (not ,test-form)
+       ,then-form
+       ,else-form))
+
 (def- alpha-reader (stream char)
   "Define the reader for α, so that it can be used to refer to the anaphora."
   (declare (ignore stream char))
@@ -146,9 +166,3 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   (set-macro-character #\α #'alpha-reader))
 
 (use-alpha-reader)
-
-(defm nif (test-form then-form &optional else-form)
-  "Not IF."
-  `(if (not ,test-form)
-       ,then-form
-       ,else-form))

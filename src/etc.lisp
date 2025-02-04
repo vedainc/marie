@@ -9,93 +9,28 @@
 
 (in-package #:marie/src/etc)
 
-(def apropos* (&rest args)
-  "Display sorted matching symbols from ARGS with CL:APROPOS."
-  (loop :for symbol :in (sort (apply #'apropos-list args) #'string<)
-        :do (format t "~S~%" symbol)))
+
+;;; Optimiziation
 
-(def read-integer (string)
-  "Return integer from STRING."
-  (parse-integer string :junk-allowed t))
+(defm optimize-safety ()
+  "Enable compiler options for maximum safety options."
+  `(declaim (optimize (safety 3) (debug 3) (speed 0))))
 
-(def read-integer-line (file)
-  "Return integer from a line in FILE."
-  (read-integer (read-line file nil)))
+(defm optimize-speed ()
+  "Enable compiler options for maximum speed options."
+  `(declaim (optimize (safety 1) (debug 3) (speed 3) )))
 
-(def display-file (file)
-  "Display the contents of FILE."
-  (let ((in (open file :if-does-not-exist nil)))
-    (when in
-      (loop :for line = (read-line in nil)
-            :while line
-            :do (format t "~A~%" line))
-      (close in))))
+(defm optimize-speed-unsafe ()
+  "Enable compiler options for maximum speed options."
+  `(declaim (optimize (safety 0) (debug 3) (speed 3))))
 
-(def collect-characters (start end)
-  "Collect ASCII characters from START to END."
-  (loop :for index :from start :below (+ start end) :collect (code-char index)))
+(defm optimize-debug ()
+  "Enable compiler options for maximum debug settings."
+  `(declaim (optimize (speed 1) (debug 3) (safety 1))))
 
-(def copy-table^copyhash (hash-table)
-  "Return a new hash table from HASH-TABLE."
-  (let ((table (make-hash-table :test (hash-table-test hash-table)
-                                :rehash-size (hash-table-rehash-size hash-table)
-                                :rehash-threshold (hash-table-rehash-threshold hash-table)
-                                :size (hash-table-size hash-table))))
-    (loop :for key :being each hash-key :of hash-table
-            :using (hash-value value)
-          :do (setf (gethash key table) value)
-          :finally (return table))))
 
-(def hash-table-keys (hash-table)
-  "Return the keys of HASH-TABLE."
-  (maphash #'(λ (k v) (declare (ignore v)) k) hash-table))
-
-(def hash-table-values (hash-table)
-  "Return the values of HASH-TABLE."
-  (maphash #'(λ (k v) (declare (ignore k)) v) hash-table))
-
-(def list-table^listhash (hash-table &key sort key)
-  "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
-be used by SORT with KEY being the key that will be used for sorting."
-  (let ((alist))
-    (maphash #'(lambda (key val)
-                 (push `(,key . ,val) alist))
-             hash-table)
-    (if (and sort key)
-        (sort alist sort :key key)
-        alist)))
-
-(def home^~ (path)
-  "Return a path relative to the home directory."
-  (uiop:subpathname (user-homedir-pathname) path))
-
-(def expand-pathname (path)
-  "Return a path while performing tilde expansion."
-  (let ((home (uiop:pathname-parent-directory-pathname (user-homedir-pathname)))
-        (pathstring (uiop:native-namestring path)))
-    (cond ((and (char-equal (elt pathstring 0) #\~)
-                (char-equal (elt pathstring 1) #\/))
-           (home (subseq pathstring 2)))
-          ((and (char-equal (elt pathstring 0) #\~)
-                (not (char-equal (elt pathstring 1) #\/)))
-           (uiop:subpathname home (subseq pathstring 1)))
-          (t (uiop:ensure-absolute-pathname pathstring)))))
-
-(defm with-time ((&optional) &body body)
-  "Execute BODY then return timing information."
-  `(time (progn ,@body (values))))
-
-#-lispworks
-(def true (&rest args)
-  "Return true for anything."
-  (declare (ignore args))
-  t)
-
-#-lispworks
-(def false (&rest args)
-  "Return false for anything."
-  (declare (ignore args))
-  nil)
+
+;;; Debugging
 
 (defm dbg (&rest args)
   "Print information about ARGS, then return the result of evaluating ARGS."
@@ -119,45 +54,6 @@ be used by SORT with KEY being the key that will be used for sorting."
      (dbg ,arg)
      ,@body))
 
-(def hyphenate-to-string (&rest names)
-  "Return a new string from the hyphenated concatenation of NAMES."
-  (format nil "~{~A~^-~}"
-          (mapcar (lambda (name)
-                    (string-upcase (string* name)))
-                  names)))
-
-(def hyphenate-to-symbol (&rest names)
-  "Apply HYPHENATE to NAMES then return it as a symbol."
-  (read-from-string (apply #'hyphenate-to-string names)))
-
-(def hyphenate-to-interned-symbol (package &rest names)
-  "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
-  (let ((pkg (if (null package) *package* package)))
-    (intern (apply #'hyphenate-to-string names) (find-package pkg))))
-
-(def show-table (table)
-  "Print the contents of hash table TABLE."
-  (maphash (lambda (k v)
-             (format t "~S => ~S~%" k v)
-             (force-output *standard-output*))
-           table))
-
-(def show-table* (table &optional (pad 0))
-  "Print the contents of hash table TABLE recursively."
-  (loop :for key :being :the :hash-keys :in table
-        :for value :being :the :hash-values :in table
-        :do (if (hash-table-p value)
-                (progn
-                  (format t "~A~S => ~S~%"
-                          (make-string pad :initial-element #\space)
-                          key
-                          value)
-                  (show-table* value (+ pad 2)))
-                (format t "~A~S => ~S~%"
-                        (make-string pad :initial-element #\space)
-                        key
-                        value))))
-
 (def muffle-debugger-handler (condition hook)
   "Define a handler for muffling the debugger messages."
   (declare (ignore hook))
@@ -174,6 +70,27 @@ be used by SORT with KEY being the key that will be used for sorting."
      (setf *debugger-hook* #'muffle-debugger-handler)
      ,@body))
 
+
+;;; Hyphenated fns
+
+(def hyphenate-to-string (&rest names)
+  "Return a new string from the hyphenated concatenation of NAMES."
+  (format nil "~{~A~^-~}"
+          (mapcar (lambda (name)
+                    (string-upcase (string* name)))
+                  names)))
+
+(def hyphenate-to-symbol (&rest names)
+  "Apply HYPHENATE to NAMES then return it as a symbol."
+  (read-from-string (apply #'hyphenate-to-string names)))
+
+(def hyphenate-to-interned-symbol (package &rest names)
+  "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
+  (let ((pkg (if (null package) *package* package)))
+    (intern (apply #'hyphenate-to-string names) (find-package pkg))))
+
+;;; (empty - NULL)
+
 (defm empty (object)
   "Set the value of OBJECT to null."
   `(setf ,object nil))
@@ -183,6 +100,50 @@ be used by SORT with KEY being the key that will be used for sorting."
   `(progn
      ,@(loop :for object :in objects
              :collect `(empty ,object))))
+
+(def null* (value)
+  "Return true if VALUE is null or every item is."
+  (or (null value)
+      (every #'null value)))
+
+
+;;; System fns
+
+(def system-object^sys-object (name)
+  "Return the system object for the current system."
+  (asdf:find-system name))
+
+(def system-path^sys-path (system)
+  "Return the ASDF file path for the current system."
+  (let ((object (system-object system)))
+    (uiop:merge-pathnames* (cat system ".asd")
+                           (asdf:system-source-directory object))))
+
+(def system-directory^sys-directory (system)
+  "Return the top-level directory of a system."
+  (let ((path (sys-path system)))
+    nil))
+
+(def system-version^sys-version (name)
+  "Return the version number extracted from the system resources."
+  (asdf:system-version (sys-object name)))
+
+
+;;;  Miscellaneous fns
+
+(defm with-time ((&optional) &body body)
+  "Execute BODY then return timing information."
+  `(time (progn ,@body (values))))
+
+(def true (&rest args)
+  "Return true for anything."
+  (declare (ignore args))
+  t)
+
+(def false (&rest args)
+  "Return false for anything."
+  (declare (ignore args))
+  nil)
 
 #+unix
 (def getuid ()
@@ -200,29 +161,12 @@ be used by SORT with KEY being the key that will be used for sorting."
 (def getuid ()
   (error "no getuid"))
 
-(def gethash* (path table)
-  "Return the value specified by path starting from TABLE."
-  (cond ((singlep path) (gethash (car path) table))
-        ((null (hash-table-p (gethash (car path) table))) nil)
-        (t (gethash* (cdr path)
-                     (gethash (car path) table)))))
-
-(def null* (value)
-  "Return true if VALUE is null or every item is."
-  (or (null value)
-      (every #'null value)))
 
 (defm eval-always (&body body)
   "Evaluate the forms in BODY in all situations."
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
 
-(def fmt-error (string)
-  "Output STRING to *STANDARD-ERROR* then return."
-  (format *error-output* string)
-  (finish-output *error-output*))
-
-#-lispworks
 (defmm appendf (&rest lists) append
   "Set the value of the first argument to the result of applying APPEND to LISTS.")
 
@@ -238,22 +182,6 @@ be used by SORT with KEY being the key that will be used for sorting."
      ,@(loop :for n :from 0 :to count
              :for name = (read-from-string (concat prefix (write-to-string n)))
              :collect `(def ,name (list) (elt list ,n)))))
-
-(defm optimize-safety ()
-  "Enable compiler options for maximum safety options."
-  `(declaim (optimize (safety 3) (debug 3) (speed 0))))
-
-(defm optimize-speed ()
-  "Enable compiler options for maximum speed options."
-  `(declaim (optimize (safety 1) (debug 3) (speed 3) )))
-
-(defm optimize-speed-unsafe ()
-  "Enable compiler options for maximum speed options."
-  `(declaim (optimize (safety 0) (debug 3) (speed 3))))
-
-(defm optimize-debug ()
-  "Enable compiler options for maximum debug settings."
-  `(declaim (optimize (speed 1) (debug 3) (safety 1))))
 
 (defm fns (fn1 &rest args)
   "Return a function that applies FN1 and ARGS to OBJ that returns multiple values."
@@ -280,21 +208,11 @@ be used by SORT with KEY being the key that will be used for sorting."
     ((typep object 'cons) (format t "~{~S~%~}" object))
     (t (format t "~A~%" object))))
 
-(def system-object^sys-object (name)
-  "Return the system object for the current system."
-  (asdf:find-system name))
+(def apropos* (&rest args)
+  "Display sorted matching symbols from ARGS with CL:APROPOS."
+  (loop :for symbol :in (sort (apply #'apropos-list args) #'string<)
+        :do (format t "~S~%" symbol)))
 
-(def system-path^sys-path (system)
-  "Return the ASDF file path for the current system."
-  (let ((object (system-object system)))
-    (uiop:merge-pathnames* (cat system ".asd")
-                           (asdf:system-source-directory object))))
-
-(def system-directory^sys-directory (system)
-  "Return the top-level directory of a system."
-  (let ((path (sys-path system)))
-    nil))
-
-(def system-version^sys-version (name)
-  "Return the version number extracted from the system resources."
-  (asdf:system-version (sys-object name)))
+(def collect-characters (start end)
+  "Collect ASCII characters from START to END."
+  (loop :for index :from start :below (+ start end) :collect (code-char index)))

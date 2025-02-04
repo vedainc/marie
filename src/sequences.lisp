@@ -8,142 +8,65 @@
 
 (in-package #:marie/src/sequences)
 
-(def end (seq)
-  "Return the last element of SEQ."
-  (etypecase seq
-    (cons (first (last seq)))
-    (string (elt seq (1- (length seq))))
-    (null nil)))
+
+;;; Length predicate fns
 
 (def length= (seq len)
   "Return true if the length of SEQ is LEN."
-  (declare (type sequence seq))
+  (declare (type sequence seq)
+           (type integer len))
   (= (length seq) len))
 
 (def length< (seq len)
   "Return true if the length of SEQ is LEN."
-  (declare (type sequence seq))
+  (declare (type sequence seq)
+           (type integer len))
   (< (length seq) len))
 
 (def length> (seq len)
   "Return true if the length of SEQ is LEN."
-  (declare (type sequence seq))
+  (declare (type sequence seq)
+           (type integer len))
   (> (length seq) len))
 
 (def length<= (seq len)
   "Return true if the length of SEQ is LEN."
-  (declare (type sequence seq))
+  (declare (type sequence seq)
+           (type integer len))
   (<= (length seq) len))
 
 (def length>= (seq len)
   "Return true if the length of SEQ is LEN."
-  (declare (type sequence seq))
+  (declare (type sequence seq)
+           (type integer len))
   (>= (length seq) len))
 
 (def singlep (seq)
   "Return true if there is only one item in SEQ."
+  (declare (type sequence seq)
+           (optimize (speed 3) (debug 0) (safety 1)))
   (length= seq 1))
-
-(def single (seq)
-  "Return the only item in SEQ if SEQ has only one element."
-  (if (singlep seq)
-      (elt seq 0)
-      (error "Argument must exactly be of length 1.")))
 
 (def longerp (x y)
   "Return true if X is longer than Y."
   (labels ((fn (x y)
-               (and (consp x)
-                    (or (null y)
-                        (fn (cdr x) (cdr y))))))
+             (and (consp x)
+                  (or (null y)
+                      (fn (cdr x) (cdr y))))))
     (if (and (listp x) (listp y))
         (fn x y)
         (> (length x) (length y)))))
 
-(def partition (source n)
-  "Create partition of N from SOURCE."
-  (when (zerop n) (error "Zero length"))
-  (labels ((fn (source acc)
-               (let ((rest (nthcdr n source)))
-                 (if (consp rest)
-                     (fn rest (cons (subseq source 0 n) acc))
-                     (nreverse (cons source acc))))))
-    (when source
-      (fn source nil))))
+
+;;; List manipulation, filtering, transformation, and etc. fns
 
 (def flatten-list (list)
   "Merge all symbols from LIST to one list."
   (labels ((fn (list acc)
-               (cond ((null list) acc)
-                     ((atom list) (cons list acc))
-                     (t (fn (car list) (fn (cdr list) acc))))))
+             (cond ((null list) acc)
+                   ((atom list) (cons list acc))
+                   (t (fn (car list) (fn (cdr list) acc))))))
     (fn list nil)))
-
-(def filter-if (fn list)
-  "Collect the results of applying FN to LIST which returns true."
-  (let ((acc nil))
-    (dolist (x list)
-      (let ((value (funcall fn x)))
-        (when value (push value acc))))
-    (nreverse acc)))
-
-(def filter-if-not (fn list)
-  "Collect the results of applying FN to LIST which returns false."
-  (filter-if (complement fn) list))
-
-(def prune-if (fn tree)
-  "Remove all items from TREE to which FN returns true."
-  (labels ((fn (tree acc)
-               (cond ((null tree) (nreverse acc))
-                     ((consp (car tree)) (fn (cdr tree)
-                                             (cons (fn (car tree) nil)
-                                                   acc)))
-                     (t (fn (cdr tree)
-                            (if (funcall fn (car tree))
-                                acc
-                                (cons (car tree) acc)))))))
-    (fn tree nil)))
-
-(def prune-if-not (fn tree)
-  "Remove all items from TREE to which FN returns false."
-  (prune-if (complement fn) tree))
-
-(def locate-if (fn list)
-  "Find element in list satisfying FN. When found, return the car of LIST and
-the result of applying FN, as values. Otherwise, return false."
-  (unless (null list)
-    (let ((val (funcall fn (car list))))
-      (if val
-          (values (car list) val)
-          (find-if fn (cdr list))))))
-
-(def beforep (x y list &key (test #'eql))
-  "Return true if X occurs before Y in LIST."
-  (when list
-    (let ((first (car list)))
-      (cond ((funcall test y first) nil)
-            ((funcall test x first) list)
-            (t (beforep x y (cdr list) :test test))))))
-
-(def afterp (x y list &key (test #'eql))
-  "Return true if X occurs after Y in LIST."
-  (let ((rest (beforep y x list :test test)))
-    (when rest
-      (member x rest :test test))))
-
-(def duplicatep (x list &key (test #'eql))
-  "Return true if X has a duplicate in LIST."
-  (member x (cdr (member x list :test test)) :test test))
-
-(def split-if (fn list)
-  "Return two lists wherein the first list contains everything that satisfies
-FN, until it doesn't, and another list that starts where FN returns true,as
-values."
-  (let ((acc nil))
-    (do ((source list (cdr source)))
-        ((or (null source) (funcall fn (car source)))
-         (values (nreverse acc) source))
-      (push (car source) acc))))
 
 (def append* (list data)
   "Destructively update list with data."
@@ -167,10 +90,10 @@ values."
 (def group-alike (list)
   "Group similar elements together."
   (labels ((fn (list acc)
-               (cond ((null list) (nreverse acc))
-                     (t (fn (remove (first list) list)
-                            (cons (make-list (count (first list) list) :initial-element (first list))
-                                  acc))))))
+             (cond ((null list) (nreverse acc))
+                   (t (fn (remove (first list) list)
+                          (cons (make-list (count (first list) list) :initial-element (first list))
+                                acc))))))
     (fn list nil)))
 
 (def build-length-index (groups)
@@ -192,7 +115,7 @@ as the key and the length of each list as the value."
 (def reduce-append^red-append (&rest args)
   "Reduce ARGS with APPEND."
   (flet ((fn (arg)
-             (reduce #'append arg)))
+           (reduce #'append arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
@@ -200,59 +123,17 @@ as the key and the length of each list as the value."
 (def reduce-nconc^red-nconc (&rest args)
   "Reduce ARGS with NCONC."
   (flet ((fn (arg)
-             (reduce #'nconc arg)))
+           (reduce #'nconc arg)))
     (if (length= args 1)
         (fn (car args))
         (fn args))))
 
-(def join (list &optional (pad " "))
-  "Merge items in LIST by the space character."
-  (let* ((separator (if (null pad) "" pad))
-         (fmt (uiop:strcat "~{~A~^" separator "~}")))
-    (format nil fmt list)))
-
-(def join-stream (stream end)
-  "Read lines from 1 to END from STREAM."
-  (join (loop :for i :from 1 :to end
-              :collect (read-line stream nil nil))))
-
-(def assoc-key (key items &key (test #'equal))
-  "Return the key found in ITEMS if KEY is found."
-  (let ((val (assoc key items :test test)))
-    (when val
-      (car val))))
-
-(def assoc-value (key items &key (test #'equal))
-  "Return the value found in ITEMS if KEY is found."
-  (let ((val (assoc key items :test test)))
-    (when val
-      (cdr val))))
-
-(def mem (elem list &key (test #'equal))
-  "Return true if ELEM is a member of LIST using TEST as the equality function."
-  (when (member elem list :test test)
-    t))
-
-(def mem* (elems list &key (test #'equal))
-  "Return true if all items ELEMS are members of LIST using TEST as the equality
-function."
-  (labels ((fn (args)
-               (cond ((null args) t)
-                     ((member (car args) list :test test) (fn (cdr args)))
-                     (t nil))))
-    (or (funcall test elems list)
-        (fn elems))))
-
 (def remove* (elems list &key (test #'equal))
   "Remove all items in ELEMS in LIST."
   (labels ((fn (args list)
-               (cond ((null args) list)
-                     (t (fn (cdr args) (remove (car args) list :test test))))))
+             (cond ((null args) list)
+                   (t (fn (cdr args) (remove (car args) list :test test))))))
     (fn elems list)))
-
-(def sequence-string (seq)
-  "Return SEQ as a string."
-  (format nil "~{~A~}" seq))
 
 (def butrest (list)
   "Return everything from LIST except the rest."
@@ -279,9 +160,97 @@ function."
   "Apply NCONC to LIST and OBJ ensuring that OBJ is a list."
   (nconc list (uiop:ensure-list obj)))
 
-(def include-if (&rest args)
-  "Apply REMOVE-IF-NOT to ARGS."
-  (apply #'remove-if-not args))
+(def transpose (list)
+  "Return a matrix transposition of LIST."
+  (apply #'mapcar #'list list))
+
+(defmm delete-from-plistf (&rest keys)
+  delete-from-plist
+  "Modify macro for DELETE-FROM-PLIST.")
+
+(def make-empty-list (object)
+  "Return an empty list from OBJECT."
+  (let ((length (length object)))
+    (make-list length :initial-element nil)))
+
+(def groups (list)
+  "Return decreasing order of groups from LIST.
+  (groups '(a b c)) => ((a b c) (b c) (c))"
+  (maplist #'identity list))
+
+(def pairs (list)
+  "Return pairs of lists from LIST.
+  (pairs '(a b c)) => ((a b) (b c))"
+  (labels ((fn (list &optional acc)
+             (cond ((neg list) (nreverse acc))
+                   ((length= list 1) (nreverse acc))
+                   (t (fn (cdr list)
+                          (cons (list (first list)
+                                      (second list))
+                                acc))))))
+    (fn list)))
+
+(def array-to-list (array)
+  "Return a list from ARRAY.
+   (array-to-list #(foo)) => (foo)"
+  (let* ((dimensions (array-dimensions array))
+         (depth (1- (length dimensions)))
+         (indices (make-list (1+ depth) :initial-element 0)))
+    (labels ((fn (n)
+               (loop :for j :below (nth n dimensions)
+                     :do (setf (nth n indices) j)
+                     :collect (if (= n depth)
+                                  (apply #'aref array indices)
+                                  (fn (1+ n))))))
+      (fn 0))))
+
+(def show-list^ls (list &key (output *standard-output*) (fn #'identity))
+  "Display the items in LIST according to FN, separated by newlines."
+  (loop :for item :in list
+        :do (format output "~S~%" (funcall fn item))))
+
+
+(def join (list &optional (pad " "))
+  "Merge items in LIST by the space character."
+  (let* ((separator (if (null pad) "" pad))
+         (fmt (uiop:strcat "~{~A~^" separator "~}")))
+    (format nil fmt list)))
+
+(def join-stream (stream end)
+  "Read lines from 1 to END from STREAM."
+  (join (loop :for i :from 1 :to end
+              :collect (read-line stream nil nil))))
+
+(def sequence-string (seq)
+  "Return SEQ as a string."
+  (format nil "~{~A~}" seq))
+
+(def assoc-key (key items &key (test #'equal))
+  "Return the key found in ITEMS if KEY is found."
+  (let ((val (assoc key items :test test)))
+    (when val
+      (car val))))
+
+(def assoc-value (key items &key (test #'equal))
+  "Return the value found in ITEMS if KEY is found."
+  (let ((val (assoc key items :test test)))
+    (when val
+      (cdr val))))
+
+(def mem (elem list &key (test #'equal))
+  "Return true if ELEM is a member of LIST using TEST as the equality function."
+  (when (member elem list :test test)
+    t))
+
+(def mem* (elems list &key (test #'equal))
+  "Return true if all items ELEMS are members of LIST using TEST as the equality
+function."
+  (labels ((fn (args)
+             (cond ((null args) t)
+                   ((member (car args) list :test test) (fn (cdr args)))
+                   (t nil))))
+    (or (funcall test elems list)
+        (fn elems))))
 
 (def take (seq count)
   "Return COUNT amount of items from SEQ."
@@ -290,19 +259,35 @@ function."
         :while (< n count)
         :collect s))
 
+(def drop (seq count)
+  "Return items from SEQ without the first COUNT items."
+  (loop :for s :in seq
+        :for n = 1 :then (1+ n)
+        :when (>= count n)
+          :collect s))
+
+(def single (seq)
+  "Return the only item in SEQ if SEQ has only one element."
+  (if (singlep seq)
+      (elt seq 0)
+      (error "Argument must exactly be of length 1.")))
+
+(def end (seq)
+  "Return the last element of SEQ."
+  (etypecase seq
+    (cons (first (last seq)))
+    (string (elt seq (1- (length seq))))
+    (null nil)))
+
+
+;;; List manipulation with-Ifs fns
+
 (def take-if (fn seq count)
   "Return COUNT amount of items from SEQ that satisfy FN."
   (loop :for s :in seq
         :for val = (funcall fn s)
         :for n = 0 :then (if val (1+ n) n)
         :when (and val (> count 0) (< n (1+ count)))
-          :collect s))
-
-(def drop (seq count)
-  "Return items from SEQ without the first COUNT items."
-  (loop :for s :in seq
-        :for n = 1 :then (1+ n)
-        :when (>= count n)
           :collect s))
 
 (def drop-if (fn seq count)
@@ -313,10 +298,86 @@ function."
         :unless (and val (> count 0) (< n (1+ count)))
           :collect s))
 
+(def include-if (&rest args)
+  "Apply REMOVE-IF-NOT to ARGS."
+  (apply #'remove-if-not args))
+
+(def filter-if (fn list)
+  "Collect the results of applying FN to LIST which returns true."
+  (let ((acc nil))
+    (dolist (x list)
+      (let ((value (funcall fn x)))
+        (when value (push value acc))))
+    (nreverse acc)))
+
+(def filter-if-not (fn list)
+  "Collect the results of applying FN to LIST which returns false."
+  (filter-if (complement fn) list))
+
+(def prune-if (fn tree)
+  "Remove all items from TREE to which FN returns true."
+  (labels ((fn (tree acc)
+             (cond ((null tree) (nreverse acc))
+                   ((consp (car tree)) (fn (cdr tree)
+                                           (cons (fn (car tree) nil)
+                                                 acc)))
+                   (t (fn (cdr tree)
+                          (if (funcall fn (car tree))
+                              acc
+                              (cons (car tree) acc)))))))
+    (fn tree nil)))
+
+(def prune-if-not (fn tree)
+  "Remove all items from TREE to which FN returns false."
+  (prune-if (complement fn) tree))
+
+(def locate-if (fn list)
+  "Find element in list satisfying FN. When found, return the car of LIST and
+the result of applying FN, as values. Otherwise, return false."
+  (unless (null list)
+    (let ((val (funcall fn (car list))))
+      (if val
+          (values (car list) val)
+          (find-if fn (cdr list))))))
+
+(def split-if (fn list)
+  "Return two lists wherein the first list contains everything that satisfies
+FN, until it doesn't, and another list that starts where FN returns true,as
+values."
+  (let ((acc nil))
+    (do ((source list (cdr source)))
+        ((or (null source) (funcall fn (car source)))
+         (values (nreverse acc) source))
+      (push (car source) acc))))
+
+
+;;; Predicates fns
+
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."
   (land (listp object)
-        (every #'listp object)))
+    (every #'listp object)))
+
+(def beforep (x y list &key (test #'eql))
+  "Return true if X occurs before Y in LIST."
+  (when list
+    (let ((first (car list)))
+      (cond ((funcall test y first) nil)
+            ((funcall test x first) list)
+            (t (beforep x y (cdr list) :test test))))))
+
+(def afterp (x y list &key (test #'eql))
+  "Return true if X occurs after Y in LIST."
+  (let ((rest (beforep y x list :test test)))
+    (when rest
+      (member x rest :test test))))
+
+(def duplicatep (x list &key (test #'eql))
+  "Return true if X has a duplicate in LIST."
+  (member x (cdr (member x list :test test)) :test test))
+
+
+;;; Property list manipulation
 
 (def remove-from-plist (plist &rest keys)
   "Returns a property-list with same keys and values as PLIST, except that keys
@@ -351,54 +412,19 @@ provided PLIST."
                 (setf tail rest))
         :finally (return head)))
 
-(defmm delete-from-plistf (&rest keys)
-  delete-from-plist
-  "Modify macro for DELETE-FROM-PLIST.")
+
+;;; Miscellaneous fns
 
-(def make-empty-list (object)
-  "Return an empty list from OBJECT."
-  (let ((length (length object)))
-    (make-list length :initial-element nil)))
-
-(def groups (list &optional count)
-  "Return decreasing order of groups from LIST.
-
-  (groups '(a b c))
-
-would return
-
-  ((a b c) (b c) (c))"
-  (maplist #'identity list))
-
-(def pairs (list)
-  "Return pairs of lists from LIST.
-
-  (pairs '(a b c))
-
-would return
-
-  ((a b) (b c))"
-  (labels ((fn (list &optional acc)
-               (cond ((neg list) (nreverse acc))
-                     ((length= list 1) (nreverse acc))
-                     (t (fn (cdr list)
-                            (cons (list (first list)
-                                        (second list))
-                                  acc))))))
-    (fn list)))
-
-(def array-to-list (array)
-  "Return a list from ARRAY."
-  (let* ((dimensions (array-dimensions array))
-         (depth (1- (length dimensions)))
-         (indices (make-list (1+ depth) :initial-element 0)))
-    (labels ((fn (n)
-                 (loop :for j :below (nth n dimensions)
-                       :do (setf (nth n indices) j)
-                       :collect (if (= n depth)
-                                    (apply #'aref array indices)
-                                    (fn (1+ n))))))
-      (fn 0))))
+(def partition (source n)
+  "Create partition of N from SOURCE."
+  (when (zerop n) (error "Zero length"))
+  (labels ((fn (source acc)
+             (let ((rest (nthcdr n source)))
+               (if (consp rest)
+                   (fn rest (cons (subseq source 0 n) acc))
+                   (nreverse (cons source acc))))))
+    (when source
+      (fn source nil))))
 
 (def permutations^perms (list)
   "Return the permutations of LIST."
@@ -409,12 +435,8 @@ would return
                                    (cons element l))
                                  (permutations (remove element list)))))))
 
-(def show-list^ls (list &key (output *standard-output*) (fn #'identity))
-  "Display the items in LIST according to FN, separated by newlines."
-  (loop :for item :in list
-        :do (format output "~S~%" (funcall fn item))))
 
-;; from https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
+;;NOTE from https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
 (deft scramble ((sequence array))
   "Return a randomized array from SEQUENCE."
   (loop :with len = (length sequence)
@@ -428,7 +450,3 @@ would return
   (coerce (scramble
            (make-array (length sequence) :initial-contents sequence))
           'list))
-
-(def transpose (list)
-  "Return a matrix transposition of LIST."
-  (apply #'mapcar #'list list))

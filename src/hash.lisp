@@ -2,9 +2,9 @@
 ;;;; hash.lisp --- utilities for dealing with sequences
 
 (uiop:define-package #:marie/src/hash
-    (:use #:cl
-	  #:marie/src/definitions
-          #:marie/src/sequences)
+  (:use #:cl
+        #:marie/src/definitions
+        #:marie/src/sequences)
   (:export #:ordered-hash-table
            #:ordered-hash-table-p))
 
@@ -12,7 +12,6 @@
 
 
 ;;; Ordered Hashtable
-;;; keeps the keys in the order they were put in a hash table
 
 (declaim (inline make-ordered-hash-table%))
 (defstruct (ordered-hash-table
@@ -23,10 +22,10 @@
   (hashtable nil :type (or null hash-table) :read-only t)
   (keys (list) :type list))
 
-(def make-ordered-hash-table (&key (test 'eql) 
-                                  (size 7) 
-                                  (rehash-size 1.5) 
-                                  (rehash-threshold 1.0))
+(def make-ordered-hash-table (&key (test 'eql)
+                                   (size 7)
+                                   (rehash-size 1.5)
+                                   (rehash-threshold 1.0))
   (make-ordered-hash-table%
    :hashtable (make-hash-table :test test
                                :size size
@@ -116,3 +115,66 @@
         ((null (ordered-hash-table-p (get-ordered-hash (car path) hash-table))) nil)
         (t (get-ordered-hash* (cdr path)
                               (get-ordered-hash (car path) hash-table)))))
+
+
+;;; Misc hash-table related fns
+
+(def copy-table^copyhash (hash-table)
+  "Return a new hash table from HASH-TABLE."
+  (let ((table (make-hash-table :test (hash-table-test hash-table)
+                                :rehash-size (hash-table-rehash-size hash-table)
+                                :rehash-threshold (hash-table-rehash-threshold hash-table)
+                                :size (hash-table-size hash-table))))
+    (loop :for key :being each hash-key :of hash-table
+            :using (hash-value value)
+          :do (setf (gethash key table) value)
+          :finally (return table))))
+
+(def hash-table-keys (hash-table)
+  "Return the keys of HASH-TABLE."
+  (maphash #'(λ (k v) (declare (ignore v)) k) hash-table))
+
+(def hash-table-values (hash-table)
+  "Return the values of HASH-TABLE."
+  (maphash #'(λ (k v) (declare (ignore k)) v) hash-table))
+
+(def list-table^listhash (hash-table &key sort key)
+  "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will
+be used by SORT with KEY being the key that will be used for sorting."
+  (let ((alist))
+    (maphash #'(lambda (key val)
+                 (push `(,key . ,val) alist))
+             hash-table)
+    (if (and sort key)
+        (sort alist sort :key key)
+        alist)))
+
+(def show-table (table)
+  "Print the contents of hash table TABLE."
+  (maphash (lambda (k v)
+             (format t "~S => ~S~%" k v)
+             (force-output *standard-output*))
+           table))
+
+(def show-table* (table &optional (pad 0))
+  "Print the contents of hash table TABLE recursively."
+  (loop :for key :being :the :hash-keys :in table
+        :for value :being :the :hash-values :in table
+        :do (if (hash-table-p value)
+                (progn
+                  (format t "~A~S => ~S~%"
+                          (make-string pad :initial-element #\space)
+                          key
+                          value)
+                  (show-table* value (+ pad 2)))
+                (format t "~A~S => ~S~%"
+                        (make-string pad :initial-element #\space)
+                        key
+                        value))))
+
+(def gethash* (path table)
+  "Return the value specified by path starting from TABLE."
+  (cond ((singlep path) (gethash (car path) table))
+        ((null (hash-table-p (gethash (car path) table))) nil)
+        (t (gethash* (cdr path)
+                     (gethash (car path) table)))))

@@ -7,10 +7,14 @@
 
 (in-package #:marie/src/reader)
 
+
+;;; Brace reader
+
 (def- brace-reader (stream char)
   "Use {+ _ 1} as a shorthand for #'(lambda (_) (+ _ 1))
 See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
-  (declare (ignore char))
+  (declare (ignore char)
+           (optimize (speed 3) (safety 0)))
   `(lambda (,(intern "_") &optional ,(intern "__"))
      (declare (ignorable ,(intern "__")))
      ,(read-delimited-list #\} stream t)))
@@ -20,16 +24,65 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
   (set-macro-character #\{ #'brace-reader)
   (set-macro-character #\} (get-macro-character #\) nil)))
 
+
+;;; Bracket reader
+
 (def- bracket-reader (stream char)
-  "Use {foo 5} as a shorthand for (funcall foo 5)
-See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
-  (declare (ignore char))
+  "Use {foo 5} as a shorthand for (funcall foo 5)."
+  (declare (ignore char)
+           (optimize (speed 3) (safety 0)))
   `(funcall ,@(read-delimited-list #\] stream t)))
 
 (def use-bracket-reader ()
   "Put the bracket reader into effect."
   (set-macro-character #\[ #'bracket-reader)
   (set-macro-character #\] (get-macro-character #\) nil)))
+
+
+;;; Lambda reader
+
+(def- lambda-reader (stream char)
+  "Define the reader for λ."
+  (declare (ignore stream char)
+           (optimize (speed 3) (safety 0)))
+  'LAMBDA)
+
+(def- use-lambda-reader ()
+  "Put the lambda reader into effect."
+  (set-macro-character #\λ #'lambda-reader))
+
+
+;;; Phi reader
+
+(def- phi-reader (stream char)
+  "Define the reader for phi."
+  (declare (ignore stream char)
+           (optimize (speed 3) (safety 0)))
+  'PROGN)
+
+(def- use-phi-reader ()
+  "Put the phi reader into effect."
+  (set-macro-character #\φ #'phi-reader))
+
+
+;;; Dollar reader
+
+(def- dollar-reader (stream char)
+  "Define the reader for dollar."
+  (declare (ignore char)
+           (optimize (speed 3) (safety 0)))
+  (list 'function (read stream t nil t)))
+
+(def use-dollar-reader ()
+  "Put the dollar reader into effect."
+  (set-macro-character #\$ #'dollar-reader))
+
+(use-lambda-reader)
+(use-phi-reader)
+
+
+;;; Preserving case
+;;; This prevents Common Lisp's default behavior of converting symbol names to uppercase.
 
 (defm with-preserved-case ((&optional) &body body)
   "Evaluate BODY while preserving the read case."
@@ -39,34 +92,8 @@ See http://dorophone.blogspot.com/2008/03/common-lisp-reader-macros-simple.html"
 
 (def read-from-string* (string)
   "Evaluate STRING with preserved case."
+  (declare (type string)
+           (type string string)
+           (inline read-from-string))
   (with-preserved-case ()
     (read-from-string string)))
-
-(def- lambda-reader (stream char)
-  "Define the reader for λ."
-  (declare (ignore stream char))
-  'LAMBDA)
-
-(def- use-lambda-reader ()
-  "Put the lambda reader into effect."
-  (set-macro-character #\λ #'lambda-reader))
-
-(def- phi-reader (stream char)
-  "Define the reader for phi."
-  (declare (ignore stream char))
-  'PROGN)
-
-(def- use-phi-reader ()
-  "Put the phi reader into effect."
-  (set-macro-character #\φ #'phi-reader))
-
-(def- dollar-reader (stream char)
-  (declare (ignore char))
-  (list (quote function) (read stream t nil t)))
-
-(def use-dollar-reader ()
-  "Put the dollar reader into effect."
-  (set-macro-character #\$ #'dollar-reader))
-
-(use-lambda-reader)
-(use-phi-reader)
