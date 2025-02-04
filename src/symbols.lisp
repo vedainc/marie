@@ -12,7 +12,7 @@
   (let ((symbols '()))
     (macrolet ((mac (fn)
                  `(,fn (symbol (find-package package))
-                      (push symbol symbols))))
+                   (push symbol symbols))))
       (ecase type
         ((:symbols) (mac do-symbols))
         ((:external-symbols) (mac do-external-symbols))
@@ -21,7 +21,7 @@
           (mapcar #'read-from-string (sort (mapcar #'string symbols) sort))
           symbols))))
 
-(def symbols* (package &key (type :external-symbols) (sort #'string<))
+(def symbols*^syms (package &key (type :external-symbols) (sort #'string<))
   "Print the symbols interned in PACKAGE by TYPE."
   (let ((symbols (symbols package :type type :sort sort)))
     (format t "~{~A~%~}" symbols)))
@@ -40,7 +40,7 @@
     (loop :for dependency :in dependencies
           :do (let* ((symbols (symbols (read-from-string dependency) :type type))
                      (sorted-symbols (sort symbols sort)))
-                (format t "~&~%** ~A~%~{~A~^~%~}" dependency sorted-symbols)))))
+                (format t "~&~%#:~A~%~{~A~^~%~}" dependency sorted-symbols)))))
 
 (defm with-gensyms ((&rest names) &body body)
   "Evaluate BODY where NAMES are unique symbols."
