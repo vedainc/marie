@@ -6,7 +6,8 @@
         #:marie/src/definitions
         #:marie/src/sequences
         #:marie/src/strings
-        #:marie/src/etc))
+        #:marie/src/etc
+        #:marie/src/files))
 
 (in-package #:marie/src/project)
 
@@ -57,7 +58,7 @@
 
 (def- build-path (path1 path2)
   "Return a new path ensuring that PATH2 is a directory."
-  (uiop:merge-pathnames* path1 (uiop:ensure-directory-pathname path2)))
+  (merge-pathnames path1 (uiop:ensure-directory-pathname path2)))
 
 (def- create-directory-structure (target)
   "Create the directory structure of the new project under TARGET."
@@ -530,7 +531,8 @@ with pkgs; rec {
       nil)))
 
 (def make-project^mk (&rest args)
-  "See %MAKE-PROJECT."
+  "See %MAKE-PROJECT.
+   Use, (mk \"foo\")"
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
