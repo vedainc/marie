@@ -242,7 +242,7 @@ with pkgs; rec {
     :in-order-to ((test-op (test-op \"${project}-tests\"))))
     :build-operation \"program-op\"
     :build-pathname \"${project}\"
-    :entry-point \"${project}/src/core:main\"
+    :entry-point \"${project}/src/cli:main\"
 "))
 
 (def- make-src-specials-stub ()
@@ -499,7 +499,7 @@ with pkgs; rec {
   (uiop:ensure-directory-pathname project-dir))
 
 
-;;; entrypoints
+;;; entry points
 
 (def- %make-project (project &key (target (home "common-lisp")))
   "Create a project skeleton named PROJECT in TARGET."
