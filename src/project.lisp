@@ -14,7 +14,7 @@
 ;;; variables
 
 (defk- +file-header+
-  ";;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-")
+  ";;;; -*- mode: lisp; syntax: common-lisp; base: 10; -*-")
 
 (defv- *project*
   "project"
@@ -126,15 +126,6 @@
                (fmt "~A" string)
                (fmt "~A~%~A" +file-header+ string))
            (or project *project*)))
-
-(def- out-file (path contents)
-  "Generate file in PATH and populate with CONTENTS."
-  (with-open-file (out path :direction :output :if-exists :supersede)
-    (format out contents)))
-
-(def- normalize-name (name)
-  "Return a new string from NAME suitable as a project name."
-  (string-downcase (string name)))
 
 
 ;;; src
@@ -314,11 +305,20 @@
 "))
 
 
-;;;  entrypoints
+;;;  helpers
 
 (def- path (name type)
   "Return a pathname from NAME and TYPE."
   (make-pathname :name name :type type))
+
+(def- normalize-name (name)
+  "Return a new string from NAME suitable as a project name."
+  (string-downcase (string name)))
+
+(def- out-file (path contents)
+  "Generate file in PATH and populate with CONTENTS."
+  (with-open-file (out path :direction :output :if-exists :supersede)
+    (format out contents)))
 
 (def- out-files (project project-dir target)
   "Write the project files in PROJECT-DIR."
@@ -339,6 +339,14 @@
       (out-file (path "driver-tests" "lisp") (make-t-driver-stub))
       (out-file (path "user-tests" "lisp") (make-t-user-stub))) ))
 
+(def- enroll-system (project-dir)
+  "Make the system indicated by PROJECT-DIR immediately accessible by ASDF."
+  (push (uiop:ensure-directory-pathname project-dir) asdf:*central-registry*)
+  (uiop:ensure-directory-pathname project-dir))
+
+
+;;; entrypoints
+
 (def- %make-project (project &optional (target (home "common-lisp")))
   "Create a project skeleton named PROJECT in TARGET."
   (let ((project (normalize-name project)))
@@ -347,8 +355,7 @@
             (*project* project))
         (create-directory-structure project-dir)
         (out-files project project-dir target)
-        (push (uiop:ensure-directory-pathname project-dir) asdf:*central-registry*)
-        (uiop:ensure-directory-pathname project-dir)))))
+        (enroll-system project-dir)))))
 
 (def- &make-project (&rest args)
   "See %MAKE-PROJECT."
