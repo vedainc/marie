@@ -10,7 +10,7 @@
 (in-package #:marie/src/etc)
 
 
-;;; Optimiziation
+;;; Optimizations
 
 (defm optimize-safety ()
   "Enable compiler options for maximum safety options."
@@ -88,6 +88,7 @@
   "Apply HYPHENATE to NAMES then return an interned symbol in the current package."
   (let ((pkg (if (null package) *package* package)))
     (intern (apply #'hyphenate-to-string names) (find-package pkg))))
+
 
 ;;; (empty - NULL)
 
