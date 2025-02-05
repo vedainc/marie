@@ -28,6 +28,15 @@
   #P"t"
   "The main tests directory.")
 
+(defv- *project-directory*
+  (uiop:subpathname (asdf:system-source-directory (asdf:find-system :marie))
+                    #P"project/")
+  "The location of the project skeleton files.")
+
+(def- project-path (path)
+  "Return a path from PATH relevant to the project directory."
+  (uiop:subpathname *project-directory* path))
+
 (def- run-trim (command)
   "Run COMMAND and remove trailing whitespace."
   (string-trim '(#\newline #\tab #\space) (uiop:run-program command :output :string)))
@@ -84,16 +93,16 @@
           :while pos)))
 
 (defv- *rep-table*
-    '(("${project}" . nil)
-      ("${PROJECT}" . string-upcase)
-      ("${author}"  . git-user-name)
-      ("${email}"   . git-user-email))
+  '(("${project}" . nil)
+    ("${PROJECT}" . string-upcase)
+    ("${author}"  . git-user-name)
+    ("${email}"   . git-user-email))
   "An alist of string substitution where the car is the string to match and the
   cdr is the function to apply.")
 
 (defn- sub-process-error (error)
-    ((text :initarg :text :reader text))
-    (:documentation "Condition for subprocess errors."))
+  ((text :initarg :text :reader text))
+  (:documentation "Condition for subprocess errors."))
 
 (def- git-user-name (&rest args)
   "Return the git user name."
@@ -137,324 +146,15 @@
   "Like, REP-FMT, but without HEADERS."
   (apply #'rep-fmt (append args (list :no-header t))))
 
-
-;;; src
+(def- in-file (path &rest args)
+  "Like REP-FMT, but read in the contents of PATH, first."
+  (let ((path (project-path path)))
+    (apply #'rep-fmt (uiop:read-file-string path) (rest args))))
 
-(def- make-readme-stub ()
-  "Generate `/README.org'."
-  (rep-fmt* "#+title: ${project}
-#+author: ${author}
-#+email: ${email}
-"))
-
-(def- make-gitignore-stub ()
-  "Generate `/.gitignore'."
-  (rep-fmt* "*.fasl
-*.64yfasl
-*.lisp-temp
-*.dfsl
-*.pfsl
-*.d64fsl
-*.p64fsl
-*.lx64fsl
-*.lx32fsl
-*.dx64fsl
-*.dx32fsl
-*.fx64fsl
-*.fx32fsl
-*.sx64fsl
-*.sx32fsl
-*.wx64fsl
-*.wx32fsl
-"))
-
-(def- make-makefile-stub ()
-  "Generate `/makefile'."
-  (rep-fmt* "SHELL := bash
-MAKEFLAGS += --warn-undefined-variables
-MAKEFLAGS += --no-builtin-rules
-
-.ONESHELL:
-.SHELLFLAGS := -eu -o pipefail -c
-.DELETE_ON_ERROR:
-
-NAME = ${project}
-LISP := sbcl
-
-.PHONY: all $(NAME) clean
-
-all: $(NAME)
-
-$(NAME):
-	@(LISP) --eval '(ql:quickload :${project})' --eval '(asdf:make :${project})' --eval '(uiop:quit)'
-
-clean:
-	@rm -f $(NAME)
-"))
-
-(def- make-flake-nix-stub ()
-  "Generate `flake.nix'."
-  (rep-fmt* "{
-  description = \"A flake\";
-  inputs = {
-    nixpkgs.url = \"github:nixos/nixpkgs/nixpkgs-unstable\";
-    flake-utils.url = \"github:numtide/flake-utils\";
-  };
-  outputs = { nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.system;
-      in { devShells = import ./shells.nix { inherit nixpkgs pkgs; }; });
-}
-"))
-
-(def- make-shells-nix-stub ()
-  "Generate `shells.nix'."
-  (rep-fmt* "{ nixpkgs, pkgs, ... }:
-with pkgs; rec {
-  lisp = mkShell { buildInputs = [ sbcl ecl ]; };
-  default = lisp;
-}
-"))
-
-(def- make-src-version-stub ()
-  "Generate `/version.sexp'."
-  (fmt "\"0.0.1\""))
-
-(def- make-src-asdf-stub ()
-  "Generate the main ASDF stub."
-  (rep-fmt ";;;; ${project}.asd --- top-level ASDF file for ${project}
-
-(defsystem #:${project}
-    :name \"${project}\"
-    :long-name \"${project}\"
-    :description \"\"
-    :long-description \"\"
-    :version (:read-file-form #P\"version.sexp\")
-    :author \"${author} <${email}>\"
-    :maintainer \"${author} <${email}>\"
-    :license \"\"
-    :homepage \"\"
-    :bug-tracker \"\"
-    :source-control \"\"
-    :class :package-inferred-system
-    :depends-on (#:marie
-                 #:clingon
-                 #:${project}/src/core
-                 #:${project}/src/driver
-                 #:${project}/src/user
-                 #:${project}/src/cli)
-    :in-order-to ((test-op (test-op \"${project}-tests\"))))
-    :build-operation \"program-op\"
-    :build-pathname \"${project}\"
-    :entry-point \"${project}/src/cli:main\"
-"))
-
-(def- make-src-specials-stub ()
-  "Generate `/src/specials.lisp'."
-  (rep-fmt ";;;; specials.lisp --- special variables
-
-(uiop:define-package #:${project}/src/specials
-  (:use #:cl
-        #:marie))
-
-(in-package #:${project}/src/specials)
-"))
-
-(def- make-src-utilities-stub ()
-  "Generate `/src/utilities.lisp'."
-  (rep-fmt ";;;; utilities.lisp --- common utilities
-
-(uiop:define-package #:${project}/src/utilities
-  (:use #:cl
-        #:marie))
-
-(in-package #:${project}/src/utilities)
-"))
-
-(def- make-src-core-stub ()
-  "Generate `/src/core.lisp'."
-  (rep-fmt ";;;; core.lisp --- core functions
-
-(uiop:define-package #:${project}/src/core
-  (:use #:cl
-        #:marie))
-
-(in-package #:${project}/src/core)
-
-(def main^hello ()
-  \"Display a greeting.\"
-  (format t \"Hello, world!~%\"))
-"))
-
-(def- make-src-driver-stub ()
-  "Generate `/src/driver.lisp'."
-  (rep-fmt ";;;; driver.lisp --- symbol driver
-
-(uiop:define-package #:${project}/src/driver
-  (:nicknames #:${project})
-  (:use #:uiop/common-lisp)
-  (:use-reexport #:${project}/src/core))
-
-(provide \"${project}\")
-(provide \"${PROJECT}\")
-"))
-
-(def- make-src-user-stub ()
-  "Generate `/src/user.lisp'."
-  (rep-fmt ";;;; user.lisp --- user sandbox
-
-(uiop:define-package #:${project}/src/user
-  (:nicknames #:${project}-user)
-  (:use #:cl
-        #:marie
-        #:${project}/src/driver))
-
-(in-package #:${project}-user)
-"))
-
-(def- make-src-cli-stub ()
-  "Generate `/src/cli.lisp'."
-  (rep-fmt ";;;; cli.lisp --- command line interface
-
-(uiop:define-package #:${project}/src/cli
-  (:use #:cl
-        #:marie
-        #:${project}/src/driver))
-
-(in-package #:${project}/src/cli)
-
-(def- cli-opts ()
-  \"Return the list of options.\"
-  (list
-   (clingon:make-option
-    :flag
-    :description \"Display usage\"
-    :short-name #\\h
-    :long-name \"help\"
-    :key :help)
-   (clingon:make-option
-    :string
-    :description \"Foo\"
-    :short-name #\\f
-    :long-name \"foo\"
-    :initial-value \"foo-bar-baz\"
-    :key :foo)))
-
-(def- cli-handler (cmd)
-  \"The top-level handler function.\"
-  (let ((args (clingon:command-arguments cmd))
-        (foo (clingon:getopt cmd :foo)))
-    (princ foo)
-    (princ (lisp-implementation-type))
-    (princ (lisp-implementation-version))))
-
-(def- cli-command ()
-  \"A command to ${project}.\"
-  (clingon:make-command
-   :name \"${project}\"
-   :description \"${project}\"
-   :version (:read-file-form #P\"version.sexp\")
-   :authors '(\"${author} <${email}>\")
-   :license \"\"
-   :options (cli-opts)
-   :handler #'cli-handler))
-
-(def main ()
-  \"The main blah blah blah.\"
-  (clingon:run (cli-command)))
-"))
-
-(def- make-src-build-stub ()
-  "Generate `/src/build.lisp'."
-  (rep-fmt "(require 'asdf)
-(defun cwd-name ()
-  (multiple-value-bind (type list &rest rest)
-      (uiop:split-unix-namestring-directory-components
-       (namestring (uiop:getcwd)))
-    (car (last list))))
-(defun cwd-keyword () (intern (cwd-name) (find-package :keyword)))
-(defun home (path) (merge-pathnames path (user-homedir-pathname)))
-#-quicklisp (load (home \"quicklisp/setup.lisp\"))
-(push (uiop:getcwd) asdf:*central-registry*)
-(ql:quickload (cwd-keyword))
-(asdf:make (cwd-keyword))
-"))
-
-
-;;; tests
-
-(def- make-t-version-stub ()
-  "Generate `/version-tests.sexp'."
-  (fmt "\"0.0.1\""))
-
-(def- make-t-asdf-stub ()
-  "Generate the test ASDF stub."
-  (rep-fmt "${project}-tests.asd --- test ASDF file for ${project}
-
-(defsystem #:${project}-tests
-    :name \"${project}-tests\"
-    :long-name \"${project}\"
-    :description \"\"
-    :long-description \"\"
-    :version (:read-file-form #P\"version-tests.sexp\")
-    :author \"${author} <${email}>\"
-    :maintainer \"${author} <${email}>\"
-    :license \"\"
-    :homepage \"\"
-    :bug-tracker \"\"
-    :source-control \"\"
-    :class :package-inferred-system
-    :depends-on (#:fiveam
-                 #:marie
-                 #:${project}
-                 #:${project}/t/core-tests
-                 #:${project}/t/driver-tests
-                 #:${project}/t/user-tests)
-    :perform (test-op (o c) (uiop:symbol-call :${project}/t/core-tests :run-tests)))
-"))
-
-(def- make-t-core-stub ()
-  "Generate `/t/core-tests.lisp'."
-  (rep-fmt ";;;; core-tests.lisp -- core functions tests
-
-(uiop:define-package #:${project}/t/core-tests
-  (:use #:cl #:marie
-        #:fiveam
-        #:${project}))
-
-(in-package #:${project}/t/core-tests)
-
-(def run-tests ()
-  \"Run all the tests defined in the suite.\"
-  (run-all-tests))
-")
-  )
-
-(def- make-t-driver-stub ()
-  "Generate `/t/driver-tests.lisp'."
-  (rep-fmt ";;;; driver-tests.lisp --- symbol driver tests
-
-(uiop:define-package :${project}/t/driver-tests
-  (:nicknames #:${project}/t)
-  (:use #:uiop/common-lisp
-        #:marie)
-  (:use-reexport #:${project}/t/core-tests))
-
-(provide \"${project}/t\")
-(provide \"${PROJECT}/T\")
-"))
-
-(def- make-t-user-stub ()
-  "Generate `/t/user-tests.lisp'."
-  (rep-fmt ";;;; user-tests.lisp --- user sandbox tests
-
-(uiop:define-package :${project}/t/user-tests
-  (:nicknames #:${project}-tests-user)
-  (:use #:cl #:marie
-        #:${project}/t/driver-tests))
-
-(in-package #:${project}-tests-user)
-"))
+(def- in-file* (path &rest args)
+  "Like REP-FMT*, but read in the contents of PATH, first."
+  (let ((path (project-path path)))
+    (apply #'rep-fmt* (uiop:read-file-string path) (rest args))))
 
 
 ;;;  helpers
@@ -482,29 +182,29 @@ with pkgs; rec {
   "Write the project files in PROJECT-DIR."
   (let ((project-source-dir (build-path +source-directory+ project-dir))
         (project-tests-dir (build-path +tests-directory+ project-dir)))
-    ;; Root files
+    ;; root files
     (with-out-files project-dir
-      (("README" "org") (make-readme-stub))
-      (("makefile") (make-makefile-stub))
-      ((".gitignore") (make-gitignore-stub))
-      (("flake" "nix") (make-flake-nix-stub))
-      (("shells" "nix") (make-shells-nix-stub))
-      ((project "asd") (make-src-asdf-stub))
-      (((cat project #\- "tests") "asd") (make-t-asdf-stub))
-      (("version" "sexp") (make-src-version-stub))
-      (("version-tests" "sexp") (make-t-version-stub)))
+      (("README" "org") (in-file* "README.org"))
+      (("makefile") (in-file* "makefile"))
+      ((".gitignore") (in-file* ".gitignore"))
+      (("flake" "nix") (in-file* "flake.nix"))
+      (("shells" "nix") (in-file* "shells.nix"))
+      (("version" "sexp") (in-file* "version.sexp"))
+      (("version-tests" "sexp") (in-file* "version-tests.sexp"))
+      ((project "asd") (in-file "project.asd"))
+      (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
     ;; src files
     (with-out-files project-source-dir
-      (("core" "lisp") (make-src-core-stub))
-      (("driver" "lisp") (make-src-driver-stub))
-      (("user" "lisp") (make-src-user-stub))
-      (("cli" "lisp") (make-src-cli-stub))
-      (("build" "lisp") (make-src-build-stub)))
+      (("core" "lisp") (in-file "core.lisp"))
+      (("driver" "lisp") (in-file "driver.lisp"))
+      (("user" "lisp") (in-file "user.lisp"))
+      (("cli" "lisp") (in-file "cli.lisp"))
+      (("build" "lisp") (in-file "build.lisp")))
     ;; test files
     (with-out-files project-tests-dir
-      (("core-tests" "lisp") (make-t-core-stub))
-      (("driver-tests" "lisp") (make-t-driver-stub))
-      (("user-tests" "lisp") (make-t-user-stub)))))
+      (("core-tests" "lisp") (in-file "core-tests.lisp"))
+      (("driver-tests" "lisp") (in-file "driver-tests.lisp"))
+      (("user-tests" "lisp") (in-file "user-tests.lisp")))))
 
 (def- enroll-system (project-dir)
   "Make the system indicated by PROJECT-DIR immediately accessible by ASDF."
@@ -531,8 +231,7 @@ with pkgs; rec {
       nil)))
 
 (def make-project^mk (&rest args)
-  "See %MAKE-PROJECT.
-  (mk \"foo\")"
+  "See %MAKE-PROJECT."
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
