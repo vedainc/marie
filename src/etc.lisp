@@ -194,3 +194,12 @@
 (def collect-characters (start end)
   "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
+
+(def- %print-doc (type string)
+  (format t "~A: ~A~%" type string))
+
+(defm doc (sym)
+  "Return the documentation strings of SYM."
+  `(progn
+     (when (boundp ',sym) (%print-doc "Variable" (documentation ',sym 'variable)))
+     (when (fboundp ',sym) (%print-doc "Function" (documentation ',sym 'function)))))
