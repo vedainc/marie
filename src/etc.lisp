@@ -5,7 +5,8 @@
   (:use #:cl
         #:marie/src/definitions
         #:marie/src/sequences
-        #:marie/src/strings))
+        #:marie/src/strings
+        #:marie/src/hash))
 
 (in-package #:marie/src/etc)
 
@@ -108,11 +109,13 @@
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
+#-lispworks
 (def true (&rest args)
   "Return true for anything."
   (declare (ignore args))
   t)
 
+#-lispworks
 (def false (&rest args)
   "Return false for anything."
   (declare (ignore args))
@@ -140,6 +143,7 @@
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
 
+#-lispworks
 (defmm appendf (&rest lists) append
   "Set the value of the first argument to the result of applying APPEND to LISTS.")
 
