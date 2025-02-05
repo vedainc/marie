@@ -7,9 +7,10 @@
 
 (in-package #:marie/src/definitions)
 
-#|
-This component provides a set of macros and utility functions that extend Common-Lisp's definition capabilities,
-- Simplified definition of functions, macros, methods, classes, conditions, types and etc.
+#| This component provides a set of macros and utility functions that extend
+Common Lisp's definition capabilities,
+- Simplified definition of functions, macros, methods, classes, conditions,
+types and etc.
 - Support for multiple name/alias definitions
 - Performance optimization hints (defun, defgeneric, defmethod)
 
@@ -388,7 +389,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
           val))))
 
 (defm- compose-definitions (type name superclasses slot-specs
-                                 &optional class-option)
+                            &optional class-option)
   "Compose the forms for creating a class."
   `(progn
      (,type ,name (,@superclasses)
@@ -414,7 +415,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 ;;; Defclass
 
 (defm- %defc (names (&rest superclasses)
-                    (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -527,7 +528,7 @@ define the symbol macro APPENDF; and export that name."
 ;;; Define-condition
 
 (defm- %defn (names (&rest superclasses)
-                    (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define conditions with DEFINE-CONDITION."
   (destructuring-bind (name &rest aliases)
       (split-names names)

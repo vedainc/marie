@@ -4,7 +4,8 @@
 (uiop:define-package #:marie/src/filesystem
   (:use #:cl
         #:marie/src/definitions
-        #:marie/src/sequences))
+        #:marie/src/sequences
+        #:marie/src/strings))
 
 (in-package #:marie/src/filesystem)
 
@@ -93,11 +94,6 @@
   (let ((object (system-object system)))
     (uiop:merge-pathnames* (cat system ".asd")
                            (asdf:system-source-directory object))))
-
-(def system-directory^sys-directory (system)
-  "Return the top-level directory of a system."
-  (let ((path (sys-path system)))
-    nil))
 
 (def system-version^sys-version (name)
   "Return the version number extracted from the system resources."
