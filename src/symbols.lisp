@@ -13,7 +13,7 @@
 (def symbols (package &key (type :external-symbols) sort)
   "Return the symbols interned in PACKAGE by TYPE.
   (symbols :package-name :sort #'string<)
-  (symbols :pacakage-name :type :symbols)
+  (symbols :package-name :type :symbols)
   (symbols :package-name)"
   (let ((symbols '()))
     (macrolet ((mac (fn)
