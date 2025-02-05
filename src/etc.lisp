@@ -4,6 +4,7 @@
 (uiop:define-package #:marie/src/etc
   (:use #:cl
         #:marie/src/definitions
+        #:marie/src/symbols
         #:marie/src/sequences
         #:marie/src/strings
         #:marie/src/hash))
@@ -200,5 +201,6 @@
 (defm doc (sym)
   "Return the documentation strings of SYM."
   `(progn
-     (when (boundp ',sym) (%print-doc "Variable" (documentation ',sym 'variable)))
-     (when (fboundp ',sym) (%print-doc "Function" (documentation ',sym 'function)))))
+     (when (boundp ',sym) (%print-doc "VARIABLE" (documentation ',sym 'variable)))
+     (cond ((mboundp ',sym) (%print-doc "MACRO" (documentation ',sym 'function)))
+           ((fboundp ',sym) (%print-doc "FUNCTION" (documentation ',sym 'function)))) nil))
