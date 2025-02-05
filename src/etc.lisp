@@ -19,10 +19,9 @@
        (format t "~A~%" opts)
        (proclaim `(optimize ,@opts)))))
 
-(define-optimize-macro debug@ (speed 1) (debug 3) (safety 1))
-(define-optimize-macro safety@ (safety 3) (debug 3) (speed 0))
-(define-optimize-macro speed@ (safety 1) (debug 3) (speed 3))
-(define-optimize-macro unsafe-speed@ (safety 0) (debug 3) (speed 3))
+(define-optimize-macro debug@  (speed 0) (debug 3) (safety 0))
+(define-optimize-macro safety@ (speed 0) (debug 3) (safety 3))
+(define-optimize-macro speed@  (speed 3) (debug 3) (safety 0))
 
 
 ;;; Debugging
