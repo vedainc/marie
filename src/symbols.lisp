@@ -79,6 +79,11 @@ as dependencies."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
 
+(def mboundp (sym)
+  "Return true if SYM is bound to a macro."
+  (when (macro-function sym)
+    t))
+
 (defm flet* (&rest body)
   "Evaluate BODY in LABELS."
   `(labels ,@body))
