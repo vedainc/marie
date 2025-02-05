@@ -135,6 +135,15 @@ as the key and the length of each list as the value."
                    (t (fn (cdr args) (remove (car args) list :test test))))))
     (fn elems list)))
 
+(def remove-nil (value)
+  "Remove nil at any level of tree."
+  (labels ((denull (elem)
+             (cond ((null elem) nil)
+                   ((not (listp elem)) elem)
+                   (t (remove-if #'null
+                                 (mapcar #'denull elem))))))
+    (denull value)))
+
 (def butrest (list)
   "Return everything from LIST except the rest."
   (butlast list (1- (length list))))
@@ -236,6 +245,12 @@ as the key and the length of each list as the value."
   (let ((val (assoc key items :test test)))
     (when val
       (cdr val))))
+
+(def- massoc (atom list)
+  "Return the first match on the atom."
+  (cond ((null list) list)
+        ((eq (caar list) atom) (car list))
+        (t (massoc atom (cdr list)))))
 
 (def mem (elem list &key (test #'equal))
   "Return true if ELEM is a member of LIST using TEST as the equality function."
