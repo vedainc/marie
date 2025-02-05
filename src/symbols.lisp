@@ -27,7 +27,7 @@
           (mapcar #'read-from-string (sort (mapcar #'string symbols) sort))
           symbols))))
 
-(def symbols*^syms (package &key (type :external-symbols) (sort #'string<))
+(def symbols*^syms (&key (package *package*) (type :external-symbols) (sort #'string<))
   "Print the symbols in interned in PACKAGE by TYPE."
   (declare (optimize (speed 3) (safety 0)))
   (let ((symbols (symbols package :type type :sort sort)))
