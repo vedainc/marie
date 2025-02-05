@@ -52,7 +52,23 @@
   "Create a list from STRING."
   (loop :for char :across string :collect char))
 
+(def string-integer-list (string)
+  (loop :with start := 0
+        :with end := (length string)
+        :while (< start end)
+        :for (value pos) := (multiple-value-list (parse-integer string :start start :junk-allowed t))
+        :do (setf start (or pos end))
+        :collect value))
+
+
 ;; NOTE: superseded by UIOP:STRCAT
+
+(def make-atom-string (&rest atom)
+  (let ((result nil))
+    (loop :for x :in atom
+          :do (push (symbol-name x) result))
+    (join (nreverse result))))
+
 (def concat^cat (&rest args)
   "Concatenate ARGS to a string."
   (let ((value (loop :for arg :in args :collect (string* arg))))
