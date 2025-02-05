@@ -10,8 +10,8 @@
                  #:marie/src/symbols
                  #:marie/src/conditionals
                  #:marie/src/strings
-                 #:marie/src/etc
                  #:marie/src/hash
+                 #:marie/src/etc
                  #:marie/src/filesystem
                  #:marie/src/project))
 
