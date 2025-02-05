@@ -12,22 +12,17 @@
 
 ;;; Optimizations
 
-(defm optimize-safety ()
-  "Enable compiler options for maximum safety options."
-  `(declaim (optimize (safety 3) (debug 3) (speed 0))))
+(defm define-optimize-macro (name &rest options)
+  "Define an optimize macro"
+  `(defm ,name ()
+     (let ((opts ',options))
+       (format t "~A~%" opts)
+       (proclaim `(optimize ,@opts)))))
 
-(defm optimize-speed ()
-  "Enable compiler options for maximum speed options."
-  `(declaim (optimize (safety 1) (debug 3) (speed 3) )))
-
-(defm optimize-speed-unsafe ()
-  "Enable compiler options for maximum speed options."
-  `(declaim (optimize (safety 0) (debug 3) (speed 3))))
-
-(defm optimize-debug ()
-  "Enable compiler options for maximum debug settings."
-  `(declaim (optimize (speed 1) (debug 3) (safety 1))))
-
+(define-optimize-macro debug@ (speed 1) (debug 3) (safety 1))
+(define-optimize-macro safety@ (safety 3) (debug 3) (speed 0))
+(define-optimize-macro speed@ (safety 1) (debug 3) (speed 3))
+(define-optimize-macro unsafe-speed@ (safety 0) (debug 3) (speed 3))
 
 
 ;;; Debugging
