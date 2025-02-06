@@ -5,6 +5,7 @@
   (:use #:cl
         #:marie/src/definitions
         #:marie/src/symbols
+        #:marie/src/conditionals
         #:marie/src/sequences
         #:marie/src/strings
         #:marie/src/hash))
@@ -194,12 +195,12 @@
   "Collect ASCII characters from START to END."
   (loop :for index :from start :below (+ start end) :collect (code-char index)))
 
-(def- %print-doc (type string)
-  (format t "~A: ~A~%" type string))
+(def- %print-doc (string sym type)
+  "Print the docstring of SYM under TYPE if present."
+  (marie/src/conditionals:when-let ((doc-string (documentation sym type)))
+    (format t "~A: ~A~%" string doc-string)))
 
-(defm doc (sym)
-  "Return the documentation strings of SYM."
-  `(progn
-     (when (boundp ',sym) (%print-doc "VARIABLE" (documentation ',sym 'variable)))
-     (cond ((mboundp ',sym) (%print-doc "MACRO" (documentation ',sym 'function)))
-           ((fboundp ',sym) (%print-doc "FUNCTION" (documentation ',sym 'function)))) nil))
+(def doc (symbol)
+  "Return the documentation strings of SYMBOL."
+  (let ((types '(function variable setf t compile-macro method-combination structure)))
+    (loop :for type :in types :do (%print-doc (prin1-to-string type) symbol type))))
