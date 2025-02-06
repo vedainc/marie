@@ -144,7 +144,6 @@
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      ,@body))
 
-#-lispworks
 (defmm appendf (&rest lists) append
   "Set the value of the first argument to the result of applying APPEND to LISTS.")
 

@@ -74,7 +74,6 @@
 
 ;;; When macro bindings
 
-#-lispworks
 (defm when-let (bindings &body forms)
   "Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a
 true value. This is ALEXANDRIA:WHEN-LET."
@@ -86,7 +85,6 @@ true value. This is ALEXANDRIA:WHEN-LET."
        (when (and ,@variables)
          ,@forms))))
 
-#-lispworks
 (defm when-let* (bindings &body body)
   "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
 a true value. This is ALEXANDRIA:WHEN-LET*."
