@@ -27,20 +27,17 @@
           (mapcar #'read-from-string (sort (mapcar #'string symbols) sort))
           symbols))))
 
-(def symbols*^syms (&key (package *package*) (type :external-symbols) (sort #'string<))
+(def symbols*^syms (&optional (package *package*) &key (type :external-symbols) (sort #'string<))
   "Print the symbols in interned in PACKAGE by TYPE."
-  (declare (optimize (speed 3) (safety 0)))
   (let ((symbols (symbols package :type type :sort sort)))
     (format t "~{~A~%~}" symbols)))
 
 (def external-symbols (package &key sort)
   "Return the external symbols in PACKAGE."
-  (declare (optimize (speed 3) (safety 0)))
   (symbols package :type :external-symbols :sort sort))
 
 (def present-symbols (package)
   "Return the present symbols in PACKAGE."
-  (declare (optimize (speed 3) (safety 0)))
   (symbols package :type :present-symbols))
 
 (def pretty-print-symbols^pps (package &optional (type :external-symbols) (sort #'string<))
