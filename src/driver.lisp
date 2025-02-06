@@ -2,7 +2,7 @@
 ;;;; driver.lisp --- top-level definitions for exporting marie symbols
 
 (uiop:define-package #:marie/src/driver
-  (:nicknames :marie)
+  (:nicknames :marie :m)
   (:use :uiop/common-lisp)
   (:use-reexport #:marie/src/definitions
                  #:marie/src/reader
