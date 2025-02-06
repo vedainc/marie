@@ -138,3 +138,7 @@ as dependencies."
          (setf (symbol-value ',name-1) ,name-2)
          (setf (symbol-value ',name-2) ,temp)
          (values)))))
+
+(def keyword-used-p^kup (string)
+  "Return true if keyword is already interned."
+  (find-symbol (string-upcase string) 'keyword))
