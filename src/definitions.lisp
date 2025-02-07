@@ -7,42 +7,6 @@
 
 (in-package #:marie/src/definitions)
 
-#| This component provides a set of macros and utility functions that extend
-Common Lisp's definition capabilities,
-- Simplified definition of functions, macros, methods, classes, conditions,
-types and etc.
-- Support for multiple name/alias definitions
-- Performance optimization hints (defun, defgeneric, defmethod)
-
-([Export symbols (without '-')  | Without exporting symbols (with '-')])
-DEFMACRO                  defm  |  defm-     : Define a macro
-DEFUN                     def   |  def-      : Define a function
-DEFVAR                    defv  |  defv-     : Define a special variable
-DEFPARAMETER              defp  |  defp-     : Define a dynamic parameter
-DEFCONSTANT               defk  |  defk-     : Define a constant
-DEFGENERIC                defg  |  defg-     : Define a generic function
-DEFMETHOD                 deft  |  deft-     : Define a method
-DEFCLASS                  defc  |  defc-     : Define a class
-DEFINE-CONDITION          defn  |  defn-     : Define an error condition
-DEFINE-MODIFY-MACRO       defmm |  defmm-    : Define a modify macro
-DEFINE-SYMBOL-MACRO       defsm |  defsm-    : Define a symbol macro
-DEFTYPE                   defy  |  defy-     : Define a type
-SET-VARIABLE              setv  |  setv-     : Custom variable setting
-MVB                            mvb           ; multiple-value-bind
-
-Utilities:
-- COMPOSE-DEFINITION: Create classes with an instant instantiation and predicate
-- COMPOSE-EXPORT: Generate export forms
-
-Features:
-- Use "^" or "·" as name separators for aliases
-- Append "^t" or "tack-t" to force export of defined names/symbols
-- Optimization variants like "def!" (speed) and "def@" (safety)
-
-Example:
-(def foo^bar (x) (1+ x))  ; Defines FOO and BAR functions, exports both
-|#
-
 
 ;;; Utilities
 
