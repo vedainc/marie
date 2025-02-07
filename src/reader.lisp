@@ -11,8 +11,9 @@
 ;;; Brace reader
 
 (def- brace-reader (stream char)
-  "Use {+ _ 1} as a shorthand for #'(lambda (_) (+ _ 1))
-See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
+  "Use `{+ _ 1}` as shorthand for #'(lambda (_) (+ _ 1)),
+reading from stream and ignoring char. See
+ http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
   (declare (ignore char)
            (optimize (speed 3) (safety 0)))
   `(lambda (,(intern "_") &optional ,(intern "__"))
@@ -28,7 +29,8 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
 ;;; Bracket reader
 
 (def- bracket-reader (stream char)
-  "Use {foo 5} as a shorthand for (funcall foo 5)."
+  "Use `{foo 5}` as shorthand for `(funcall foo 5)`,
+  reading from stream and ignoring char. "
   (declare (ignore char)
            (optimize (speed 3) (safety 0)))
   `(funcall ,@(read-delimited-list #\] stream t)))
@@ -42,7 +44,9 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
 ;;; Lambda reader
 
 (def- lambda-reader (stream char)
-  "Define the reader for λ."
+  "Define the reader for λ.
+  (λ ...) as a shorthand for (lambda ...),
+  reading from stream and ignoring stream char. "
   (declare (ignore stream char)
            (optimize (speed 3) (safety 0)))
   'LAMBDA)
@@ -55,7 +59,8 @@ See http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
 ;;; Phi reader
 
 (def- phi-reader (stream char)
-  "Define the reader for phi."
+  "(φ ...) as a shordhand for (progn ...),
+ reading from stream and ignoring stream char. "
   (declare (ignore stream char)
            (optimize (speed 3) (safety 0)))
   'PROGN)
