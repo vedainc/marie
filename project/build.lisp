@@ -2,10 +2,10 @@
 
 (require 'asdf)
 (defun cwd-name ()
-  (multiple-value-bind (type list &rest rest)
+  (multiple-value-bind (type list x y)
       (uiop:split-unix-namestring-directory-components
        (namestring (uiop:getcwd)))
-    (declare (ignore rest))
+    (declare (ignore type x y))
     (car (last list))))
 (defun cwd-keyword () (intern (cwd-name) (find-package :keyword)))
 (defun home (path) (merge-pathnames path (user-homedir-pathname)))
