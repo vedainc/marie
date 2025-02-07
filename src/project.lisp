@@ -17,9 +17,6 @@
 (defk- +file-header+
   ";;;; -*- mode: lisp; syntax: common-lisp; base: 10; -*-")
 
-(defv- *project* "project"
-  "The default project name.")
-
 (defk- +source-directory+
   #P"src"
   "The main source directory.")
@@ -36,6 +33,9 @@
 (def- project-path (path)
   "Return a path from PATH relevant to the project directory."
   (uiop:subpathname *project-directory* path))
+
+(defv- *project* "project"
+  "The default project name.")
 
 (def- run-trim (command)
   "Run COMMAND and remove trailing whitespace."
@@ -54,13 +54,6 @@
                        (declare (ignore c))
                        (invoke-restart 'return-empty-string))))
     (&cmd-output command)))
-
-;; allow reloading
-(defp- *git-user-name* (cmd-output "git config user.name || (cd && git config user.name)")
-  "Preload the Git username")
-
-(defp- *git-user-email* (cmd-output "git config user.email || (cd && git config user.email)")
-  "Preload the Git user email")
 
 
 ;;; functions
@@ -92,27 +85,24 @@
             :do (write-string replacement out)
           :while pos)))
 
-(defv- *rep-table*
-  '(("${project}" . nil)
-    ("${PROJECT}" . string-upcase)
-    ("${author}"  . git-user-name)
-    ("${email}"   . git-user-email))
-  "An alist of string substitution where the car is the string to match and the
-  cdr is the function to apply.")
-
-(defn- sub-process-error (error)
-  ((text :initarg :text :reader text))
-  (:documentation "Condition for subprocess errors."))
-
-(def- git-user-name (&rest args)
+(def- get-user-name (&rest args)
   "Return the git user name."
   (declare (ignore args))
-  *git-user-name*)
+  (cmd-output "git config user.name || (cd && git config user.name)"))
 
-(def- git-user-email (&rest args)
+(def- get-user-email (&rest args)
   "Return the git email address."
   (declare (ignore args))
-  *git-user-email*)
+  (cmd-output "git config user.email || (cd && git config user.email)"))
+
+(defp- *rep-table*
+  '(("${project}" . nil)
+    ("${PROJECT}" . string-upcase)
+    ("${author}"  . get-user-name)
+    ("${email}"   . get-user-email))
+  "An alist of string substitution where the CAR is the string to match and the
+CDR is the function to apply. If the cdr is nil, don't apply any function to
+the CAR.")
 
 (def- rep-get (string)
   "Return the transformation function for STRING."
@@ -156,6 +146,10 @@
   (let ((path (project-path path)))
     (apply #'rep-fmt* (uiop:read-file-string path) (rest args))))
 
+(defn- sub-process-error (error)
+  ((text :initarg :text :reader text))
+  (:documentation "Condition for subprocess errors."))
+
 
 ;;;  helpers
 
@@ -189,8 +183,8 @@
       ((".gitignore") (in-file* ".gitignore"))
       (("flake" "nix") (in-file* "flake.nix"))
       (("shells" "nix") (in-file* "shells.nix"))
-      (("version" "sexp") (in-file* "version.sexp"))
-      (("version-tests" "sexp") (in-file* "version-tests.sexp"))
+      (("version" "lisp") (in-file* "version.lisp"))
+      (("version-tests" "lisp") (in-file* "version-tests.lisp"))
       ((project "asd") (in-file "project.asd"))
       (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
     ;; src files

@@ -13,7 +13,7 @@ LISP := sbcl
 all: $(NAME)
 
 $(NAME):
-	@(LISP) --eval '(ql:quickload :${project})' --eval '(asdf:make :${project})' --eval '(uiop:quit)'
+	@$(LISP) --eval '(ql:quickload :${project})' --eval '(asdf:make :${project})' --eval '(uiop:quit)'
 
 clean:
 	@rm -f $(NAME)
