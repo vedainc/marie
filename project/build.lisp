@@ -11,4 +11,5 @@
 #-quicklisp (load (home "quicklisp/setup.lisp"))
 (push (uiop:getcwd) asdf:*central-registry*)
 (ql:quickload (cwd-keyword))
+(asdf:load-system (cwd-keyword))
 (asdf:make (cwd-keyword))
