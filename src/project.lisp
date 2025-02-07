@@ -193,7 +193,8 @@ the CAR.")
       (("driver" "lisp") (in-file "driver.lisp"))
       (("user" "lisp") (in-file "user.lisp"))
       (("cli" "lisp") (in-file "cli.lisp"))
-      (("build" "lisp") (in-file "build.lisp")))
+      (("build" "lisp") (in-file "build.lisp"))
+      (("build" "sh") (in-file* "build.sh")))
     ;; test files
     (with-out-files project-tests-dir
       (("core-tests" "lisp") (in-file "core-tests.lisp"))

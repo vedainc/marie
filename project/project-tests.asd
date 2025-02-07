@@ -5,7 +5,7 @@
     :long-name "${project}"
     :description ""
     :long-description ""
-    :version (:read-file-form #P"version-tests.sexp")
+    :version (:read-file-form #P"version-tests.lisp")
     :author "${author} <${email}>"
     :maintainer "${author} <${email}>"
     :license ""
