@@ -614,38 +614,6 @@ names."
 
 ;;; DEFSTRUCT
 
-;;; Scratch
-
-;; (defm- %defs (&optional names &rest body)
-;;   #.(compose-docstring "Define structures with only simple structure, TEMPORARY.")
-;;   (destructuring-bind (name &rest aliases)
-;;       (split-names names)
-;;     `(progn
-;;        (defstruct ,name ,@body)
-;;        ,@(loop :for alias :in (remove t aliases)
-;;                :collect `(defstruct ,alias ,@body))
-;;        (export-names ,name ,aliases))))
-
-
-;; (defm defs (names &rest body)
-;;   "Define structures with DEFSTRUCT. The forms is only simple structure
-
-;;   (defs foo
-;;          (x nil)
-;;          (y nil)
-;;          (z 1))
-
-;;   (defs foo^bar
-;;          (x nil)
-;;          (y nil)
-;;          (z 1))
-;;   Use defstruct"
-;;   `(%defs ,(tack-t names) ,@body))
-
-;; (defm defs- (names &rest body)
-;;   "Like DEFS, but do not export NAMES."
-;;   `(%defs ,names ,@body))
-
 (defm- %defs (name-and-options &rest slots)
   #.(compose-docstring "Define structures with DEFSTRUCT supporting all options.")
   (if (symbolp name-and-options)
