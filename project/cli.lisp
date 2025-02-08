@@ -2,8 +2,7 @@
 
 (uiop:define-package #:${project}/src/cli
   (:use #:cl
-        #:marie
-        #:${project}/src/driver))
+        #:marie))
 
 (in-package #:${project}/src/cli)
 
