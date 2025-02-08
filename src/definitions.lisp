@@ -611,3 +611,38 @@ names."
 (defm mvb (&rest args)
   "Pass ARGS to MULTIPLE-VALUE-BIND."
   `(multiple-value-bind ,@args))
+
+;;; DEFSTRUCT
+
+(defm- %defs (names (&rest options) (&rest slot-specs))
+  "Define structures with DEFSTRUCT."
+  (destructuring-bind (name &rest aliases)
+      (split-names names)
+    `(progn
+       (defstruct ,name ,@options ,@slot-specs)
+       ,@(loop :for alias :in (remove t aliases)
+               :collect `(defstruct ,alias ,@options ,@slot-specs))
+       (when (member t ',aliases)
+         (progn
+           (export-names ',name)
+           ,@(loop :for alias :in (remove t aliases)
+                   :collect `(export-names ',alias)))))))
+
+(defm defs (names (&rest options) (&rest slot-specs))
+  "Define structures with DEFSTRUCT and export their names.
+
+The form
+
+    (defs point^3d-point
+      (:conc-name nil)
+      (x :type number :read-only t)
+      (y :type number :read-only t)
+      (z :type number :read-only t))
+
+defines the structures POINT and 3D-POINT with the given slots and options.
+The symbols POINT and 3D-POINT are exported."
+  `(%defs ,(tack-t names) ,options ,slot-specs))
+
+(defm defs- (names (&rest options) (&rest slot-specs))
+  "Like DEFS, but do not export NAMES."
+  `(%defs ,names ,options ,slot-specs))
