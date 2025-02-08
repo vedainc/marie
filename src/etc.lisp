@@ -161,10 +161,10 @@
              :for name = (read-from-string (concat prefix (write-to-string n)))
              :collect `(def ,name (list) (elt list ,n)))))
 
-(defm fns (fn1 &rest args)
-  "Return a function that applies FN1 and ARGS to OBJ that returns multiple values."
+(defm fns (fn &rest args)
+  "Return a function that applies FN and ARGS to OBJ that returns multiple values."
   `(lambda (obj)
-     (list (funcall ,fn1 obj)
+     (list (funcall ,fn obj)
            ,@(loop :for arg :in args :collect `(funcall ,arg obj)))))
 
 (defm with-suppresed-output^mute (&body body)

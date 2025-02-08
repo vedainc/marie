@@ -85,19 +85,19 @@ true value. This is ALEXANDRIA:WHEN-LET."
        (when (and ,@variables)
          ,@forms))))
 
-(defm when-let* (bindings &body body)
+(defm when-let* (bindings &body forms)
   "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
 a true value. This is ALEXANDRIA:WHEN-LET*."
   (let ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
                           (list bindings)
                           bindings)))
-    (labels ((bind (bindings body)
+    (labels ((bind (bindings forms)
                (if bindings
                    `(let (,(car bindings))
                       (when ,(caar bindings)
-                        ,(bind (cdr bindings) body)))
-                   `(progn ,@body))))
-      (bind binding-list body))))
+                        ,(bind (cdr bindings) forms)))
+                   `(progn ,@forms))))
+      (bind binding-list forms))))
 
 
 ;;; Boolean logic helpers
@@ -123,23 +123,27 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   (and x y t))
 
 (defm aif (test-form then-form &optional else-form)
-  "Anaphoric IF."
+  "Anaphoric IF takes test-form, then-form, and optionally else-form,
+   binding the test result to it."
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
 
 (defm awhen (test-form &body then-form)
-  "Anaphoric WHEN."
+  "Anaphoric WHEN takes test-form and a body (then-form),
+  using aif to evaluate and bind it.  "
   `(aif ,test-form
-    (progn ,@then-form)))
+        (progn ,@then-form)))
 
 (defm aand (&rest args)
-  "Anaphoric AND."
+  "Anaphoric AND takes multiple arguments, evaluating them with
+  short-circuiting logic using AIF."
   (cond ((null args) t)
         ((null (cdr args)) (car args))
         (t `(aif ,(car args) (aand ,@(cdr args))))))
 
 (defm acond (&rest clauses)
-  "Anaphoric COND."
+  "It takes multiple clauses, evaluating
+   them sequentially with an anaphoric binding of it."
   (if (null clauses)
       nil
       (let ((clause (car clauses))
@@ -150,13 +154,15 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
                (acond ,@(cdr clauses)))))))
 
 (defm nif (test-form then-form &optional else-form)
-  "Not IF."
+  "It takes test-form, then-form, and optionally else-form,
+   performing a negated if condition."
   `(if (not ,test-form)
        ,then-form
        ,else-form))
 
 (def- alpha-reader (stream char)
-  "Define the reader for α, so that it can be used to refer to the anaphora."
+  "Define the reader for α, so that it can be used to refer to the anaphora.
+Ignoring the stream and char."
   (declare (ignore stream char))
   'MARIE/SRC/CONDITIONALS::IT)
 
