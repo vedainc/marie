@@ -40,7 +40,7 @@
   (uiop:merge-pathnames* file (asdf:system-source-directory (asdf:find-system system))))
 
 (defm with-output-file ((var path) &body body)
-  "A thin wrapper over WITH-OPEN-FILE."
+  "Define a macro for thin wrapper over WITH-OPEN-FILE that takes an input of VAR, PATH and BODY."
   `(with-open-file (,var ,path
                          :direction :output
                          :if-exists :supersede
@@ -49,8 +49,6 @@
 
 (def home^~ (path)
   "Return a path relative to the home directory."
-  ;; (uiop:merge-pathnames* path (user-homedir-pathname))
-  ;; (merge-pathnames path (user-homedir-pathname))
   (uiop:subpathname (user-homedir-pathname) path))
 
 (def expand-pathname (path)
@@ -85,9 +83,9 @@
 
 ;;; System fns
 
-(def system-object^sys-object (name)
+(def system-object^sys-object (system)
   "Return the system object for the current system."
-  (asdf:find-system name))
+  (asdf:find-system system))
 
 (def system-path^sys-path (system)
   "Return the ASDF file path for the current system."
@@ -95,6 +93,6 @@
     (uiop:merge-pathnames* (cat system ".asd")
                            (asdf:system-source-directory object))))
 
-(def system-version^sys-version (name)
+(def system-version^sys-version (system)
   "Return the version number extracted from the system resources."
-  (asdf:system-version (sys-object name)))
+  (asdf:system-version (sys-object system)))
