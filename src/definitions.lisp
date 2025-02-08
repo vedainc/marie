@@ -614,32 +614,102 @@ names."
 
 ;;; DEFSTRUCT
 
-(defm- %defs (names &rest body)
-  #.(compose-docstring "Define structures with only simple structure, TEMPORARY.")
-  (destructuring-bind (name &rest aliases)
-      (split-names names)
-    `(progn
-       (defstruct ,name ,@body)
-       ,@(loop :for alias :in (remove t aliases)
-               :collect `(defstruct ,alias ,@body))
-       (export-names ,name ,aliases))))
+;;; Scratch
+
+;; (defm- %defs (&optional names &rest body)
+;;   #.(compose-docstring "Define structures with only simple structure, TEMPORARY.")
+;;   (destructuring-bind (name &rest aliases)
+;;       (split-names names)
+;;     `(progn
+;;        (defstruct ,name ,@body)
+;;        ,@(loop :for alias :in (remove t aliases)
+;;                :collect `(defstruct ,alias ,@body))
+;;        (export-names ,name ,aliases))))
 
 
-(defm defs (names &rest body)
-  "Define structures with DEFSTRUCT. The forms is only simple structure
+;; (defm defs (names &rest body)
+;;   "Define structures with DEFSTRUCT. The forms is only simple structure
 
-  (defs foo
-         (x nil)
-         (y nil)
-         (z 1))
+;;   (defs foo
+;;          (x nil)
+;;          (y nil)
+;;          (z 1))
 
-  (defs foo^bar
-         (x nil)
-         (y nil)
-         (z 1))
-  Use defstruct"
-  `(%defs ,(tack-t names) ,@body))
+;;   (defs foo^bar
+;;          (x nil)
+;;          (y nil)
+;;          (z 1))
+;;   Use defstruct"
+;;   `(%defs ,(tack-t names) ,@body))
 
-(defm defs- (names &rest body)
-  "Like DEFS, but do not export NAMES."
-  `(%defs ,names ,@body))
+;; (defm defs- (names &rest body)
+;;   "Like DEFS, but do not export NAMES."
+;;   `(%defs ,names ,@body))
+
+(defm- %defs (name-and-options &rest slots)
+  #.(compose-docstring "Define structures with DEFSTRUCT supporting all options.")
+  (if (symbolp name-and-options)
+      ;; Simple structure definition (just a name or name with aliases)
+      (destructuring-bind (name &rest aliases)
+          (split-names name-and-options)
+        `(progn
+           (defstruct ,name ,@slots)
+           ,@(loop :for alias :in (remove t aliases)
+                   :collect `(defstruct ,alias ,@slots))
+           (export-names ,name ,aliases)))
+      ;; Complex structure definition (with name & options)
+      (let* ((struct-name (if (listp name-and-options)
+                              (first name-and-options)
+                              name-and-options)) ; extract (name (:...))
+             (options (when (listp name-and-options)
+                        (rest name-and-options)))) ; extract ((:...))
+        (if (symbolp struct-name)
+            ;; Name with options but no aliases
+            `(defstruct (,struct-name ,@options) ,@slots)
+            ;; Name with aliases and options
+            (destructuring-bind (name &rest aliases)
+                (split-names struct-name)
+              `(progn
+                 (defstruct (,name ,@options) ,@slots)
+                 ,@(loop :for alias :in (remove t aliases)
+                         :collect `(defstruct (,alias ,@options) ,@slots))
+                 (export-names ,name ,aliases)))))))
+
+(defm defs (name-and-options &rest slots)
+  "Define structures with DEFSTRUCT, supporting all standard DEFSTRUCT options
+  and syntax. Example used for testing were from HYPERSEC and hash.lisp.
+
+   Simple named structure:
+   (defs foo (x nil) (y nil) (z 1))
+
+   Structure with options:
+   (defs (ordered-hash-table
+           (:constructor make-ordered-hash-table%)
+           (:predicate ordered-hash-table-p)
+           (:print-object print-ordered-hash-table)
+           (:copier nil))
+       (hashtable nil :type (or null hash-table) :read-only t)
+       (keys (list) :type list))
+
+   Structure with aliases:
+   (defs foo^bar (x nil) (y nil))
+
+   Structure with type specification:
+   (defs (binop (:type list) :named (:initial-offset 2))
+         (operator '? :type symbol)
+         operand-1
+         operand-2)
+
+   Structure with inheritance:
+   (defs (astronaut (:include person)
+                    (:conc-name astro-))
+         helmet-size
+         (favorite-beverage 'tang))"
+  `(%defs ,(if (symbolp name-and-options)
+               (tack-t name-and-options)
+               name-and-options)
+       ,@slots))
+
+(defm defs- (name-and-options &rest slots)
+  "Like DEFS, but do not export names."
+  `(%defs ,name-and-options ,@slots))
