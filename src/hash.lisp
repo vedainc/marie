@@ -14,13 +14,13 @@
 ;;; Ordered Hashtable
 
 (declaim (inline make-ordered-hash-table%))
-(defstruct (ordered-hash-table
-            (:constructor make-ordered-hash-table%)
-            (:predicate ordered-hash-table-p)
-            (:print-object print-ordered-hash-table)
-            (:copier nil))
-  (hashtable nil :type (or null hash-table) :read-only t)
-  (keys (list) :type list))
+(defs (ordered-hash-table
+       (:constructor make-ordered-hash-table%)
+       (:predicate ordered-hash-table-p)
+       (:print-object print-ordered-hash-table)
+       (:copier nil))
+    (hashtable nil :type (or null hash-table) :read-only t)
+    (keys (list) :type list))
 
 (def make-ordered-hash-table (&key (test 'eql)
                                    (size 7)
@@ -149,17 +149,17 @@ be used by SORT with KEY being the key that will be used for sorting."
         (sort alist sort :key key)
         alist)))
 
-(def show-table (table)
+(def show-table (hash-table)
   "Print the contents of hash table TABLE."
   (maphash (lambda (k v)
              (format t "~S => ~S~%" k v)
              (force-output *standard-output*))
-           table))
+           hash-table))
 
-(def show-table* (table &optional (pad 0))
+(def show-table* (hash-table &optional (pad 0))
   "Print the contents of hash table TABLE recursively."
-  (loop :for key :being :the :hash-keys :in table
-        :for value :being :the :hash-values :in table
+  (loop :for key :being :the :hash-keys :in hash-table
+        :for value :being :the :hash-values :in hash-table
         :do (if (hash-table-p value)
                 (progn
                   (format t "~A~S => ~S~%"
@@ -172,9 +172,9 @@ be used by SORT with KEY being the key that will be used for sorting."
                         key
                         value))))
 
-(def gethash* (path table)
+(def gethash* (path hash-table)
   "Return the value specified by path starting from TABLE."
-  (cond ((singlep path) (gethash (car path) table))
-        ((null (hash-table-p (gethash (car path) table))) nil)
+  (cond ((singlep path) (gethash (car path) hash-table))
+        ((null (hash-table-p (gethash (car path) hash-table))) nil)
         (t (gethash* (cdr path)
-                     (gethash (car path) table)))))
+                     (gethash (car path) hash-table)))))

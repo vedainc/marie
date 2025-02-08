@@ -76,9 +76,9 @@ as dependencies."
   `(progn
      ,@(loop :for arg :in args :collect `(,macro ,arg))))
 
-(def mboundp (sym)
-  "Return true if SYM is bound to a macro."
-  (when (macro-function sym)
+(def mboundp (symbol)
+  "Return true if SYMBOL is bound to a macro."
+  (when (macro-function symbol)
     t))
 
 (defm flet* (&rest body)
