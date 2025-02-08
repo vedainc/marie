@@ -353,7 +353,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
           val))))
 
 (defm- compose-definitions (type name superclasses slot-specs
-                            &optional class-option)
+                                 &optional class-option)
   "Compose the forms for creating a class."
   `(progn
      (,type ,name (,@superclasses)
@@ -379,7 +379,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 ;;; Defclass
 
 (defm- %defc (names (&rest superclasses)
-              (&rest slot-specs) &optional class-option)
+                    (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -492,7 +492,7 @@ define the symbol macro APPENDF; and export that name."
 ;;; Define-condition
 
 (defm- %defn (names (&rest superclasses)
-              (&rest slot-specs) &optional class-option)
+                    (&rest slot-specs) &optional class-option)
   "Define conditions with DEFINE-CONDITION."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -614,35 +614,32 @@ names."
 
 ;;; DEFSTRUCT
 
-(defm- %defs (names (&rest options) (&rest slot-specs))
-  "Define structures with DEFSTRUCT."
+(defm- %defs (names &rest body)
+  #.(compose-docstring "Define structures with only simple structure, TEMPORARY.")
   (destructuring-bind (name &rest aliases)
       (split-names names)
     `(progn
-       (defstruct ,name ,@options ,@slot-specs)
+       (defstruct ,name ,@body)
        ,@(loop :for alias :in (remove t aliases)
-               :collect `(defstruct ,alias ,@options ,@slot-specs))
-       (when (member t ',aliases)
-         (progn
-           (export-names ',name)
-           ,@(loop :for alias :in (remove t aliases)
-                   :collect `(export-names ',alias)))))))
+               :collect `(defstruct ,alias ,@body))
+       (export-names ,name ,aliases))))
 
-(defm defs (names (&rest options) (&rest slot-specs))
-  "Define structures with DEFSTRUCT and export their names.
 
-The form
+(defm defs (names &rest body)
+  "Define structures with DEFSTRUCT. The forms is only simple structure
 
-    (defs point^3d-point
-      (:conc-name nil)
-      (x :type number :read-only t)
-      (y :type number :read-only t)
-      (z :type number :read-only t))
+  (defs foo
+         (x nil)
+         (y nil)
+         (z 1))
 
-defines the structures POINT and 3D-POINT with the given slots and options.
-The symbols POINT and 3D-POINT are exported."
-  `(%defs ,(tack-t names) ,options ,slot-specs))
+  (defs foo^bar
+         (x nil)
+         (y nil)
+         (z 1))
+  Use defstruct"
+  `(%defs ,(tack-t names) ,@body))
 
-(defm defs- (names (&rest options) (&rest slot-specs))
+(defm defs- (names &rest body)
   "Like DEFS, but do not export NAMES."
-  `(%defs ,names ,options ,slot-specs))
+  `(%defs ,names ,@body))
