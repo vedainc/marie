@@ -85,19 +85,19 @@ true value. This is ALEXANDRIA:WHEN-LET."
        (when (and ,@variables)
          ,@forms))))
 
-(defm when-let* (bindings &body body)
+(defm when-let* (bindings &body forms)
   "Use BINDINGS like with LET*, then evaluate FORMS if all BINDINGS evaluate to
 a true value. This is ALEXANDRIA:WHEN-LET*."
   (let ((binding-list (if (and (consp bindings) (symbolp (car bindings)))
                           (list bindings)
                           bindings)))
-    (labels ((bind (bindings body)
+    (labels ((bind (bindings forms)
                (if bindings
                    `(let (,(car bindings))
                       (when ,(caar bindings)
-                        ,(bind (cdr bindings) body)))
-                   `(progn ,@body))))
-      (bind binding-list body))))
+                        ,(bind (cdr bindings) forms)))
+                   `(progn ,@forms))))
+      (bind binding-list forms))))
 
 
 ;;; Boolean logic helpers

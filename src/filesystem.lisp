@@ -40,7 +40,7 @@
   (uiop:merge-pathnames* file (asdf:system-source-directory (asdf:find-system system))))
 
 (defm with-output-file ((var path) &body body)
-  "A thin wrapper over WITH-OPEN-FILE."
+  "Define a macro for thin wrapper over WITH-OPEN-FILE that takes an input of VAR, PATH and BODY."
   `(with-open-file (,var ,path
                          :direction :output
                          :if-exists :supersede
@@ -49,8 +49,6 @@
 
 (def home^~ (path)
   "Return a path relative to the home directory."
-  ;; (uiop:merge-pathnames* path (user-homedir-pathname))
-  ;; (merge-pathnames path (user-homedir-pathname))
   (uiop:subpathname (user-homedir-pathname) path))
 
 (def expand-pathname (path)
