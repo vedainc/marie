@@ -60,9 +60,7 @@
         :do (setf start (or pos end))
         :collect value))
 
-
 ;; NOTE: superseded by UIOP:STRCAT
-
 (def make-atom-string (&rest atom)
   (let ((result nil))
     (loop :for x :in atom
@@ -104,14 +102,14 @@
   "Return true if X is part of Y, and that X is found from the start of Y."
   (land (not (= (length x)
                 (length y)))
-    (let ((val (search x y)))
-      (awhen val
-        (zerop it)))))
+        (let ((val (search x y)))
+          (awhen val
+            (zerop it)))))
 
 (def every-string-p (object)
   "Return true if OBJECT is a list and all members are strings."
   (land (listp object)
-    (every #'stringp object)))
+        (every #'stringp object)))
 
 (def empty-string-p (string)
   "Return true if STRING is of length zero."
