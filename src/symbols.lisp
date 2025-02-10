@@ -142,3 +142,7 @@ as dependencies."
 (def keyword-used-p^kup (string)
   "Return true if keyword is already interned."
   (find-symbol (string-upcase string) 'keyword))
+
+(def read-cat (&rest args)
+  "Read from the concatenation of ARGS."
+  (read-from-string (apply #'cat args)))
