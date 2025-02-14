@@ -7,7 +7,7 @@
     :description "A small collection of CL utilities without external dependencies"
     :author "Rommel Martínez <ebzzry@icloud.com>"
     :maintainer ("Rommel Martínez <ebzzry@icloud.com>"
-                 "Michael Adrian Villareal <eldriv.eldriv@gmail.com>")
+                 "Michael Adrian Villareal <eldriv@proton.me>")
     :class :package-inferred-system
     :depends-on (#+sbcl #:sb-cltl2
                  #:marie/src/definitions
