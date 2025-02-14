@@ -23,17 +23,17 @@ variants: those with =-= are non-exporting, while those without are exporting.
 |-----------+---------------+-------------------------+--------|
 | ~DEFM~    | ~DEFM-~       | ~DEFMACRO~              | ~m~    |
 | ~DEF~     | ~DEF-~        | ~DEFUN~                 | ~f~    |
-| ~DEFV~    | ~DEFV-~       | ~DEFVAR~                | ~fv~   |
-| ~DEFP~    | ~DEFP-~       | ~DEFPARAMETER~          | ~fp~   |
-| ~DEFK~    | ~DEFK-~       | ~DEFCONSTANT~           | ~fk~   |
-| ~DEFG~    | ~DEFG-~       | ~DEFGENERIC~            | ~fg~   |
+| ~DEFV~    | ~DEFV-~       | ~DEFVAR~                | ~v~    |
+| ~DEFP~    | ~DEFP-~       | ~DEFPARAMETER~          | ~p~    |
+| ~DEFK~    | ~DEFK-~       | ~DEFCONSTANT~           | ~k~    |
+| ~DEFG~    | ~DEFG-~       | ~DEFGENERIC~            | ~g~    |
 | ~DEFT~    | ~DEFT-~       | ~DEFMETHOD~             | ~t~    |
 | ~DEFC~    | ~DEFC-~       | ~DEFCLASS~              | ~c~    |
 | ~DEFN~    | ~DEFN-~       | ~DEFINE-CONDITION~      | ~n~    |
 | ~DEFMM~   | ~DEFMM-~      | ~DEFINE-MODIFY-MACRO~   | ~mm~   |
 | ~DEFSM~   | ~DEFSM-~      | ~DEFINE-SYMBOL-MACRO~   | ~sm~   |
 | ~DEFY~    | ~DEFY-~       | ~DEFTYPE~               | ~y~    |
-| ~DEFS~    | ~DEFS-~       | ~DEFSTRUCT~             | ~fs~   |
+| ~DEFS~    | ~DEFS-~       | ~DEFSTRUCT~             | ~s~    |
 ** Miscellaneous definitions
 | EXPORTING | NON-EXPORTING | CUSTOM DEFINITION | LEGEND |
 |-----------+---------------+-------------------+--------|
