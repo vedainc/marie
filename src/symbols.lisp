@@ -145,4 +145,8 @@ as dependencies."
 
 (def read-cat (&rest args)
   "Read from the concatenation of ARGS."
-  (read-from-string (apply #'cat args)))
+  (read-from-string (apply #'uiop:strcat (mapcar #'string-upcase args))))
+
+(def prin1-downcase (symbol)
+  "Return a downcased string from symbol."
+  (string-downcase (prin1-to-string symbol)))

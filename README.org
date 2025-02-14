@@ -1,0 +1,345 @@
+#+title: Marie
+* Overview
+Marie is small collection of Common Lisp utilities without external dependencies.
+* Installation
+Clone this repo to =~/common-lisp/=, or any location that is visible to ASDF, like =~/.local/share/common-lisp/source/=
+#+begin_src sh
+$ mkdir -p ~/common-lisp
+$ git clone https://github.com/kreipro/marie.git ~/common-lisp/marie
+#+end_src
+You can then load it with ASDF
+#+begin_src lisp
+CL-USER> (asdf:load-system :marie)
+#+end_src
+* Components
+Each section or component is designed to simplify and accelerate development
+that can be selectively used depending on the task at hand. You can explore all
+the functions listed in the table for more details.
+* Definitions
+Exporting replacements for functions, macros, and other things. It has two
+variants: those with =-= are non-exporting, while those without are exporting.
+** Shorthands
+| EXPORTING | NON-EXPORTING | STANDARD MACRO/FUNCTION | LEGEND |
+|-----------+---------------+-------------------------+--------|
+| ~DEFM~    | ~DEFM-~       | ~DEFMACRO~              | ~m~    |
+| ~DEF~     | ~DEF-~        | ~DEFUN~                 | ~f~    |
+| ~DEFV~    | ~DEFV-~       | ~DEFVAR~                | ~fv~   |
+| ~DEFP~    | ~DEFP-~       | ~DEFPARAMETER~          | ~fp~   |
+| ~DEFK~    | ~DEFK-~       | ~DEFCONSTANT~           | ~fk~   |
+| ~DEFG~    | ~DEFG-~       | ~DEFGENERIC~            | ~fg~   |
+| ~DEFT~    | ~DEFT-~       | ~DEFMETHOD~             | ~t~    |
+| ~DEFC~    | ~DEFC-~       | ~DEFCLASS~              | ~c~    |
+| ~DEFN~    | ~DEFN-~       | ~DEFINE-CONDITION~      | ~n~    |
+| ~DEFMM~   | ~DEFMM-~      | ~DEFINE-MODIFY-MACRO~   | ~mm~   |
+| ~DEFSM~   | ~DEFSM-~      | ~DEFINE-SYMBOL-MACRO~   | ~sm~   |
+| ~DEFY~    | ~DEFY-~       | ~DEFTYPE~               | ~y~    |
+| ~DEFS~    | ~DEFS-~       | ~DEFSTRUCT~             | ~fs~   |
+** Miscellaneous definitions
+| EXPORTING | NON-EXPORTING | CUSTOM DEFINITION | LEGEND |
+|-----------+---------------+-------------------+--------|
+| ~SETV~    | ~SETV-~       | ~SET-VARIABLE~    | ~sv~   |
+* Reader
+Minor tweaks with the Lisp reader's behavior to add some convenient syntactic shortcuts.
+** Shortcuts
+| FUNCTION                | ARGS             | DESCRIPTION                                                                                                 |
+|-------------------------+------------------+-------------------------------------------------------------------------------------------------------------|
+| ~BRACE-READER~ (f)      | ~STREAM~ ~CHAR~  | Use ~{+ _ 1}~ as shorthand for ~#'(lambda (_) (+ _ 1))~, reading from ~STREAM~ and ignoring ~CHAR~.         |
+| ~BRACKET-READER~ (f)    | ~STREAM~ ~CHAR~  | Use ~{foo 5}~ as shorthand for ~(funcall foo 5)~, reading from stream and ignoring ~CHAR~.                  |
+| ~LAMBDA-READER~ (f)     | ~STREAM~ ~CHAR~  | Use ~(λ ...)~ as a shorthand for ~(lambda ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.  |
+| ~PHI-READER~ (f)        | ~STREAM~ ~CHAR~  | Use ~(φ ...)~ as a shordhand for ~(progn ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.   |
+| ~ALPHA-READER~ (f)      | ~STREAM~ ~CHAR~  | Define the reader for α, so that it can be used to refer to the anaphora. Ignoring the ~STREAM~ and ~CHAR~. |
+| ~READ-FROM-STRING*~ (f) | ~STRING~         | Evaluate ~STRING~ with preserved case.                                                                      |
+* Symbols
+Utility functions for symbols and macro manipulation.
+** Show symbol functions
+| FUNCTION                       | ARGS             | DESCRIPTION                                                                                     |
+|--------------------------------+------------------+-------------------------------------------------------------------------------------------------|
+| ~SYMBOLS~ (f)                  | ~PACKAGE~ ~TYPE~ | Returns the symbols interned in ~PACKAGE~ by ~TYPE~.                                            |
+| ~EXTERNAL-SYMBOLS~ (f)         | ~PACKAGE~        | Returns the external symbols in ~PACKAGE~.                                                       |
+| ~PRESENT-SYMBOLS~ (f)          | ~PACKAGE~        | Returns the present symbols in ~PACKAGE~.                                                        |
+| ~SYMBOLS*^SYMS~ (f)            | ~PACKAGE~ ~TYPE~ | Print the symbols in interned in ~PACKAGE~ by ~TYPE~.                                           |
+| ~PRETTY-PRINT-SYMBOLS^PPS~ (f) | ~PACKAGE~        | Display the external symbols in ~PACKAGE~ in the order that they were declared as dependencies. |
+|                                |                  |                                                                                                 |
+
+** Macro utilities
+| FUNCTION                 | ARGS           | DESCRIPTION                                       |
+|--------------------------+----------------+---------------------------------------------------|
+| ~MACRO-EXPAND^MX~ (m)    | ~FORM~         | Pretty prints macro expansions of ~FORM~.         |
+| ~WITH-GENSYMS~ (m)       | ~NAMES~ ~BODY~ | Evaluate ~BODY~ where ~NAMES~ are unique symbols. |
+| ~MACRO-APPLY^MAPPLY~ (m) | ~MACRO~ ~ARGS~ | Invoke the macro ~MACRO~ to each item in ~ARGS~.  |
+| ~MBOUNDP~ (f)            | ~SYMBOL~       | Return true if ~SYMBOL~ is bound to a macro.      |
+| ~FLET*~ (m)              | ~BODY~         | Evaluate ~BODY~ in LABELS.                        |
+** Symbol manipulation macros
+| FUNCTION                      | ARGS              | DESCRIPTION                                                                       |
+|-------------------------------+-------------------+-----------------------------------------------------------------------------------|
+| ~FREE~ (m)                    | ~ARG-1~ ~ARG-2~   | Unbind ~ARG-1~ if ~ARG-2~ is present, free ~ARG-2~ in instance of ~ARG-1~.        |
+| ~UNBIND~ (m)                  | ~SYMBOL~          | Remove the bindings of ~SYMBOL~.                                                  |
+| ~RENAME-MACRO~ (m)            | ~NAME-1~ ~NAME-2~ | Change the macro name from ~NAME-1~ to ~NAME-2~.                                  |
+| ~RENAME-SPECIAL-VARIABLE~ (m) | ~NAME-1~ ~NAME-2~ | Update the special variable ~NAME-1~ to ~NAME-2~.                                 |
+| ~SWAP-SPECIAL-VARIABLES~ (m)  | ~NAME-1~ ~NAME-2~ | Swap the values of the special variables ~NAME-1~ and ~NAME-2~.                   |
+| ~KEYWORD-USED-P^KUP~ (f)      | ~STRING~          | Return true if keyword is already interned, accepting a ~STRING~ as the argument. |
+|                               |                   |                                                                                   |
+* Conditionals
+Utilities for handling conditional expressions and logical operations.
+** Mapping
+| FUNCTION       | ARGS          | DESCRIPTION                                                            |
+|----------------+---------------+------------------------------------------------------------------------|
+| ~MAP-AND~ (m)  | ~FN~ ~ARGS~   | Return true if ~FN~ returns true for all items in ~ARGS~.              |
+| ~MAP-OR~ (m)   | ~FN~ ~ARGS~   | Return true if ~FN~ returns true for at least one item in ~ARGS~.      |
+| ~RMAP-AND~ (m) | ~VALUE~ ~FNS~ | Return true if all functions in ~FNS~ return true for ~VALUE~.         |
+| ~RMAP-OR~ (m)  | ~VALUE~ ~FNS~ | Return true if at least one function in ~FNS~ return true for ~VALUE~. |
+|                |               |                                                                        |
+** Logical operator variants
+| FUNCTION                 | ARGS          | DESCRIPTION                                                   |
+|--------------------------+---------------+---------------------------------------------------------------|
+| ~LOGICAL-AND^LAND^∧~ (m) | ~BODY~        | Return true if all forms in ~BODY~ evaluates to true.         |
+| ~LOGICAL-OR^LOR^∨~ (m)   | ~BODY~        | Return true if at least one form in ~BODY~ evaluates to true. |
+| ~NEGATION^NEG^¬~ (m)     | ~ARG~         | Return the negation of ~ARG~.                                 |
+| ~LOGICAL-AND-NOT^∧¬~ (m) | ~ARG1~ ~ARG2~ | Return true if ~ARG1~ is true and ~ARG2~ is not true.         |
+| ~LOGICAL-NOT-AND^¬∧~ (m) | ~ARG1~ ~ARG2~ | Return true if ~ARG1~ is not true and ~ARG2~ is true.         |
+| ~LOGICAL-OR-NOT^∨¬~ (m)  | ~ARG1~ ~ARG2~ | Return true if ~ARG1~ is true or ~ARG2~ is not true.          |
+| ~LOGICAL-NOT-OR^¬∨~ (m)  | ~ARG1~ ~ARG2~ | Return true if ~ARG1~ is not true or ~ARG2~ is true.          |
+| ~LOGICAL-NOT-NOT^¬¬~ (m) | ~ARG1~ ~ARG2~ | Return true if ~ARG1~ is not true and ~ARG2~ is not true.     |
+** When macro bindings
+| FUNCTION        | ARGS               | DESCRIPTION                                                                                |
+|-----------------+--------------------+--------------------------------------------------------------------------------------------|
+| ~WHEN-LET~  (m) | ~BINDINGS~ ~FORMS~ | Use BINDINGS like with LET, then evaluate FORMS if all BINDINGS evaluate to a true value.  |
+| ~WHEM-LET*~ (m) | ~BINDINGS~ ~FORMS~ | Use bindings like with LET*, then evaluate FORMS if all BINDINGS evaluate to a true value. |
+|                 |                    |                                                                                            |
+** Boolean logic helpers
+| FUNCTION           | ARGS                                | DESCRIPTION                                                                                               |
+|--------------------+-------------------------------------+-----------------------------------------------------------------------------------------------------------|
+| ~TRUE-WHEN^ω~  (m) | ~CONDITION~                         | Return true when ~CONDITION~ evaluates as true.                                                           |
+| ~TRUE-FALSE-P~ (f) | ~X~ ~Y~                             | Return true if ~X~ is true and ~Y~ is false.                                                              |
+| ~FALSE-TRUE-P~ (f) | ~X~ ~Y~                             | Return true if ~X~ is false and ~Y~ is true.                                                              |
+| ~TRUE-TRUE-P~  (f) | ~X~ ~Y~                             | Return true if ~X~ is true and ~Y~ is true.                                                               |
+| ~AIF~ (m)          | ~TEST-FORM~ ~THEN-FORM~             | Anaphora (α) IF, takes ~TEST-FORM~, ~THEN-FORM~ and optionally else-form, binding the test result to it.  |
+| ~AWHEN~ (m)        | ~TEST-FORM~ ~THEN-FORM~             | Anaphora (α) WHEN, takes ~TEST-FORM~ and a body ~THEN-FORM~ using aif to evaluate and bind it.            |
+| ~AAND~ (m)         | ~ARGS~                              | Anaphora (α) AND,  takes multiple ~ARGS~ evaluating them with short-circuiting logic using AIF.           |
+| ~ACOND~ (m)        | ~CLAUSES~                           | Anaphora (α) COND, takes multiple ~CLAUSES~ evaluating them sequentially with an anaphoric binding.       |
+| ~NIF~ (m)          | ~TEST-FORM~ ~THEN-FORM~ ~ELSE-FORM~ | NIF takes ~TEST-FORM~ ~THEN-FORM~ and optionally ~ELSE-FORM~ performing a negated if condition.           |
+* Sequences
+Utilities for sequence manipulation.
+** List predicates
+| FUNCTION       | ARGS        | DESCRIPTION                                                           |
+|----------------+-------------+-----------------------------------------------------------------------|
+| ~LENGTH=~ (f)  | ~SEQ~ ~LEN~ | Return true if the length of ~SEQ~ is equal to ~LEN~.                  |
+| ~LENGTH<~ (f)  | ~SEQ~ ~LEN~ | Return true if the length of ~SEQ~ is less than to ~LEN~.              |
+| ~LENGTH>~ (f)  | ~SEQ~ ~LEN~ | Return true if the length of ~SEQ~ is greater than to ~LEN~.           |
+| ~LENGTH<=~ (f) | ~SEQ~ ~LEN~ | Return true if the length of ~SEQ~ is less than or equal to ~LEN~.     |
+| ~LENGTH>=~ (f) | ~SEQ~ ~LEN~ | Return true if the length of ~SEQ~ is greater than or equal to ~LEN~.  |
+| ~SINGLEP~ (f)  | ~SEQ~       | Return true if there is only one item in ~SEQ.~                       |
+| ~LONGERP~ (f)  | ~X~ ~Y~     | Return true if ~X~ is longer than ~Y~.                                |
+|                |             |                                                                       |
+** List transformation, manipulation and filtering
+| FUNCTION                        | ARGS                         | DESCRIPTION                                                                           |
+|---------------------------------+------------------------------+---------------------------------------------------------------------------------------|
+| ~FLATTEN-LIST~ (f)              | ~LIST~                       | Merge all symbols from ~LIST~ to one list.                                            |
+| ~APPEND*~ (f)                   | ~LIST~ ~DATA~                | Destructively update ~LIST~ with ~DATA~.                                              |
+| ~VECTOR-LIST~ (f)               | ~LIST~                       | Return vector as ~LIST~.                                                              |
+| ~LIST-VECTOR~ (f)               | ~VECTOR~                     | Return list as ~VECTOR~.                                                              |
+| ~REMOVE-ITEMS~ (f)              | ~LIST~ ~ITEMS~               | Remove ITEMS from ~LIST~.                                                             |
+| ~GROUP-ALIKE~ (f)               | ~LIST~                       | Group similar elements together from ~GROUPS~.                                        |
+| ~BUILD-LENGTH-INDEX~ (f)        | ~GROUPS~                     | Return a hash table from a list of lists.                                             |
+| ~MAP-APPEND~ (f)                | ~FN~ ~SEQUENCE1~ ~SEQUENCE2~ | Apply APPEND to the result of applying ~FN~ to ~SEQUENCE1~ and ~SEQUENCE2~.           |
+| ~MAP-NCONC~ (f)                 | ~FN~ ~SEQUENCE1~ ~SEQUENCE2~ | Apply NCONC to the result of applying ~FN~ to ~SEQUENCE1~ and ~SEQUENCE2~.            |
+| ~REDUCE-APPEND^*RED-APPEND~ (f) | ~ARGS~                       | Reduce ~ARGS~ with APPEND.                                                            |
+| ~REDUCE-NCONC^RED-NCONC~ (f)    | ~ARGS~                       | Reduce ~ARGS~ with NCONC.                                                             |
+| ~REMOVE*~ (f)                   | ~ELEMS~ ~VALUE~              | Remove all items in ~ELEMS~ in ~VALUE~.                                               |
+| ~REMOVE-NIL~ (f)                | ~VALUE~                      | Remove nil at any level of tree in ~VALUE~.                                           |
+| ~BUTREST~ (f)                   | ~LIST~                       | Return everything from ~LIST~ except the rest.                                        |
+| ~INSERT-AFTER~ (f)              | ~LIST~ ~INDEX~ ~ITEM~        | Return a new list from ~LIST~ where ~ITEM~ is inserted after ~INDEX~.                 |
+| ~INSERT-BEFORE~ (f)             | ~LIST~ ~INDEX~ ~ITEM~        | Return a new list from ~LIST~ where ~ITEM~ is inserted after ~INDEX~.                 |
+| ~APPEND1~ (f)                   | ~LIST~ ~OBJ~                 | Apply APPEND to ~LIST~ and ~OBJ~ ensuring that OBJ is a list.                         |
+| ~NCONC1~ (f)                    | ~LIST~ ~OBJ~                 | Apply NCONC to ~LIST~ and ~OBJ~ ensuring that OBJ is a list.                          |
+| ~TRANSPOSE~ (f)                 | ~LIST~                       | Return a matrix transposition of ~LIST~.                                              |
+| ~DELETE-FROM-PLISTF~ (f)        | ~KEYS~                       | Modify macro for DELETE-FROM-PLIST in ~KEYS~.                                         |
+| ~MAKE-EMPTY-LIST~ (f)           | ~OBJECT~                     | Return an empty list from ~OBJECT~.                                                   |
+| ~GROUPS~ (f)                    | ~LIST~                       | Return decreasing order of groups from ~LIST~.                                        |
+| ~PAIRS~ (f)                     | ~LIST~                       | Return pairs of lists from ~LIST~.                                                    |
+| ~ARRAY-TO-LIST~ (f)             | ~ARRAY~                      | Return a list from ~ARRAY~.                                                           |
+| ~SHOW-LIST^LS~ (f)              | ~LIST~ ~FN~                  | Display the items in ~LIST~ according to ~FN~, separated by newlines.                 |
+| ~JOIN~ (f)                      | ~LIST~                       | Merge items in ~LIST~ by the space character.                                         |
+| ~JOIN-STREAM~ (f)               | ~STREAM~ ~END~               | Read lines from 1 to ~END~ from ~STREAM~.                                             |
+| ~SEQUENCE-STRING~ (f)           | ~SEQ~                        | Return ~SEQ~ as a string.                                                             |
+| ~ASSOC-KEY~ (f)                 | ~KEY~ ~ITEMS~                | Return the key found in ~ITEMS~ if ~KEY~ is found.                                    |
+| ~ASSOC-VALUE~ (f)               | ~KEY~ ~ITEMS~                | Return the value found in ~ITEMS~ if ~KEY~ is found.                                  |
+| ~MASSOC~ (f)                    | ~ATOM~ ~LIST~                | Return the first match on the ~LIST~ that takes ~ATOM~ as an input.                   |
+| ~MEM~ (f)                       | ~ELEM~ ~LIST~                | Return true if ~ELEM~ is a member of ~LIST~ using TEST as the equality FN.            |
+| ~MEM*~ (f)                      | ~ELEMS~ ~LIST~               | Return true if all items ~ELEMS~ are members of ~LIST~ using test as the equality FN. |
+| ~TAKE~ (f)                      | ~SEQ~ ~COUNT~                | Return ~COUNT~ amount of items from ~SEQ~.                                            |
+| ~DROP~ (f)                      | ~SEQ~ ~COUNT~                | Return items from ~SEQ~ without the first ~COUNT~ items.                              |
+| ~SINGLE~ (f)                    | ~SEQ~                        | Return the only item in SEQ if ~SEQ~ has only one element.                            |
+| ~END~ (f)                       | ~SEQ~                        | Return the last element of ~SEQ.~                                                     |
+** List manipulation with ifs
+| FUNCTION            | ARGS               | DESCRIPTION                                                                              |
+|---------------------+--------------------+------------------------------------------------------------------------------------------|
+| ~TAKE-IF~ (f)       | ~FN~ ~SEQ~ ~COUNT~ | Return ~COUNT~ amount of items from ~SEQ~ that satisfy ~FN~.                             |
+| ~DROP-IF~ (f)       | ~FN~ ~SEQ~ ~COUNT~ | Return items from ~SEQ~ without the first ~COUNT~ items that satisfy ~FN~.               |
+| ~INCLUDE-IF~ (f)    | ~ARGS~             | Apply REMOVE-IF-NOT to ~ARGS~.                                                           |
+| ~FILTER-IF~ (f)     | ~FN~ ~LIST~        | Collect the results of applying ~FN~ to ~LIST~ which returns true.                       |
+| ~FILTER-IF-NOT~ (f) | ~FN~ ~LIST~        | Collect the results of applying ~FN~ to ~LIST~ which returns false.                      |
+| ~PRUNE-IF~ (f)      | ~FN~ ~TREE~        | Remove all items from ~TREE~ to which ~FN~ returns true.                                 |
+| ~PRUNE-IF-NOT~ (f)  | ~FN~ ~TREE~        | Remove all items from ~TREE~ to which ~FN~ returns false.                                |
+| ~LOCATE-IF~ (f)     | ~FN~ ~LIST~        | may ginagawa Find element in list satisfying ~FN~. When found, return the car of ~LIST~.  |
+| ~SPLIT-IF~ (f)      | ~FN~ ~LIST~        | Return two lists wherein the first ~LIST~ contains everything that satisfies ~FN.~       |
+** Sequence predicates
+| FUNCTION           | ARGS           | DESCRIPTION                                                  |
+|--------------------+----------------+--------------------------------------------------------------|
+| ~EVERY-LIST-P~ (f) | ~OBJECT~       | Return true if ~OBJECT~ is a list and all members are lists. |
+| ~BEFOREP~ (f)      | ~X~ ~Y~ ~LIST~ | Return true if ~X~ occurs before ~Y~ in ~LIST~.              |
+| ~AFTERP~ (f)       | ~X~ ~Y~ ~LIST~ | Return true if ~X~ occurs after ~Y~ in ~LIST~.               |
+| ~DUPLICATEP~ (f)   | ~X~ ~LIST~     | Return true if ~X~ has a duplicate in ~LIST~.                |
+** Property list manipulation
+| FUNCTION                  | ARGS           | DESCRIPTION                                                                                                                                                   |
+|---------------------------+----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ~REMOVE-FROM-PLIST~ (f)   | ~PLIST~ ~KEYS~ | Returns a property-list with same keys and values as ~PLIST~, except that keys in the list designated by ~KEYS~ and values corresponding to them are removed. |
+| ~REMOVE-FROM-PLISTF~ (mm) | ~KEYS~         | Modify macro for REMOVE-FROM-PLIST which takes a multiple ~KEYS~ as an argument.                                                                              |
+| ~DELETE-FROM-PLIST~ (f)   | ~PLIST~ ~KEYS~ | Just like REMOVE-FROM-PLIST with same ~KEYS~, but this version may destructively modify the provided ~PLIST~.                                                 |
+|                           |                |                                                                                                                                                               |
+** Miscellaneous sequence
+| FUNCTION                 | ARGS              | DESCRIPTION                                          |
+|--------------------------+-------------------+------------------------------------------------------|
+| ~PARTITION~ (f)          | ~SOURCE~ ~N~      | Create partition of ~N~ from ~SOURCE~.               |
+| ~PERMUTATIONS^PERMS~ (f) | ~LIST~            | Return the permutations of ~LIST~.                   |
+| ~SCRAMBLE~ (t)           | ~SEQUENCE~ ~LIST~ | Return a randomized array or ~LIST~ from ~SEQUENCE~. |
+|                          |                   |                                                      |
+* Strings
+Utilities for dealing with strings.
+** Formatting
+| FUNCTION        | ARGS     | DESCRIPTION                                      |
+|-----------------+----------+--------------------------------------------------|
+| ~FMT~ (f)       | ~ARGS~   | Return a string with FORMAT in ~ARGS~.           |
+| ~FMT*~ (f)      | ~ARGS~   | Print ~ARGS~ to stdout with FORMAT.              |
+| ~FMT-ERROR~ (f) | ~STRING~ | Output ~STRING~ to *STANDARD-ERROR* then return. |
+** String transformation
+| FUNCTION                    | ARGS               | DESCRIPTION                                                                     |
+|-----------------------------+--------------------+---------------------------------------------------------------------------------|
+| ~STRING*~ (f)               | ~OBJECT~           | Return ~OBJECT~ as a string.                                                    |
+| ~LIST-STRING~ (f)           | ~LIST~             | Return the string version of ~LIST~.                                            |
+| ~STRING-LIST~ (f)           | ~STRING~           | Create a list from ~STRING~.                                                    |
+| ~STRING-INTEGER-LIST~ (f)   | ~STRING~           | Parse integer and return N ~STRING~ into list.                                  |
+| ~MAKE-ATOM-STRING~ (f)      | ~ATOM~             | Return a string from symbol ~ATOM~.                                             |
+| ~CONCAT^CAT~ (f)            | ~ARGS~             | Concatenate ~ARGS~ to a string.                                                 |
+| ~REDUCE-CONCAT^RED-CAT~ (f) | ~ARGS~             | Reduce ~ARGS~ with CONCAT.                                                      |
+| ~INTERN-CONCAT^INT-CAT~ (f) | ~PACKAGE~ ~ARGS~   | Concatenate ~ARGS~ to a string then intern it to the current ~PACKAGE~.         |
+| ~NORMALIZE-STRING~ (f)      | ~LIST~ ~CHARACTER~ | Return ~LIST~ of characters with equal length using ~CHARACTER~ as end padding. |
+|                             |                    |                                                                                 |
+** Predicate FNS
+| FUNCTION                 | ARGS     | DESCRIPTION                                                                 |
+|--------------------------+----------+-----------------------------------------------------------------------------|
+| ~STRING-SUBSTRING-P~ (f) | ~X~ ~Y~  | Return true if ~X~ is part of ~Y~, and that X is found from the start of Y. |
+| ~EVERY-STRING-P~ (f)     | ~OBJECT~ | Return true if ~OBJECT~ is a list and all members are strings.              |
+| ~EMPTY-STRING-P~ (f)     | ~STRING~ | Return true if ~STRING~ is of length zero.                                  |
+** Miscellaneous string
+| FUNCTION     | ARGS              | DESCRIPTION                                                                     |
+|--------------+-------------------+---------------------------------------------------------------------------------|
+| ~GENSTR~     | ~N/A~             | Return a random string.                                                         |
+| ~EARMUFF~    | ~ARGS~            | Return a hyphenated symbol from ~ARGS~ with surrounding *s.                     |
+| ~SEPARATORS~ | ~STRING~ ~FILTER~ | Return the separators used in ~STRING~, applying ~FILTER~ to remove characters. |
+|              |                   |                                                                                 |
+* Etc
+Collection of miscellaneous utility functions.
+** Optimization
+| FUNCTION      | ARGS  | DESCRIPTION                                                   |
+|---------------+-------+---------------------------------------------------------------|
+| ~DEBUG@~ (m)  | ~N/A~ | Enable compiler options for maximum debug options.            |
+| ~SAFETY@~ (m) | ~N/A~ | Enable compiler options for maximum debug and safety options. |
+| ~SPEED@~ (m)  | ~N/A~ | Enable compiler options for maximum speed options.            |
+** Debugging
+| FUNCTION                      | ARGS               | DESCRIPTION                                                                                 |
+|-------------------------------+--------------------+---------------------------------------------------------------------------------------------|
+| ~DBG~  (m)                    | ~ARGS~             | Print information about ~ARGS~, then return the result of evaluating ARGS.                  |
+| ~DBG*~ (m)                    | ~ARGS~ ~BODY~      | Print information about ~ARGS~, evaluate ~BODY~, then return the result of evaluating ARGS. |
+| ~DBG1~ (m)                    | ~ARG~ ~BODY~       | Apply DBG to ~ARG~, then evaluate ~BODY~.                                                   |
+| ~MUFFLE-DEBUGGER-HANDLER~ (f) | ~CONDITION~ ~HOOK~ | Define a handler for muffling the debugger, ignoring hook and caught an error condition.    |
+| ~MUFFLE-DEBUGGER~ (f)         | ~N/A~              | Hide debugger message.                                                                      |
+| ~WITH-MUFFLED-DEBUGGER~ (m)   | ~BODY~             | Evaluate ~BODY~ with the debugger warnings turned off.                                      |
+** Hyphen functions
+| FUNCTION                           | ARGS              | DESCRIPTION                                                                         |
+|------------------------------------+-------------------+-------------------------------------------------------------------------------------|
+| ~HYPHENATE-TO-STRING~ (f)          | ~NAMES~           | Return a new string from the hyphenated concatenation of ~NAMES~.                   |
+| ~HYPHENATE-TO-SYMBOL~ (f)          | ~NAMES~           | Apply HYPHENATE to ~NAMES~ then return it as a symbol.                              |
+| ~HYPHENATE-TO-INTERNED-SYMBOL~ (f) | ~PACKAGE~ ~NAMES~ | Apply HYPHENATE to ~NAMES~ then return an interned symbol in the current ~PACKAGE~. |
+|                                    |                   |                                                                                     |
+** NULL
+| FUNCTION     | ARGS      | DESCRIPTION                                    |
+|--------------+-----------+------------------------------------------------|
+| ~EMPTY~ (m)  | ~OBJECT~  | Set the value of ~OBJECT~ to null.               |
+| ~EMPTY*~ (m) | ~OBJECTS~ | Set the value of ~OBJECTS~ to null.              |
+| ~NULL*~  (f) | ~VALUE~   | Return true if ~VALUE~ is null or every item is. |
+** Miscellaneous etc
+| FUNCTION                         | ARGS             | DESCRIPTION                                                                         |
+|----------------------------------+------------------+-------------------------------------------------------------------------------------|
+| ~WITH-TIME~ (m)                  | ~BODY~           | Execute ~BODY~ then return timing information.                                      |
+| ~TRUE~ (f)                       | ~N/A~            | Return true for anything.                                                           |
+| ~FALSE~ (f)                      | ~N/A~            | Return false for anything.                                                          |
+| ~GETUID~ (f)                     | ~N/A~            | Return the real UID of the user.                                                    |
+| ~EVAL-ALWAYS~ (m)                | ~BODY~           | Evaluate the forms in ~BODY~ in all situations.                                     |
+| ~APPENDF~ (mm)                   | ~LISTS~ ~APPEND~ | Set the value of the first argument to the result of applying ~APPEND~ to ~LISTS~.  |
+| ~MAXF~ (mm)                      | ~NUMBERS~ ~MAX~  | Set the value of the first argument to the result of applying ~MAX~ to ~NUMBERS~.   |
+| ~MINF~ (mm)                      | ~NUMBERS~ ~MIN~  | Set the value of the first argument to the result of applying ~MIN~ to ~NUMBERS~.   |
+| ~DEFSELECTORS~ (m)               | ~PREFIX~ ~COUNT~ | Define list selectors prefixed with ~PREFIX~ that will act as sequence accessors.   |
+| ~FNS~ (m)                        | ~FN~ ~ARGS~      | Return a function that applies ~FN~ and ~ARGS~ to OBJ that returns multiple values. |
+| ~WITH-SUPPRESED-OUTPUT^MUTE~ (m) | ~BODY~           | Evaluate ~BODY~ but with output suppressed.                                         |
+| ~MULF~ (m)                       | ~VAR~ ~NUM~      | Set a new value for ~VAR~ by multiplying itself by a ~NUM~.                         |
+| ~PRN~ (f)                        | ~OBJECT~         | Print ~OBJECT~ according to its type.                                               |
+| ~APROPOS*~ (f)                   | ~ARGS~           | Display sorted matching symbols from ~ARGS~ with CL:APROPOS.                        |
+| ~COLLECT-CHARACTERS~ (f)         | ~START~ ~END~    | Collect ASCII characters from ~START~ to ~END~.                                     |
+| ~DOC~ (f)                        | ~SYMBOL~         | Return the documentation strings of SYMBOL.                                         |
+|                                  |                  |                                                                                     |
+* Hash tables
+Utilities for working with hash tables.
+** Ordered hash table
+This ordered hash table is portable in LispWorks and SBCL implementations
+that are expressed in struct table.
+| FUNCTION                       | ARGS                         | DESCRIPTION                                                                                                                  |
+|--------------------------------+------------------------------+------------------------------------------------------------------------------------------------------------------------------|
+| ~MAKE-ORDERED-HASH-TABLE~ (f)  | ~N/A~                        | Create an ordered-hash-table with specified parameters.                                                                      |
+| ~PRINT-ORDERED-HASH-TABLE~ (f) | ~HASH-TABLE~ ~STREAM~        | Prints the ordered ~HASH-TABLE~ to the specified ~STREAM~.                                                                   |
+| ~ORDERED-HASH-TABLE-COUNT~ (f) | ~ORDERED-HASH-TABLE-COUNT~   | Returns the number of key-value pairs in the ordered hash table.                                                             |
+| ~GET-ORDERED-HASH~ (f)         | ~KEY~ ~HASH-TABLE~ ~DEFAULT~ | Fetches the value associated with ~KEY~ from the ordered ~HASH-TABLE~.                                                       |
+| ~REMOVE-ORDERED-HASH~ (f)      | ~KEY~ ~HASH-TABLE~           | Removes the key-value pair associated with ~KEY~ from the ordered ~HASH-TABLE~.                                              |
+| ~CLEAR-ORDERED-HASH~ (f)       | ~HASH-TABLE~                 | Clears all key-value pairs from the ordered ~HASH-TABLE~, resetting it to an empty state.                                    |
+| ~ORDERED-HASH-KEYS~ (f)        | ~HASH-TABLE~                 | Returns a list of keys in the ordered ~HASH-TABLE~ in reverse order.                                                         |
+| ~SHOW-ORDERED-HASH-TABLE~ (f)  | ~HASH-TABLE~                 | Prints the contents of the ordered ~HASH-TABLE~ showing key-value pairs.                                                     |
+| ~SHOW-ORDERED-HASH-TABLE*~ (f) | ~HASH-TABLE~                 | Recursively prints the contents of the ordered ~HASH-TABLE~, formatting output with indentation for nested hash tables.      |
+| ~GET-ORDERED-HASH*~ (f)        | ~PATH~ ~HASH-TABLE~          | Fetches the value associated with the specified ~PATH~ (a list of keys) from the ordered ~HASH-TABLE~. Allow nested lookups. |
+|                                |                              |                                                                                                                              |
+** Miscellaneous hash table
+| FUNCTION                  | ARGS                      | DESCRIPTION                                                                                                                          |
+|---------------------------+---------------------------+--------------------------------------------------------------------------------------------------------------------------------------|
+| ~COPY-TABLE^COPYHASH~ (f) | ~HASH-TABLE~              | Return a new copy of hashtable from ~HASH-TABLE~.                                                                                    |
+| ~HASH-TABLE-KEYS~ (f)     | ~HASH-TABLE~              | Return the keys of ~HASH-TABLE~.                                                                                                     |
+| ~HASH-TABLE-VALUES~ (f)   | ~HASH-TABLE~              | Return the values of ~HASH-TABLE~.                                                                                                   |
+| ~LIST-TABLE^LISTHASH~ (f) | ~HASH-TABLE~ ~SORT~ ~KEY~ | Returns an association list of key-value pairs from ~HASH-TABLE~, optionally sorted by the provided ~SORT~ function using the ~KEY~. |
+| ~SHOW-TABLE~ (f)          | ~TABLE~                   | Prints the contents of the ~HASH-TABLE~ to standard output.                                                                          |
+| ~SHOW-TABLE*~ (f)         | ~TABLE~                   | Recursively prints the contents of the ~HASH-TABLE~ with indentation for nested structures.                                          |
+| ~GETHASH*~ (f)            | ~PATH~ ~TABLE~            | Fetches a value from the ~HASH-TABLE~ by following the specified ~PATH~ (a list of keys).                                            |
+* Filesystem
+Utilities for file operations and system management.
+** File directory related
+| FUNCTION                  | ARGS                | DESCRIPTION                                                                                           |
+|---------------------------+---------------------+-------------------------------------------------------------------------------------------------------|
+| ~DIRECTORY-ENTRIES~ (f)   | ~DIRECTORY~         | Return top-level files and directories under ~DIRECTORY~.                                             |
+| ~ENTRIES^FILES~ (f)       | ~LIST~              | Return all files for every directory found under ~LIST~ expansion.                                    |
+| ~READ-FILE-SEQUENCE~ (f)  | ~PATH~              | Read entire file as byte sequence in ~PATH~.                                                          |
+| ~RESOLVE-SYSTEM-FILE~ (f) | ~SYSTEM~            | Return the path of FILE relative to ~SYSTEM~.                                                         |
+| ~WITH-OUTPUT-FILE~ (m)    | ~VAR~ ~PATH~ ~BODY~ | Define a macro for thin wrapper over WITH-OPEN-FILE that takes an input of ~VAR~, ~PATH~, and ~BODY~. |
+| ~HOME^~~ (f)              | ~PATH~              | Return a ~PATH~ relative to the home directory.                                                       |
+| ~EXPAND-PATHNAME~ (f)     | ~PATH~              | Return a ~PATH~ while performing tilde expansion.                                                     |
+| ~READ-INTEGER~ (f)        | ~STRING~            | Return integer from ~STRING~.                                                                         |
+| ~READ-INTEGER-LINE~ (f)   | ~FILE~              | Return integer from a line in ~FILE~.                                                                 |
+| ~DISPLAY-FILE~ (f)        | ~FILE~              | Display the contents of ~FILE~.                                                                       |
+** System
+| FUNCTION                         | ARGS     | DESCRIPTION                                                      |
+|----------------------------------+----------+------------------------------------------------------------------|
+| ~SYSTEM-OBJECT^SYS-OBJECT~ (f)   | ~SYSTEM~ | Return the system object for the current ~SYSTEM~.               |
+| ~SYSTEM-PATH^SYS-PATH~ (f)       | ~SYSTEM~ | Return the ASDF file path for the current ~SYSTEM~.              |
+| ~SYSTEM-VERSION^SYS-VERSION~ (f) | ~SYSTEM~ | Return the version number extracted from the ~SYSTEM~ resources. |
+* Project
+Creates a project skeleton in Common Lisp.
+** Tree generation
+| FUNCTION              | DESCRIPTION                              |
+|-----------------------+------------------------------------------|
+| ~MAKE-PROJECT^MK~ (f) | Create a complete Lisp project skeleton. |
