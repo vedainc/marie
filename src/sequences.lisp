@@ -371,7 +371,7 @@ values."
 (def every-list-p (object)
   "Return true if OBJECT is a list and all members are lists."
   (land (listp object)
-    (every #'listp object)))
+        (every #'listp object)))
 
 (def beforep (x y list &key (test #'eql))
   "Return true if X occurs before Y in LIST."
@@ -451,7 +451,7 @@ provided PLIST."
                                  (permutations (remove element list)))))))
 
 
-;;NOTE from https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
+;; NOTE https://groups.google.com/g/comp.lang.lisp/c/1ZtO84hrAuM
 (deft scramble ((sequence array))
   "Return a randomized array from SEQUENCE."
   (loop :with len = (length sequence)
@@ -465,3 +465,20 @@ provided PLIST."
   (coerce (scramble
            (make-array (length sequence) :initial-contents sequence))
           'list))
+
+;; NOTE https://web.archive.org/web/20240529080957/https://stackoverflow.com/questions/4366668/str-replace-in-common-lisp
+(def replace-all (string part replacement &key (test #'char=))
+  "Return a new string in which all the occurences of PART in STRING is replaced
+ with REPLACEMENT."
+  (with-output-to-string (out)
+    (loop :with part-length := (length part)
+          :for old-pos := 0 :then (+ pos part-length)
+          :for pos := (search part string
+                              :start2 old-pos
+                              :test test)
+          :do (write-string string out
+                            :start old-pos
+                            :end (or pos (length string)))
+          :when pos
+            :do (write-string replacement out)
+          :while pos)))
