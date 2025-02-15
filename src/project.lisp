@@ -69,22 +69,6 @@
           :for path := (build-path (uiop:ensure-directory-pathname dir) target)
           :do (uiop:ensure-all-directories-exist (list path)))))
 
-(def replace-all (string part replacement &key (test #'char=))
-  "Return a new string in which all the occurences of PART in STRING is replaced
- with REPLACEMENT."
-  (with-output-to-string (out)
-    (loop :with part-length := (length part)
-          :for old-pos := 0 :then (+ pos part-length)
-          :for pos := (search part string
-                              :start2 old-pos
-                              :test test)
-          :do (write-string string out
-                            :start old-pos
-                            :end (or pos (length string)))
-          :when pos
-            :do (write-string replacement out)
-          :while pos)))
-
 (def- get-user-name (&rest args)
   "Return the git user name."
   (declare (ignore args))

@@ -63,6 +63,10 @@ as dependencies."
               (format t "~&~A:~%~S" text value-2)))
      (values)))
 
+(defm mx1 (form)
+  "Just a shorthand for CL:MACROEXPAND-1."
+  `(cl:macroexpand-1 ,form))
+
 
 ;;; Common utils
 
