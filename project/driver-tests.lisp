@@ -4,7 +4,7 @@
   (:nicknames #:${project}/t)
   (:use #:uiop/common-lisp
         #:marie)
-  (:use-reexport #:${project}/t/core-tests))
+  (:use-reexport #:${project}/t/main-tests))
 
 (provide "${project}/t")
 (provide "${PROJECT}/T")

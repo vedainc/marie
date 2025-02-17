@@ -52,7 +52,7 @@ as dependencies."
 
 ;;; Modified print expansion
 
-(defm macro-expand^mx (form)
+(defm macro-expand (form)
   "Pretty print the macro expansion of FORM."
   `(let* ((text "MACROEXPAND")
           (value-1 (macroexpand-1 ,form))
@@ -64,8 +64,12 @@ as dependencies."
      (values)))
 
 (defm mx1 (form)
-  "Just a shorthand for CL:MACROEXPAND-1."
-  `(cl:macroexpand-1 ,form))
+  "A macro shorthand for CL:MACROEXPAND-1."
+  `(cl:macroexpand-1 ',form))
+
+(defm mx (form)
+  "A macro shorthand for CL:MACROEXPAND."
+  `(cl:macroexpand ',form))
 
 
 ;;; Common utils
@@ -154,3 +158,7 @@ as dependencies."
 (def prin1-downcase (symbol)
   "Return a downcased string from symbol."
   (string-downcase (prin1-to-string symbol)))
+
+(def prin1-upcase (symbol)
+  "Return a upcased string from symbol."
+  (string-upcase (prin1-to-string symbol)))
