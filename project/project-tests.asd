@@ -1,4 +1,4 @@
-;;;; ${project}-tests.asd --- test ASDF file for ${project}
+;;;; ${project}-tests.asd --- test ASDF file of ${project}
 
 (defsystem #:${project}-tests
     :name "${project}-tests"
@@ -16,7 +16,7 @@
     :depends-on (#:fiveam
                  #:marie
                  #:${project}
-                 #:${project}/t/core-tests
+                 #:${project}/t/main-tests
                  #:${project}/t/driver-tests
                  #:${project}/t/user-tests)
-    :perform (test-op (o c) (uiop:symbol-call :${project}/t/core-tests :run-tests)))
+    :perform (test-op (o c) (uiop:symbol-call :${project}/t/main-tests :run-tests)))

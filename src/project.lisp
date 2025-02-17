@@ -111,9 +111,7 @@ the CAR.")
 
 (def- rep-fmt (string &key project no-header)
   "Return a string with pre-defined substitutions."
-  (rep-all (if no-header
-               (fmt "~A" string)
-               (fmt "~A~%~A" +file-header+ string))
+  (rep-all (if no-header string (cat +file-header+ #\newline string))
            (or project *project*)))
 
 (def- rep-fmt* (&rest args)
@@ -137,6 +135,11 @@ the CAR.")
 
 ;;;  helpers
 
+(def- out-file (path contents)
+  "Generate file in PATH and populate with CONTENTS."
+  (with-output-file (out path)
+    (princ contents out)))
+
 (defm- with-out-files (dir &body file-specs)
   "Define macro helper to avoid out-file repetition."
   `(uiop:with-current-directory (,dir)
@@ -150,11 +153,6 @@ the CAR.")
 (def- normalize-name (name)
   "Return a new string from NAME suitable as a project name."
   (string-downcase (string name)))
-
-(def- out-file (path contents)
-  "Generate file in PATH and populate with CONTENTS."
-  (with-open-file (out path :direction :output :if-exists :supersede)
-    (format out contents)))
 
 (def- out-files (project project-dir)
   "Write the project files in PROJECT-DIR."
@@ -173,14 +171,17 @@ the CAR.")
       (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
     ;; src files
     (with-out-files project-source-dir
+      (("specials" "lisp") (in-file "specials.lisp"))
       (("core" "lisp") (in-file "core.lisp"))
+      (("main" "lisp") (in-file "main.lisp"))
+      (("key" "lisp") (in-file "key.lisp"))
+      (("etc" "lisp") (in-file "etc.lisp"))
       (("driver" "lisp") (in-file "driver.lisp"))
       (("user" "lisp") (in-file "user.lisp"))
-      (("cli" "lisp") (in-file "cli.lisp"))
       (("build" "lisp") (in-file "build.lisp")))
     ;; test files
     (with-out-files project-tests-dir
-      (("core-tests" "lisp") (in-file "core-tests.lisp"))
+      (("main-tests" "lisp") (in-file "main-tests.lisp"))
       (("driver-tests" "lisp") (in-file "driver-tests.lisp"))
       (("user-tests" "lisp") (in-file "user-tests.lisp")))))
 
