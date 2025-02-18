@@ -1,4 +1,4 @@
-;;;; -*- mode: lisp; syntax: common-lisp; base: 10; coding: utf-8-unix; external-format: (:utf-8 :eol-style :lf); -*-
+;;;; -*- mode: lisp; syntax: common-lisp; base: 10 -*-
 ;;;; marie.asd --- main ASDF file of marie
 
 (defsystem #:marie

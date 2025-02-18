@@ -18,11 +18,10 @@
                  #:${project}/src/specials
                  #:${project}/src/core
                  #:${project}/src/main
-                 #:${project}/src/key
-                 #:${project}/src/etc
                  #:${project}/src/driver
                  #:${project}/src/user)
     :in-order-to ((test-op (test-op "${project}-tests")))
     :build-operation "program-op"
     :build-pathname "${project}"
-    :entry-point "${project}/src/main:main")
+    :entry-point "${project}/src/main:main"
+    :perform (load-op :after (o c) (uiop:symbol-call :${project}/src/main :initialize)))

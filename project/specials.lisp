@@ -18,7 +18,7 @@
   "The version number of the project.")
 
 (defk +project-description+
-  "A program for blah blah blah"
+  "a program for ${project}"
   "The description of the project.")
 
 (defk +exe+

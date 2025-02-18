@@ -37,6 +37,15 @@
 (defv- *project* "project"
   "The default project name.")
 
+(defv- *src-directory*
+  (uiop:subpathname (asdf:system-source-directory (asdf:find-system :marie))
+                    #P"src/")
+  "The location of the src files.")
+
+(def- src-path (path)
+  "Return a path from PATH relevant to the project directory."
+  (uiop:subpathname *src-directory* path))
+
 (def- run-trim (command)
   "Run COMMAND and remove trailing whitespace."
   (string-trim '(#\newline #\tab #\space) (uiop:run-program command :output :string)))
@@ -102,9 +111,9 @@ the CAR.")
   (let ((replacement (rep-apply marker subst)))
     (replace-all string marker replacement)))
 
-(def- rep-all (string subst)
+(def- rep-all (string subst &optional (table *rep-table*))
   "Perform string replacements blah blah blah."
-  (let ((markers (mapcar #'car *rep-table*)))
+  (let ((markers (mapcar #'car table)))
     (loop :for marker :in markers
           :for str := (rep string marker subst) :then (rep str marker subst)
           :finally (return str))))
@@ -174,8 +183,6 @@ the CAR.")
       (("specials" "lisp") (in-file "specials.lisp"))
       (("core" "lisp") (in-file "core.lisp"))
       (("main" "lisp") (in-file "main.lisp"))
-      (("key" "lisp") (in-file "key.lisp"))
-      (("etc" "lisp") (in-file "etc.lisp"))
       (("driver" "lisp") (in-file "driver.lisp"))
       (("user" "lisp") (in-file "user.lisp"))
       (("build" "lisp") (in-file "build.lisp")))

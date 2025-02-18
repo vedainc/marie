@@ -5,9 +5,7 @@
   (:use #:uiop/common-lisp)
   (:use-reexport #:${project}/src/specials
                  #:${project}/src/core
-                 #:${project}/src/main
-                 #:${project}/src/key
-                 #:${project}/src/etc))
+                 #:${project}/src/main))
 
 (provide "${project}")
 (provide "${PROJECT}")

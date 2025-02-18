@@ -24,7 +24,6 @@
 (def or-args (args)
   "Return a string separated by #\|, from the list ARGS."
   (format nil "~{~A~^|~}" args))
-
 (def mini-help (&rest args)
   "Return a list suitable for the example usage of a command."
   (let ((parts (partition args 2)))
