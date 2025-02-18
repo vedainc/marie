@@ -5,7 +5,6 @@
     :name "marie-tests"
     :version (:read-file-form #P"version-tests.lisp")
     :description "test ASDF file of marie"
-    :author "Krei, Inc."
     :class :package-inferred-system
     :depends-on (#:fiveam
                  #:marie

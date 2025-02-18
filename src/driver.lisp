@@ -12,6 +12,7 @@
                  #:marie/src/strings
                  #:marie/src/hash
                  #:marie/src/etc
+                 #:marie/src/system
                  #:marie/src/filesystem
                  #:marie/src/project))
 

@@ -239,7 +239,7 @@ EXAMPLES is a list of description & command-line usage pairs for the command.
   "Define the main entry point function."
   (let* ((%name "main")
          (%command (read-cat %name '/command)))
-    `(def main (&rest args)
+    `(def main^${project} (&rest args)
        "The main entry point of the program."
        (let ((app (,%command)))
          (handler-case (clingon:run app)
