@@ -79,20 +79,3 @@
             :while line
             :do (format t "~A~%" line))
       (close in))))
-
-
-;;; System fns
-
-(def system-object^sys-object (system)
-  "Return the system object for the current system."
-  (asdf:find-system system))
-
-(def system-path^sys-path (system)
-  "Return the ASDF file path for the current system."
-  (let ((object (system-object system)))
-    (uiop:merge-pathnames* (cat system ".asd")
-                           (asdf:system-source-directory object))))
-
-(def system-version^sys-version (system)
-  "Return the version number extracted from the system resources."
-  (asdf:system-version (sys-object system)))

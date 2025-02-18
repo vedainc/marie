@@ -3,7 +3,8 @@
 
 (uiop:define-package #:marie/src/system
   (:use #:cl
-        #:marie))
+        #:marie/src/definitions
+        #:marie/src/etc))
 
 (in-package #:marie/src/system)
 
@@ -39,12 +40,12 @@
          (driver (make-pathname :directory '(:relative "src") :name name)))
     (uiop:merge-pathnames* driver directory)))
 
-(def reload-driver^rl (system)
+(def reload-driver (system)
   "Reload the driver file of SYSTEM."
   (let* ((path (driver-path system)))
     (load path)))
 
-(defm ! (system)
+(defm reload-system (system)
   "Reload SYSTEM using symbol name."
   `(let* ((base (prin1-to-string ',system))
           (string (string-downcase base))

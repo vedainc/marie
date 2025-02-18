@@ -16,8 +16,8 @@
                  #:marie/src/strings
                  #:marie/src/hash
                  #:marie/src/etc
-                 #:marie/src/system
                  #:marie/src/filesystem
+                 #:marie/src/system
                  #:marie/src/project
                  #:marie/src/driver)
     :in-order-to ((test-op (test-op "marie-tests"))))
