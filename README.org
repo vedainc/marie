@@ -55,8 +55,8 @@ Utility functions for symbols and macro manipulation.
 | FUNCTION                       | ARGS             | DESCRIPTION                                                                                     |
 |--------------------------------+------------------+-------------------------------------------------------------------------------------------------|
 | ~SYMBOLS~ (f)                  | ~PACKAGE~ ~TYPE~ | Returns the symbols interned in ~PACKAGE~ by ~TYPE~.                                            |
-| ~EXTERNAL-SYMBOLS~ (f)         | ~PACKAGE~        | Returns the external symbols in ~PACKAGE~.                                                       |
-| ~PRESENT-SYMBOLS~ (f)          | ~PACKAGE~        | Returns the present symbols in ~PACKAGE~.                                                        |
+| ~EXTERNAL-SYMBOLS~ (f)         | ~PACKAGE~        | Returns the external symbols in ~PACKAGE~.                                                      |
+| ~PRESENT-SYMBOLS~ (f)          | ~PACKAGE~        | Returns the present symbols in ~PACKAGE~.                                                       |
 | ~SYMBOLS*^SYMS~ (f)            | ~PACKAGE~ ~TYPE~ | Print the symbols in interned in ~PACKAGE~ by ~TYPE~.                                           |
 | ~PRETTY-PRINT-SYMBOLS^PPS~ (f) | ~PACKAGE~        | Display the external symbols in ~PACKAGE~ in the order that they were declared as dependencies. |
 |                                |                  |                                                                                                 |
@@ -65,6 +65,8 @@ Utility functions for symbols and macro manipulation.
 | FUNCTION                 | ARGS           | DESCRIPTION                                       |
 |--------------------------+----------------+---------------------------------------------------|
 | ~MACRO-EXPAND^MX~ (m)    | ~FORM~         | Pretty prints macro expansions of ~FORM~.         |
+| ~MX1~ (m)                | ~FORM~         | Expand a macro, a shorthand for CL:macroexpand-1. |
+| ~MX~ (m)                 | ~FORM~         | Expand a macro, a shorthand for CL:macroexpand.   |
 | ~WITH-GENSYMS~ (m)       | ~NAMES~ ~BODY~ | Evaluate ~BODY~ where ~NAMES~ are unique symbols. |
 | ~MACRO-APPLY^MAPPLY~ (m) | ~MACRO~ ~ARGS~ | Invoke the macro ~MACRO~ to each item in ~ARGS~.  |
 | ~MBOUNDP~ (f)            | ~SYMBOL~       | Return true if ~SYMBOL~ is bound to a macro.      |
@@ -78,7 +80,9 @@ Utility functions for symbols and macro manipulation.
 | ~RENAME-SPECIAL-VARIABLE~ (m) | ~NAME-1~ ~NAME-2~ | Update the special variable ~NAME-1~ to ~NAME-2~.                                 |
 | ~SWAP-SPECIAL-VARIABLES~ (m)  | ~NAME-1~ ~NAME-2~ | Swap the values of the special variables ~NAME-1~ and ~NAME-2~.                   |
 | ~KEYWORD-USED-P^KUP~ (f)      | ~STRING~          | Return true if keyword is already interned, accepting a ~STRING~ as the argument. |
-|                               |                   |                                                                                   |
+| ~READ-CAT~ (f)                | ~ARGS~            | Read from the concatenation of ARGS.                                              |
+| ~PRIN1-DOWNCASE~ (f)          | ~SYMBOL~          | Return a downcased string from symbol.                                            |
+| ~PRIN1-UPCASE~ (f)            | ~SYMBOL~          | Return a upcased string from symbol.                                              |
 * Conditionals
 Utilities for handling conditional expressions and logical operations.
 ** Mapping
@@ -198,12 +202,12 @@ Utilities for sequence manipulation.
 | ~DELETE-FROM-PLIST~ (f)   | ~PLIST~ ~KEYS~ | Just like REMOVE-FROM-PLIST with same ~KEYS~, but this version may destructively modify the provided ~PLIST~.                                                 |
 |                           |                |                                                                                                                                                               |
 ** Miscellaneous sequence
-| FUNCTION                 | ARGS              | DESCRIPTION                                          |
-|--------------------------+-------------------+------------------------------------------------------|
-| ~PARTITION~ (f)          | ~SOURCE~ ~N~      | Create partition of ~N~ from ~SOURCE~.               |
-| ~PERMUTATIONS^PERMS~ (f) | ~LIST~            | Return the permutations of ~LIST~.                   |
-| ~SCRAMBLE~ (t)           | ~SEQUENCE~ ~LIST~ | Return a randomized array or ~LIST~ from ~SEQUENCE~. |
-|                          |                   |                                                      |
+| FUNCTION                 | ARGS                   | DESCRIPTION                                                                                     |
+|--------------------------+------------------------+-------------------------------------------------------------------------------------------------|
+| ~PARTITION~ (f)          | ~SOURCE~ ~N~           | Create partition of ~N~ from ~SOURCE~.                                                          |
+| ~PERMUTATIONS^PERMS~ (f) | ~LIST~                 | Return the permutations of ~LIST~.                                                              |
+| ~SCRAMBLE~ (t)           | ~SEQUENCE~ ~LIST~      | Return a randomized array or ~LIST~ from ~SEQUENCE~.                                            |
+| ~REPLACE-ALL~ (f)        | ~STRING~ ~REPLACEMENT~ | Return a new string in which all the occurences of PART in STRING is replaced with REPLACEMENT. |
 * Strings
 Utilities for dealing with strings.
 ** Formatting
@@ -340,6 +344,6 @@ Utilities for file operations and system management.
 * Project
 Creates a project skeleton in Common Lisp.
 ** Tree generation
-| FUNCTION              | DESCRIPTION                              |
-|-----------------------+------------------------------------------|
-| ~MAKE-PROJECT^MK~ (f) | Create a complete Lisp project skeleton. |
+| FUNCTION              | DESCRIPTION                                                |
+|-----------------------+------------------------------------------------------------|
+| ~MAKE-PROJECT^MK~ (f) | Create a complete Lisp project skeleton including CLI app. |
