@@ -2,10 +2,12 @@
 * Overview
 Marie is a collection of Lisp utilities without external dependencies.
 * Installation
-Clone this repo to =~/common-lisp/=, or any location that is visible to ASDF, like =~/.local/share/common-lisp/source/=
+Clone this repo to =~/common-lisp/=, or any location that is visible to ASDF,
+like =~/.local/share/common-lisp/source/=
 #+begin_src sh
-$ mkdir -p ~/common-lisp
-$ git clone https://github.com/krei-systems/marie.git
+mkdir -p ~/common-lisp
+cd ~/common-lisp
+git clone https://github.com/krei-systems/marie
 #+end_src
 You can then load it with =ASDF:LOAD-SYSTEM= or =QL:QUICKLOAD=
 #+begin_src lisp
@@ -21,7 +23,7 @@ the functions listed in the table for more details.
 * Definitions
 Exporting replacements for functions, macros, and other things. It has two
 variants: those with =-= are non-exporting, while those without are exporting.
-** Shorthands
+** Main symbols
 | EXPORTING | NON-EXPORTING | STANDARD MACRO/FUNCTION | LEGEND |
 |-----------+---------------+-------------------------+--------|
 | ~DEFM~    | ~DEFM-~       | ~DEFMACRO~              | ~m~    |
@@ -37,12 +39,12 @@ variants: those with =-= are non-exporting, while those without are exporting.
 | ~DEFSM~   | ~DEFSM-~      | ~DEFINE-SYMBOL-MACRO~   | ~sm~   |
 | ~DEFY~    | ~DEFY-~       | ~DEFTYPE~               | ~y~    |
 | ~DEFS~    | ~DEFS-~       | ~DEFSTRUCT~             | ~s~    |
-** Miscellaneous definitions
+** Additional symbols
 | EXPORTING | NON-EXPORTING | CUSTOM DEFINITION | LEGEND |
 |-----------+---------------+-------------------+--------|
 | ~SETV~    | ~SETV-~       | ~SET-VARIABLE~    | ~sv~   |
 * Reader
-Minor tweaks with the Lisp reader's behavior to add some convenient syntactic shortcuts.
+Minor tweaks with the Lisp reader's behavior to add convenient syntactic shortcuts.
 ** Shortcuts
 | FUNCTION                | ARGS             | DESCRIPTION                                                                                                 |
 |-------------------------+------------------+-------------------------------------------------------------------------------------------------------------|
