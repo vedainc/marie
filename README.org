@@ -5,7 +5,7 @@ Marie is small collection of Common Lisp utilities without external dependencies
 Clone this repo to =~/common-lisp/=, or any location that is visible to ASDF, like =~/.local/share/common-lisp/source/=
 #+begin_src sh
 $ mkdir -p ~/common-lisp
-$ git clone https://github.com/kreipro/marie.git ~/common-lisp/marie
+$ git clone https://github.com/krei-systems/marie.git ~/common-lisp/marie
 #+end_src
 You can then load it with ASDF
 #+begin_src lisp
