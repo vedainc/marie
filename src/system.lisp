@@ -21,11 +21,6 @@
     (uiop:merge-pathnames* (cat system ".asd")
                            (asdf:system-source-directory object))))
 
-(def system-directory^sys-directory (system)
-  "Return the top-level directory of a system."
-  (let ((path (sys-path system)))
-    nil))
-
 (def read-system-path^read-sys-path (system)
   "Return the system ASDF file as s-expressions."
   (uiop:read-file-forms (sys-path system)))
