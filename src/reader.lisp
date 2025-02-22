@@ -29,7 +29,7 @@ reading from stream and ignoring char. See
 ;;; Bracket reader
 
 (def- bracket-reader (stream char)
-  "Use `{foo 5}` as shorthand for `(funcall foo 5)`,
+  "Use `[foo 5]` as shorthand for `(funcall foo 5)`,
   reading from stream and ignoring char. "
   (declare (ignore char)
            (optimize (speed 3) (safety 0)))
@@ -82,9 +82,6 @@ reading from stream and ignoring char. See
   "Put the dollar reader into effect."
   (set-macro-character #\$ #'dollar-reader))
 
-(use-lambda-reader)
-(use-phi-reader)
-
 
 ;;; Preserving case
 ;;; This prevents Common Lisp's default behavior of converting symbol names to uppercase.
@@ -102,3 +99,10 @@ reading from stream and ignoring char. See
            (inline read-from-string))
   (with-preserved-case ()
     (read-from-string string)))
+
+
+;;; init
+
+(use-lambda-reader)
+(use-phi-reader)
+(use-bracket-reader)

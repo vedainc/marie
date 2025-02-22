@@ -4,6 +4,7 @@
 (uiop:define-package #:marie/src/system
   (:use #:cl
         #:marie/src/definitions
+        #:marie/src/strings
         #:marie/src/etc))
 
 (in-package #:marie/src/system)
