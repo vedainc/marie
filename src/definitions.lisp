@@ -353,7 +353,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
           val))))
 
 (defm- compose-definitions (type name superclasses slot-specs
-                                 &optional class-option)
+                            &optional class-option)
   "Compose the forms for creating a class."
   `(progn
      (,type ,name (,@superclasses)
@@ -379,7 +379,7 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 ;;; Defclass
 
 (defm- %defc (names (&rest superclasses)
-                    (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define classes with DEFCLASS."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -492,7 +492,7 @@ define the symbol macro APPENDF; and export that name."
 ;;; Define-condition
 
 (defm- %defn (names (&rest superclasses)
-                    (&rest slot-specs) &optional class-option)
+              (&rest slot-specs) &optional class-option)
   "Define conditions with DEFINE-CONDITION."
   (destructuring-bind (name &rest aliases)
       (split-names names)
@@ -676,7 +676,7 @@ names."
   `(%defs ,(if (symbolp name-and-options)
                (tack-t name-and-options)
                name-and-options)
-       ,@slots))
+    ,@slots))
 
 (defm defs- (name-and-options &rest slots)
   "Like DEFS, but do not export names."

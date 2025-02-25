@@ -10,10 +10,10 @@
 
 ;;; Brace reader
 
+;;; http://www.bradediger.com/blog/2008/03/stealing_from_arc.html
 (def- brace-reader (stream char)
   "Use `{+ _ 1}` as shorthand for #'(lambda (_) (+ _ 1)),
-reading from stream and ignoring char. See
- http://www.bradediger.com/blog/2008/03/stealing_from_arc.html"
+reading from stream and ignoring CHAR."
   (declare (ignore char)
            (optimize (speed 3) (safety 0)))
   `(lambda (,(intern "_") &optional ,(intern "__"))
@@ -29,8 +29,8 @@ reading from stream and ignoring char. See
 ;;; Bracket reader
 
 (def- bracket-reader (stream char)
-  "Use `[foo 5]` as shorthand for `(funcall foo 5)`,
-  reading from stream and ignoring char. "
+  "Use `[foo 5]` as shorthand for `(funcall foo 5)`,reading from stream and
+ignoring CHAR. "
   (declare (ignore char)
            (optimize (speed 3) (safety 0)))
   `(funcall ,@(read-delimited-list #\] stream t)))
