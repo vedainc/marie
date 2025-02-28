@@ -9,7 +9,6 @@
 
 (in-package #:marie/src/strings)
 
-
 
 ;;; Formatting
 
@@ -43,8 +42,8 @@
              (cond ((null args) (funcall converter (nreverse acc)))
                    ((consp (car args))
                     (fn (cdr args)
-                        (cons (fn (car args) nil)
-                              acc)))
+                      (cons (fn (car args) nil)
+                            acc)))
                    (t (fn (cdr args) (cons (car args) acc))))))
     (fn list)))
 

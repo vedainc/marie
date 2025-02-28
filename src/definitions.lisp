@@ -681,3 +681,14 @@ names."
 (defm defs- (name-and-options &rest slots)
   "Like DEFS, but do not export names."
   `(%defs ,name-and-options ,@slots))
+
+
+;;; alias
+
+(defm defalias (fn alias)
+  "Define ALIAS as another name for function FN."
+  `(setf (fdefinition ',alias) (function ,fn)))
+
+(defm defmalias (mac alias)
+  "Define ALIAS as another name for macro MAC."
+  `(setf (macro-function ',alias) (macro-function ',mac)))
