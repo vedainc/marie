@@ -687,8 +687,8 @@ names."
 
 (defm defalias (fn alias)
   "Define ALIAS as another name for function FN."
-  `(setf (fdefinition ',alias) (function ,fn)))
-
-(defm defmalias (mac alias)
-  "Define ALIAS as another name for macro MAC."
-  `(setf (macro-function ',alias) (macro-function ',mac)))
+  `(progn
+     (cond ((function ,fn)
+            (setf (fdefinition ',alias) (function ,fn)))
+           ((macro-function ,fn)
+            (setf (macro-function ',alias) (macro-function ',fn))))))
