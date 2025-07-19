@@ -52,7 +52,7 @@ like =~/.local/share/common-lisp/source/=
 #+begin_src sh
 mkdir -p ~/common-lisp
 cd ~/common-lisp
-git clone https://github.com/krei-systems/marie
+git clone https://github.com/vedainc/marie
 #+end_src
 You can then load it with =ASDF:LOAD-SYSTEM= or =QL:QUICKLOAD=
 #+begin_src lisp
