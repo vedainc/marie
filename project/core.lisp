@@ -241,6 +241,7 @@ EXAMPLES is a list of description & command-line usage pairs for the command.
          (%command (read-cat %name '/command)))
     `(def main^${project} (&rest args)
        "The main entry point of the program."
+       (declare (ignorable args))
        (let ((app (,%command)))
          (handler-case (clingon:run app)
            (#+sbcl sb-sys:interactive-interrupt
