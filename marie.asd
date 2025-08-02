@@ -3,8 +3,8 @@
 
 (defsystem #:marie
     :name "marie"
-    :version (:read-file-form #P"version.lisp")
-    :description "A small collection of CL utilities without external dependencies"
+    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "src") :name "version" :type "lisp"))
+    :description "A tiny collection of CL utilities without external dependencies"
     :author "Rommel Martinez <ebzzry@icloud.com>"
     :class :package-inferred-system
     :depends-on (#+sbcl #:sb-cltl2

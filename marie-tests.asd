@@ -3,8 +3,8 @@
 
 (defsystem #:marie-tests
     :name "marie-tests"
-    :version (:read-file-form #P"version-tests.lisp")
-    :description "test ASDF file of marie"
+    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "t") :name "version" :type "lisp"))
+    :description "ASDF test file of marie"
     :class :package-inferred-system
     :depends-on (#:fiveam
                  #:marie

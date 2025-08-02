@@ -5,7 +5,7 @@
     :long-name "${project}"
     :description ""
     :long-description ""
-    :version (:read-file-form #P"version-tests.lisp")
+    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "t") :name "version" :type "lisp"))
     :author "${author} <${email}>"
     :maintainer "${author} <${email}>"
     :license ""

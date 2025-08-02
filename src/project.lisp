@@ -174,12 +174,11 @@ the CAR.")
       ((".gitignore") (in-file* ".gitignore"))
       (("flake" "nix") (in-file* "flake.nix"))
       (("shells" "nix") (in-file* "shells.nix"))
-      (("version" "lisp") (in-file* "version.lisp"))
-      (("version-tests" "lisp") (in-file* "version-tests.lisp"))
       ((project "asd") (in-file "project.asd"))
       (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
     ;; src files
     (with-out-files project-source-dir
+      (("version" "lisp") (in-file* "version.lisp"))
       (("specials" "lisp") (in-file "specials.lisp"))
       (("core" "lisp") (in-file "core.lisp"))
       (("main" "lisp") (in-file "main.lisp"))
@@ -188,6 +187,7 @@ the CAR.")
       (("build" "lisp") (in-file "build.lisp")))
     ;; test files
     (with-out-files project-tests-dir
+      (("version" "lisp") (in-file* "version-tests.lisp"))
       (("main-tests" "lisp") (in-file "main-tests.lisp"))
       (("driver-tests" "lisp") (in-file "driver-tests.lisp"))
       (("user-tests" "lisp") (in-file "user-tests.lisp")))))

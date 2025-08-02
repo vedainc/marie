@@ -230,7 +230,7 @@ EXAMPLES is a list of description & command-line usage pairs for the command.
          (clingon:make-command
           :name ,+project-name+
           :version ,+project-version+
-          :description ,+project-description+
+          :description #.(uiop:read-file-form (make-pathname :directory '(:relative "src") :name "version" :type "lisp"))
           :options (,%options)
           :handler #'print-usage
           :sub-commands (,%sub-commands))))))
@@ -245,11 +245,11 @@ EXAMPLES is a list of description & command-line usage pairs for the command.
        (let ((app (,%command)))
          (handler-case (clingon:run app)
            (#+sbcl sb-sys:interactive-interrupt
+            #+lispworks mp:process-interrupt
+            #+ecl ext:interactive-interrupt
             #+ccl ccl:interrupt-signal-condition
             #+clisp system::simple-interrupt-condition
-            #+ecl ext:interactive-interrupt
             #+allegro excl:interrupt-signal
-            #+lispworks mp:process-interrupt
             () nil)
            (error (c)
              (format t "Oof, an unknown error occured:~&~A~&" c)))))))
