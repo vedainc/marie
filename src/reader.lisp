@@ -45,7 +45,7 @@ ignoring CHAR. "
 
 (def- lambda-reader (stream char)
   "Define the reader for λ.
-  (λ ...) as a shorthand for (lambda ...),
+  (λ …) as a shorthand for (lambda …),
   reading from stream and ignoring stream char. "
   (declare (ignore stream char)
            (optimize (speed 3) (safety 0)))
@@ -59,7 +59,7 @@ ignoring CHAR. "
 ;;; Phi reader
 
 (def- phi-reader (stream char)
-  "(φ ...) as a shordhand for (progn ...),
+  "(φ …) as a shordhand for (progn …),
  reading from stream and ignoring stream char. "
   (declare (ignore stream char)
            (optimize (speed 3) (safety 0)))

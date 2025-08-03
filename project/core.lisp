@@ -184,7 +184,7 @@ EXAMPLES is a list of description & command-line usage pairs for the command.
             :name ,%command
             :aliases ',%aliases
             :description ,description
-            :usage ,(if (null usage) "[<argument>...|<option>...]" usage)
+            :usage ,(if (null usage) "[<argument>…|<option>…]" usage)
             :options ,(cond ((eql t options)
                              `(,%options))
                             (t options))

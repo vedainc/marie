@@ -40,7 +40,7 @@
 
 (define-command nil find (f)
   "find files"
-  "<arg>..."
+  "<arg>…"
   nil
   (lambda (cmd)
     (let ((args (clingon:command-arguments cmd)))

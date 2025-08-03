@@ -35,13 +35,18 @@
 
 ;;; Logical operator variants
 
+(defm when* (condition)
+  "Return T when CONDITION evaluates as true."
+  `(when ,condition
+     t))
+
 (defm logical-and^land^∧ (&body body)
   "Return true if all forms in BODY evaluates to true."
-  `(ω (and ,@body)))
+  `(when* (and ,@body)))
 
 (defm logical-or^lor^∨ (&body body)
   "Return true if at least one form in BODY evaluates to true."
-  `(ω (or ,@body)))
+  `(when* (or ,@body)))
 
 (defm negation^neg^¬ (arg)
   "Return the negation of ARG."
@@ -53,23 +58,23 @@
 
 (defm logical-and-not^∧¬ (arg1 arg2)
   "Return true if ARG1 is true and ARG2 is not true."
-  `(ω (and ,arg1 (not ,arg2))))
+  `(when* (and ,arg1 (not ,arg2))))
 
 (defm logical-not-and^¬∧ (arg1 arg2)
   "Return true if ARG1 is not true and ARG2 is true."
-  `(ω (and (not ,arg1) ,arg2)))
+  `(when* (and (not ,arg1) ,arg2)))
 
 (defm logical-or-not^∨¬ (arg1 arg2)
   "Return true if ARG1 is true or ARG2 is not true."
-  `(ω (or ,arg1 (not ,arg2))))
+  `(when* (or ,arg1 (not ,arg2))))
 
 (defm logical-not-or^¬∨ (arg1 arg2)
   "Return true if ARG1 is not true or ARG2 is true."
-  `(ω (or (not ,arg1) ,arg2)))
+  `(when* (or (not ,arg1) ,arg2)))
 
 (defm logical-not-not^¬¬ (arg1 arg2)
   "Return true if ARG1 is not true and ARG2 is not true."
-  `(ω (and (not ,arg1) (not ,arg2))))
+  `(when* (and (not ,arg1) (not ,arg2))))
 
 
 ;;; When macro bindings
@@ -102,11 +107,6 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
 
 ;;; Boolean logic helpers
 
-(defm true-when^ω (condition)
-  "Return T when CONDITION evaluates as true."
-  `(when ,condition
-     t))
-
 (def true-false-p (x y)
   "Return true if X is true and Y is false."
   (declare (type boolean x y))
@@ -132,7 +132,7 @@ a true value. This is ALEXANDRIA:WHEN-LET*."
   "Anaphoric WHEN takes test-form and a body (then-form),
   using aif to evaluate and bind it.  "
   `(aif ,test-form
-        (progn ,@then-form)))
+    (progn ,@then-form)))
 
 (defm aand (&rest args)
   "Anaphoric AND takes multiple arguments, evaluating them with
