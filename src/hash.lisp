@@ -20,12 +20,12 @@
        (:print-object print-ordered-hash-table)
        (:copier nil))
     (hashtable nil :type (or null hash-table) :read-only t)
-    (keys (list) :type list))
+  (keys (list) :type list))
 
 (def make-ordered-hash-table (&key (test 'eql)
-                                   (size 7)
-                                   (rehash-size 1.5)
-                                   (rehash-threshold 1.0))
+                                (size 7)
+                                (rehash-size 1.5)
+                                (rehash-threshold 1.0))
   (make-ordered-hash-table%
    :hashtable (make-hash-table :test test
                                :size size
@@ -132,11 +132,11 @@
 
 (def hash-table-keys (hash-table)
   "Return the keys of HASH-TABLE."
-  (maphash #'(λ (k v) (declare (ignore v)) k) hash-table))
+  (maphash #'(lambda (k v) (declare (ignore v)) k) hash-table))
 
 (def hash-table-values (hash-table)
   "Return the values of HASH-TABLE."
-  (maphash #'(λ (k v) (declare (ignore k)) v) hash-table))
+  (maphash #'(lambda (k v) (declare (ignore k)) v) hash-table))
 
 (def list-table^listhash (hash-table &key sort key)
   "Returns an association list of key-value pairs from HASH-TABLE. If SORT is supplied, it will

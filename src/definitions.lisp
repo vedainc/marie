@@ -696,7 +696,7 @@ names."
 
 ;;; lambda λ
 
-;; (defm λ (&whole form &rest bvl-decls-and-body)
-;;   (declare (ignore bvl-decls-and-body)
-;;            (optimize (speed 3) (safety 0)))
-;;   `#',form)
+(defm λ (&whole form &rest bvl-decls-and-body)
+  (declare (ignore bvl-decls-and-body)
+           (optimize (speed 3) (safety 0)))
+  `#',form)

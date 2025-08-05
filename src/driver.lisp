@@ -14,7 +14,8 @@
                  #:marie/src/etc
                  #:marie/src/filesystem
                  #:marie/src/system
-                 #:marie/src/project))
+                 #:marie/src/project
+                 #:marie/src/init))
 
 (provide "marie")
 (provide "MARIE")

@@ -21,5 +21,6 @@
                  #:marie/src/filesystem
                  #:marie/src/system
                  #:marie/src/project
+                 #:marie/src/init
                  #:marie/src/driver)
     :in-order-to ((test-op (test-op "marie-tests"))))

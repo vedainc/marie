@@ -166,8 +166,6 @@ Ignoring the stream and char."
   (declare (ignore stream char))
   'MARIE/SRC/CONDITIONALS::IT)
 
-(def- use-alpha-reader ()
+(def use-alpha-reader ()
   "Put the alpha reader into effect."
   (set-macro-character #\α #'alpha-reader))
-
-(use-alpha-reader)

@@ -99,10 +99,3 @@ ignoring CHAR. "
            (inline read-from-string))
   (with-preserved-case ()
     (read-from-string string)))
-
-
-;;; init
-
-(use-lambda-reader)
-(use-phi-reader)
-(use-bracket-reader)
