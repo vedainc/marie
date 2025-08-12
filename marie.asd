@@ -10,6 +10,7 @@
     :licence "BSD-3-Clause"
     :class :package-inferred-system
     :depends-on (#+sbcl #:sb-cltl2
+                 #+lispworks #:marie/src/lispworks
                  #:marie/src/definitions
                  #:marie/src/reader
                  #:marie/src/symbols

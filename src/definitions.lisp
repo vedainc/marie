@@ -108,18 +108,21 @@ define the functions FOO, BAR, and BAZ; and export those names."
   `(%def ,names ,args ,@body))
 
 ;; Defun optimization hints
-(defm def! (names args &rest body)
-  "Like DEF, but optimize for speed."
-  `(def ,names ,args (optimize speed (safety 1)) ,@body))
-(defm def@ (names args &rest body)
-  "Like DEF, but optimize for safety."
-  `(def ,names ,args (optimize (speed 0) safety debug) ,@body))
 (defm def!- (names args &rest body)
   "Like DEF-, but optimize for speed."
-  `(def- ,names ,args (optimize speed (safety 1)) ,@body))
+  `(def- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
+(defm def! (names args &rest body)
+  "Like DEF, but optimize for speed."
+  `(def ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
 (defm def@- (names args &rest body)
   "Like DEF-, but optimize for safety."
-  `(def- ,names ,args (optimize (speed 0) safety debug) ,@body))
+  `(def- ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
+
+(defm def@ (names args &rest body)
+  "Like DEF, but optimize for safety."
+  `(def ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
 
 
 ;;; Defvar
@@ -254,18 +257,21 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
   `(%defg ,names ,parameters ,@body))
 
 ;; Defgeneric optimization hints
-(defm defg! (names args &rest body)
-  "Like DEFG, but optimize for speed."
-  `(defg ,names ,args (optimize speed (safety 1)) ,@body))
-(defm defg@ (names args &rest body)
-  "Like DEFG, but optimize for safety."
-  `(defg ,names ,args (optimize (speed 0) safety debug) ,@body))
 (defm defg!- (names args &rest body)
   "Like DEFG-, but optimize for speed."
-  `(defg- ,names ,args (optimize speed (safety 1)) ,@body))
+  `(defg- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
+(defm defg! (names args &rest body)
+  "Like DEFG, but optimize for speed."
+  `(defg ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
 (defm defg@- (names args &rest body)
   "Like DEFG-, but optimize for safety."
-  `(defg- ,names ,args (optimize (speed 0) safety debug) ,@body))
+  `(defg- ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
+
+(defm defg@ (names args &rest body)
+  "Like DEFG, but optimize for safety."
+  `(defg ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
 
 
 ;;; Defmethod
@@ -314,18 +320,21 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
   `(%deft ,names ,@body))
 
 ;; Defmethod optimization hints
-(defm deft! (names args &rest body)
-  "Like DEFT, but optimize for speed."
-  `(deft ,names ,args (optimize speed (safety 1)) ,@body))
-(defm deft@ (names args &rest body)
-  "Like DEFT, but optimize for safety."
-  `(deft ,names ,args (optimize (speed 0) safety debug) ,@body))
 (defm deft!- (names args &rest body)
   "Like DEFT-, but optimize for speed."
-  `(deft- ,names ,args (optimize speed (safety 1)) ,@body))
+  `(deft- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
+(defm deft! (names args &rest body)
+  "Like DEFT, but optimize for speed."
+  `(deft ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+
 (defm deft@- (names args &rest body)
   "Like DEFT-, but optimize for safety."
-  `(deft- ,names ,args (optimize (speed 0) safety debug) ,@body))
+  `(deft- ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
+
+(defm deft@ (names args &rest body)
+  "Like DEFT, but optimize for safety."
+  `(deft ,names ,args (declare (optimize (speed 0) (safety 3))) ,@body))
 
 
 ;;; Define class with instant instantiation (Custom)
