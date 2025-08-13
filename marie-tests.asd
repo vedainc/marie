@@ -3,8 +3,10 @@
 
 (defsystem #:marie-tests
     :name "marie-tests"
-    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "t") :name "version" :type "lisp"))
     :description "ASDF test file of marie"
+    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "t") :name "version" :type "lisp"))
+    :author "Rommel Martinez <ebzzry@icloud.com>"
+    :licence "BSD-3-Clause"
     :class :package-inferred-system
     :depends-on (#:fiveam
                  #:marie

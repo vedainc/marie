@@ -110,11 +110,11 @@ define the functions FOO, BAR, and BAZ; and export those names."
 ;; Defun optimization hints
 (defm def!- (names args &rest body)
   "Like DEF-, but optimize for speed."
-  `(def- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(def- ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm def! (names args &rest body)
   "Like DEF, but optimize for speed."
-  `(def ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(def ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm def@- (names args &rest body)
   "Like DEF-, but optimize for safety."
@@ -259,11 +259,11 @@ define the generic functions DELETE, CREATE, and UPDATE; and export those names.
 ;; Defgeneric optimization hints
 (defm defg!- (names args &rest body)
   "Like DEFG-, but optimize for speed."
-  `(defg- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(defg- ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm defg! (names args &rest body)
   "Like DEFG, but optimize for speed."
-  `(defg ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(defg ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm defg@- (names args &rest body)
   "Like DEFG-, but optimize for safety."
@@ -322,11 +322,11 @@ define the methods CURRENT, PREV, and NEXT; and export those names."
 ;; Defmethod optimization hints
 (defm deft!- (names args &rest body)
   "Like DEFT-, but optimize for speed."
-  `(deft- ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(deft- ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm deft! (names args &rest body)
   "Like DEFT, but optimize for speed."
-  `(deft ,names ,args (declare (optimize (speed 3) (safety 1))) ,@body))
+  `(deft ,names ,args (declare (optimize (speed 3) (safety 0))) ,@body))
 
 (defm deft@- (names args &rest body)
   "Like DEFT-, but optimize for safety."

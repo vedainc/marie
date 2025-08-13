@@ -482,3 +482,8 @@ provided PLIST."
           :when pos
             :do (write-string replacement out)
           :while pos)))
+
+(def prepend (item list)
+  "Add ITEM in front of LIST."
+  (check-type list list)
+  (cons item list))

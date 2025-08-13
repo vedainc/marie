@@ -3,9 +3,8 @@
 
 (defsystem #:marie
     :name "marie"
-    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "src") :name "version" :type "lisp"))
     :description "A tiny collection of CL utilities without external dependencies"
-    :long-description #.(uiop:read-file-string (subpathname *load-pathname* "README.org"))
+    :version #.(uiop:read-file-form (make-pathname :directory '(:relative "src") :name "version" :type "lisp"))
     :author "Rommel Martinez <ebzzry@icloud.com>"
     :licence "BSD-3-Clause"
     :class :package-inferred-system
