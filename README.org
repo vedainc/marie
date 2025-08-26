@@ -91,14 +91,14 @@ variants: those with =-= are non-exporting, while those without are exporting.
 * Reader
 Minor tweaks with the Lisp reader's behavior to add convenient syntactic shortcuts.
 ** Shortcuts
-| FUNCTION                | ARGS             | DESCRIPTION                                                                                                 |
-|-------------------------+------------------+-------------------------------------------------------------------------------------------------------------|
-| ~BRACE-READER~ (f)      | ~STREAM~ ~CHAR~  | Use ~{+ _ 1}~ as shorthand for ~#'(lambda (_) (+ _ 1))~, reading from ~STREAM~ and ignoring ~CHAR~.         |
-| ~BRACKET-READER~ (f)    | ~STREAM~ ~CHAR~  | Use ~[foo 5]~ as shorthand for ~(funcall foo 5)~, reading from stream and ignoring ~CHAR~.                  |
-| ~LAMBDA-READER~ (f)     | ~STREAM~ ~CHAR~  | Use ~(λ ...)~ as a shorthand for ~(lambda ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.  |
-| ~PHI-READER~ (f)        | ~STREAM~ ~CHAR~  | Use ~(φ ...)~ as a shordhand for ~(progn ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.   |
-| ~ALPHA-READER~ (f)      | ~STREAM~ ~CHAR~  | Define the reader for α, so that it can be used to refer to the anaphora. Ignoring the ~STREAM~ and ~CHAR~. |
-| ~READ-FROM-STRING*~ (f) | ~STRING~         | Evaluate ~STRING~ with preserved case.                                                                      |
+| FUNCTION                | ARGS            | DESCRIPTION                                                                                                   |
+|-------------------------+-----------------+---------------------------------------------------------------------------------------------------------------|
+| ~BRACE-READER~ (f)      | ~STREAM~ ~CHAR~ | Use ~{+ _ 1}~ as shorthand for ~#'(lambda (_) (+ _ 1))~, reading from ~STREAM~ and ignoring ~CHAR~.           |
+| ~BRACKET-READER~ (f)    | ~STREAM~ ~CHAR~ | Use ~[foo 5]~ as shorthand for ~(funcall foo 5)~, reading from stream and ignoring ~CHAR~.                    |
+| ~LAMBDA-READER~ (f)     | ~STREAM~ ~CHAR~ | Use ~(λ ...)~ as a shorthand for ~(lambda ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.    |
+| ~PHI-READER~ (f)        | ~STREAM~ ~CHAR~ | Use ~(φ ...)~ as a shordhand for ~(progn ...)~, reading from stream and ignoring the ~STREAM~ and ~CHAR~.     |
+| ~ALPHA-READER~ (f)      | ~STREAM~ ~CHAR~ | Define the reader for ~α~, so that it can be used to refer to the anaphora. Ignoring the ~STREAM~ and ~CHAR~. |
+| ~READ-FROM-STRING*~ (f) | ~STRING~        | Evaluate ~STRING~ with preserved case.                                                                        |
 * Symbols
 Utility functions for symbols and macro manipulation.
 ** Show symbol functions
