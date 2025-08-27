@@ -10,10 +10,17 @@
 
 ;;; Documentation
 
+(defm describe1 (symbol)
+  "Call DESCRIBE at level 1."
+  `(let ((lispworks:*describe-level* 1))
+     (describe ,symbol)))
+
 (defm describe2 (symbol)
+  "Call DESCRIBE at level 2."
   `(let ((lispworks:*describe-level* 2))
      (describe ,symbol)))
 
 (defm describe3 (symbol)
+  "Call DESCRIBE at level 3."
   `(let ((lispworks:*describe-level* 3))
      (describe ,symbol)))

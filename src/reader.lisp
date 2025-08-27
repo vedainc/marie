@@ -8,7 +8,7 @@
 (in-package #:marie/src/reader)
 
 
-;;; brace reader
+;;; Brace reader
 
 ;;; http://www.bradediger.com/blog/2008/03/stealing_from_arc.html
 (def- brace-reader (stream char)
@@ -26,7 +26,7 @@ reading from stream and ignoring CHAR."
   (set-macro-character #\} (get-macro-character #\) nil)))
 
 
-;;; bracket reader
+;;; Bracket reader
 
 (def- bracket-reader (stream char)
   "Use `[foo 5]` as shorthand for `(funcall foo 5)`, reading from stream and
@@ -41,7 +41,7 @@ ignoring CHAR. "
   (set-macro-character #\] (get-macro-character #\) nil)))
 
 
-;;; lambda reader
+;;; Lambda reader
 
 (def- lambda-reader (stream char)
   "Define the reader for λ.
@@ -55,7 +55,7 @@ reading from stream and ignoring stream char. "
   (set-macro-character #\λ #'lambda-reader))
 
 
-;;; phi reader
+;;; Phi reader
 
 (def- phi-reader (stream char)
   "(φ …) as a shordhand for (progn …),
@@ -69,7 +69,7 @@ reading from stream and ignoring stream char. "
   (set-macro-character #\φ #'phi-reader))
 
 
-;;; dollar reader
+;;; Dollar reader
 
 (def- dollar-reader (stream char)
   "Define the reader for dollar."
