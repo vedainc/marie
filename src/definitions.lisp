@@ -701,11 +701,3 @@ names."
             (setf (fdefinition ',alias) (function ,fn)))
            ((macro-function ,fn)
             (setf (macro-function ',alias) (macro-function ',fn))))))
-
-
-;;; lambda λ
-
-(defm λ (&whole form &rest bvl-decls-and-body)
-  (declare (ignore bvl-decls-and-body)
-           (optimize (speed 3) (safety 0)))
-  `#',form)

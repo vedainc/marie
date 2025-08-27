@@ -9,7 +9,9 @@
 
 (in-package #:marie/src/init)
 
+;;; Oh, I’m going to get a lot of flak with these.
 (use-bracket-reader)
-;; (use-lambda-reader)
+(use-lambda-reader)
+
 ;; (use-alpha-reader)
 ;; (use-phi-reader)
