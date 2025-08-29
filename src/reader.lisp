@@ -50,7 +50,7 @@ reading from stream and ignoring stream char. "
   (declare (ignore stream char))
   'LAMBDA)
 
-(def- use-lambda-reader ()
+(def use-lambda-reader ()
   "Put the lambda reader into effect."
   (set-macro-character #\λ #'lambda-reader))
 
