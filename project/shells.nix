@@ -1,10 +1,10 @@
 { nixpkgs, pkgs, ... }:
 with pkgs;
 rec {
-  hello = mkShell {
+  h = mkShell {
     buildInputs = [
       hello
     ];
   };
-  default = hello;
+  default = h;
 }
