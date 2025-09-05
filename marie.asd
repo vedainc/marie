@@ -11,6 +11,7 @@
     :depends-on (#+sbcl #:sb-cltl2
                  #+lispworks #:marie/src/lispworks
                  #:marie/src/definitions
+                 #:marie/src/declarations
                  #:marie/src/reader
                  #:marie/src/symbols
                  #:marie/src/conditionals

@@ -111,13 +111,13 @@
   "Execute BODY then return timing information."
   `(time (progn ,@body (values))))
 
-#-lispworks
+;; #-lispworks
 (def true (&rest args)
   "Return true for anything."
   (declare (ignore args))
   t)
 
-#-lispworks
+;; #-lispworks
 (def false (&rest args)
   "Return false for anything."
   (declare (ignore args))

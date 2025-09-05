@@ -6,6 +6,7 @@
   (:use :uiop/common-lisp)
   (:use-reexport #+lispworks #:marie/src/lispworks
                  #:marie/src/definitions
+                 #:marie/src/declarations
                  #:marie/src/reader
                  #:marie/src/sequences
                  #:marie/src/symbols
