@@ -10,4 +10,4 @@
 ;;; main
 
 (defun main ()
-  (format t "Hello, world!~%"))
+  (format t "These aren't the droids you're looking for."))
