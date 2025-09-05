@@ -71,9 +71,11 @@
   "Return a new path ensuring that PATH2 is a directory."
   (uiop:merge-pathnames* path1 (uiop:ensure-directory-pathname path2)))
 
-(def- create-directory-structure (target)
+(def- create-directory-structure (target &key complete)
   "Create the directory structure of the new project under TARGET."
-  (let ((directories (list +source-directory+ +tests-directory+)))
+  (let ((directories (if complete
+                         (list +source-directory+ +tests-directory+)
+                         (list +source-directory+))))
     (loop :for dir :in directories
           :for path := (build-path (uiop:ensure-directory-pathname dir) target)
           :do (uiop:ensure-all-directories-exist (list path)))))
@@ -163,34 +165,47 @@ the CAR.")
   "Return a new string from NAME suitable as a project name."
   (string-downcase (string name)))
 
-(def- out-files (project project-dir)
+(def- out-files (project project-dir &key complete)
   "Write the project files in PROJECT-DIR."
   (let ((project-source-dir (build-path +source-directory+ project-dir))
-        (project-tests-dir (build-path +tests-directory+ project-dir)))
-    ;; root files
-    (with-out-files project-dir
-      (("README" "org") (in-file* "README.org"))
-      (("makefile") (in-file* "makefile"))
-      ((".gitignore") (in-file* ".gitignore"))
-      (("flake" "nix") (in-file* "flake.nix"))
-      (("shells" "nix") (in-file* "shells.nix"))
-      ((project "asd") (in-file "project.asd"))
-      (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
-    ;; src files
-    (with-out-files project-source-dir
-      (("version" "lisp") (in-file* "version.lisp"))
-      (("specials" "lisp") (in-file "specials.lisp"))
-      (("core" "lisp") (in-file "core.lisp"))
-      (("main" "lisp") (in-file "main.lisp"))
-      (("driver" "lisp") (in-file "driver.lisp"))
-      (("user" "lisp") (in-file "user.lisp"))
-      (("build" "lisp") (in-file "build.lisp")))
-    ;; test files
-    (with-out-files project-tests-dir
-      (("version" "lisp") (in-file* "version-tests.lisp"))
-      (("main-tests" "lisp") (in-file "main-tests.lisp"))
-      (("driver-tests" "lisp") (in-file "driver-tests.lisp"))
-      (("user-tests" "lisp") (in-file "user-tests.lisp")))))
+        (project-tests-dir (when complete
+                             (build-path +tests-directory+ project-dir))))
+    (if complete
+        (progn
+          ;; root files
+          (with-out-files project-dir
+            (("README" "org") (in-file* "README.org"))
+            (("makefile") (in-file* "makefile"))
+            ((".gitignore") (in-file* ".gitignore"))
+            (("flake" "nix") (in-file* "flake.nix"))
+            (("shells" "nix") (in-file* "shells.nix"))
+            ((project "asd") (in-file "project.asd"))
+            (((cat project #\- "tests") "asd") (in-file "project-tests.asd")))
+          ;; src files
+          (with-out-files project-source-dir
+            (("version" "lisp") (in-file* "version.lisp"))
+            (("specials" "lisp") (in-file "specials.lisp"))
+            (("core" "lisp") (in-file "core.lisp"))
+            (("main" "lisp") (in-file "main.lisp"))
+            (("driver" "lisp") (in-file "driver.lisp"))
+            (("user" "lisp") (in-file "user.lisp"))
+            (("build" "lisp") (in-file "build.lisp")))
+          ;; test files
+          (with-out-files project-tests-dir
+            (("version" "lisp") (in-file* "version-tests.lisp"))
+            (("main-tests" "lisp") (in-file "main-tests.lisp"))
+            (("driver-tests" "lisp") (in-file "driver-tests.lisp"))
+            (("user-tests" "lisp") (in-file "user-tests.lisp"))))
+        (progn
+          ;; root files
+          (with-out-files project-dir
+            (("README" "org") (in-file* "README.org"))
+            ((".gitignore") (in-file* ".gitignore"))
+            ((project "asd") (in-file "project2.asd")))
+          ;; src files
+          (with-out-files project-source-dir
+            (("main" "lisp") (in-file "main2.lisp"))
+            (("driver" "lisp") (in-file "driver2.lisp")))))))
 
 (def- enroll-system (project-dir)
   "Make the system indicated by PROJECT-DIR immediately accessible by ASDF."
@@ -200,14 +215,15 @@ the CAR.")
 
 ;;; entry points
 
-(def- %make-project (project &key (target (home "common-lisp")))
-  "Create a project skeleton named PROJECT in TARGET."
+(def- %make-project (project &key (target (home "common-lisp")) (complete t))
+  "Create a project skeleton named PROJECT in TARGET. If COMPLETE is NIL,
+create a basic project, only."
   (let ((project (normalize-name project)))
     (unless (empty-string-p project)
       (let ((project-dir (build-path project target))
             (*project* project))
-        (create-directory-structure project-dir)
-        (out-files project project-dir)
+        (create-directory-structure project-dir :complete complete)
+        (out-files project project-dir :complete complete)
         (enroll-system project-dir)))))
 
 (def- &make-project (&rest args)
@@ -216,7 +232,7 @@ the CAR.")
     (return-nil ()
       nil)))
 
-(def make-project^mk (&rest args)
+(def make-project (&rest args)
   "See %MAKE-PROJECT."
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
@@ -225,3 +241,13 @@ the CAR.")
                       (declare (ignore c))
                       (invoke-restart 'return-nil))))
     (apply #'&make-project args)))
+
+(def make-system (&rest args)
+  "See %MAKE-PROJECT."
+  (handler-bind ((#+sbcl sb-int:simple-file-error
+                  #+lispworks conditions:file-operation-error
+                  #-(or sbcl lispworks) error
+                  #'(lambda (c)
+                      (declare (ignore c))
+                      (invoke-restart 'return-nil))))
+    (apply #'&make-project (append args '(:complete nil)))))

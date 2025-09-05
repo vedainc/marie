@@ -9,14 +9,14 @@
 
 (in-package #:marie/src/declarations)
 
-(defm ftype (name args type)
+(defm ft (name args type)
   "Return a DECLAIM for FTYPE."
   `(declaim (ftype (function ,args) ,type) ,name))
 
-(defm vtype (name type)
+(defm vt (name type)
   "Return a DECLAIM for TYPE."
   `(declaim (type ,type ,name)))
 
-(defm optimize (&rest rest)
+(defm op (&rest rest)
   "Return a DECLARE for OPTIMIZE."
   `(declare (optimize ,@rest)))
