@@ -233,7 +233,8 @@ create a basic project, only."
       nil)))
 
 (def make-project (&rest args)
-  "See %MAKE-PROJECT."
+  "Make a complete project skeleton named PROJECT in TARGET. All arguments are
+passed to %MAKE-PROJECT."
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error
@@ -243,7 +244,8 @@ create a basic project, only."
     (apply #'&make-project args)))
 
 (def make-system (&rest args)
-  "See %MAKE-PROJECT."
+  "Make a basic project skeleton named PROJECT in TARGET. All arguments are
+passed to %MAKE-PROJECT."
   (handler-bind ((#+sbcl sb-int:simple-file-error
                   #+lispworks conditions:file-operation-error
                   #-(or sbcl lispworks) error

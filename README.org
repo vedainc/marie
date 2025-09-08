@@ -388,8 +388,9 @@ Utilities for file operations and system management.
 | ~SYSTEM-PATH^SYS-PATH~ (f)       | ~SYSTEM~ | Return the ASDF file path for the current ~SYSTEM~.              |
 | ~SYSTEM-VERSION^SYS-VERSION~ (f) | ~SYSTEM~ | Return the version number extracted from the ~SYSTEM~ resources. |
 * Project
-Creates a project skeleton in Common Lisp.
+Creates a project skeleton in Lisp.
 ** Tree generation
-| FUNCTION              | DESCRIPTION                              |
-|-----------------------+------------------------------------------|
-| ~MAKE-PROJECT^MK~ (f) | Create a complete Lisp project skeleton. |
+| FUNCTION           | DESCRIPTION                       |
+|--------------------+-----------------------------------|
+| ~MAKE-PROJECT~ (f) | Make a complete project skeleton. |
+| ~MAKE-SYSTEM~ (f)  | Make a basic project skeleton.    |
